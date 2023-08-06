@@ -86,13 +86,15 @@ public class IntList {
         {
             return B;
         }
-        else if (A.rest == null)
+        else
         {
-            A.rest = B;
+            IntList C = new IntList(A.first, A.rest);
+            while (C.rest != null)
+            {
+                C = C.rest;
+            }
+            C.rest = B;
             return A;
-        }
-        {
-            return new IntList(A.first, dcatenate(A.rest, B));
         }
     }
 

@@ -1,23 +1,26 @@
 public class ArrayDeque<T> {
     private T[] items;
     private int size;
+    /*
+    circular AD: <first> and <last> hold the start and end of AD;
+     */
     private int first;
-    private int Last;
-
+    private int last;
+    /* the initiating length */
     private int startLength = 8;
 
     public ArrayDeque() {
         items = (T []) new Object[startLength];
         size = 0;
         first = 0;
-        Last = items.length - 1;
+        last = items.length - 1;
     }
 //    public ArrayDeque(T val){
 //        items = (T []) new Object[startLength];
 //        items[0] = val;
 //        size = 1;
 //        first = 0;
-//        Last = 0;
+//        last = 0;
 //    }
 
     public boolean isEmpty() {
@@ -30,8 +33,8 @@ public class ArrayDeque<T> {
         for (int i = first; i < first + size & i < items.length; i++) {
             System.out.print(items[i] + " ");
         }
-        if (first > Last) {
-            for (int i = 0; i < Last + 1; i++) {
+        if (first > last) {
+            for (int i = 0; i < last + 1; i++) {
                 System.out.print(items[i] + " ");
             }
         }
@@ -39,8 +42,7 @@ public class ArrayDeque<T> {
     public T get(int index) {
         if (index >= size) {
             return null;
-        }
-        else {
+        } else {
             return items[indices(first, index)];
         }
     }
@@ -52,8 +54,8 @@ public class ArrayDeque<T> {
     }
     public void addLast(T val) {
         checkLength();
-        Last = indices(Last, 1);
-        items[Last] = val;
+        last = indices(last, 1);
+        items[last] = val;
         size++;
     }
     public T removeFirst() {
@@ -71,9 +73,9 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        T res = items[Last];
-        items[Last] = null;
-        Last = indices(Last, -1);
+        T res = items[last];
+        items[last] = null;
+        last = indices(last, -1);
         size--;
         checkLength();
         return res;
@@ -92,11 +94,11 @@ public class ArrayDeque<T> {
          */
         T[] newItems = (T []) new Object[length];
         System.arraycopy(items, first, newItems, 0, Math.min(items.length - first, size));
-        if (first > Last) {
-            System.arraycopy(items, 0, newItems, items.length - first, Last + 1);
+        if (first > last) {
+            System.arraycopy(items, 0, newItems, items.length - first, last + 1);
         }
         first = 0;
-        Last = size - 1;
+        last = size - 1;
         items = newItems;
     }
     private void checkLength() {
@@ -106,8 +108,7 @@ public class ArrayDeque<T> {
          */
         if (size == items.length) {
             resize(items.length * 2);
-        }
-        else if (items.length >= 16 & (double) size / items.length < 0.25) {
+        } else if (items.length >= 16 & (double) size / items.length < 0.25) {
             resize(items.length / 2);
         }
     }

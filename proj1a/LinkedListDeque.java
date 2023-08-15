@@ -3,9 +3,9 @@ public class LinkedListDeque<T> {
     private int size;
 
     private class Node<T> {
-        public T first;
-        public Node<T> next;
-        public Node<T> prev;
+        private T first;
+        private Node<T> next;
+        private Node<T> prev;
         public Node(Node<T> p, T f, Node<T> n) {
             this.prev = p;
             this.first = f;
@@ -101,12 +101,12 @@ public class LinkedListDeque<T> {
             return getR(node.next, index - 1);
         }
     }
-    public static void main(String[] args){
-        LinkedListDeque arr = new LinkedListDeque();
-        arr.addLast(2);
+//    public static void main(String[] args){
+//        LinkedListDeque arr = new LinkedListDeque();
+//        arr.addLast(2);
 //        arr.addFirst(1);
 //        arr.addFirst(0);
-        arr.removeLast();
-        System.out.println(arr.isEmpty());
-    }
+//        arr.removeLast();
+//        System.out.println(arr.isEmpty());
+//    }
 }

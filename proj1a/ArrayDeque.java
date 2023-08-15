@@ -85,7 +85,9 @@ public class ArrayDeque<T> {
     */
     private int indices(int start, int step) {
         int i = start + step;
-        while (i < 0) i += items.length;
+        while (i < 0) {
+            i += items.length;
+        }
         return i % items.length;
     }
     private void resize(int length) {

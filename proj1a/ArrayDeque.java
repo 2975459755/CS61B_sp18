@@ -1,11 +1,11 @@
-public class ArrayDeque<type>
+public class ArrayDeque<T>
 {
-    type[] items;
-    int size;
-    int First;
-    int Last;
+    private T[] items;
+    private int size;
+    private int First;
+    private int Last;
 
-    final int start_length = 8;
+    private int start_length = 8;
 
     private int indices(int start, int step)
     {
@@ -15,14 +15,14 @@ public class ArrayDeque<type>
     }
     public ArrayDeque()
     {
-        items = (type []) new Object[start_length];
+        items = (T []) new Object[start_length];
         size = 0;
         First = 0;
         Last = items.length - 1;
     }
-    public ArrayDeque(type val)
+    public ArrayDeque(T val)
     {
-        items = (type []) new Object[start_length];
+        items = (T []) new Object[start_length];
         items[0] = val;
         size = 1;
         First = 0;
@@ -51,7 +51,7 @@ public class ArrayDeque<type>
             }
         }
     }
-    public type get(int index)
+    public T get(int index)
     {
         if (index >= size)
         {
@@ -63,57 +63,48 @@ public class ArrayDeque<type>
             return items[indices(First, index)];
         }
     }
-    public void addFirst(type val)
+    public void addFirst(T val)
     {
         checkLength();
         First = indices(First, -1);
         items[First] = val;
         size ++;
     }
-    public void addLast(type val)
+    public void addLast(T val)
     {
         checkLength();
         Last = indices(Last, 1);
         items[Last] = val;
         size ++;
     }
-    public type removeFirst()
+    public T removeFirst()
     {
-        type res = items[First];
+        T res = items[First];
         items[First] = null;
         First = indices(First, 1);
         size --;
         checkLength();
         return res;
     }
-    public type removeLast()
+    public T removeLast()
     {
-        type res = items[Last];
+        T res = items[Last];
         items[Last] = null;
         Last = indices(Last, -1);
         size --;
         checkLength();
         return res;
     }
-    public static void main(String[] args)
-    {
-        ArrayDeque arr = new ArrayDeque();
-        for (int i = 0; i < 20; i ++)
-        {
-            arr.addFirst(Integer.toString(i));
-        }
-        arr.printDeque();
-    }
     /*
     helper functions;
     */
-    private void copyArray(int length)
+    private void resize(int length)
     {
         /*
         create and sign items to a new array sized <length>;
          */
-        type[] new_items = (type []) new Object[length];
-        System.arraycopy(items, First, new_items, 0, items.length - First);
+        T[] new_items = (T []) new Object[length];
+        System.arraycopy(items, First, new_items, 0, Math.min(items.length - First, size));
         if (First > Last)
         {
             System.arraycopy(items, 0, new_items, items.length - First, Last + 1);
@@ -130,11 +121,24 @@ public class ArrayDeque<type>
          */
         if (size == items.length)
         {
-            copyArray(items.length * 2);
+            resize(items.length * 2);
         }
-        else if (items.length >= 16 & items.length / size > 4)
+        else if (items.length >= 16 & (double) size / items.length < 0.25)
         {
-            copyArray(items.length / 2);
+            resize(items.length / 2);
         }
     }
+//    public static void main(String[] args)
+//    {
+//        ArrayDeque arr = new ArrayDeque();
+//        for (int i = 0; i < 20; i ++)
+//        {
+//            arr.addFirst(Integer.toString(i));
+//        }
+//        for (int i = 0; i < 19; i ++)
+//        {
+//            arr.removeLast();
+//        }
+//        arr.printDeque();
+//    }
 }

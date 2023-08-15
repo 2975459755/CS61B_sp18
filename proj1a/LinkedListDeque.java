@@ -35,7 +35,7 @@ public class LinkedListDeque<T> {
         else {
             sentinel.next = new Node<>(sentinel, val, sentinel.next);
         }
-        size ++;
+        size++;
     }
     public void addLast(T val) {
         if (sentinel.next == null) {
@@ -45,7 +45,7 @@ public class LinkedListDeque<T> {
             sentinel.prev = new Node<>(sentinel.prev, val, sentinel);
             sentinel.prev.prev.next = sentinel.prev;
         }
-        size ++;
+        size++;
     }
     public void printDeque() {
         Node<T> curr = sentinel.next;
@@ -59,11 +59,11 @@ public class LinkedListDeque<T> {
         do {
             curr = curr.next;
             if (curr == sentinel) {
-                System.out.println("error");
+//                System.out.println("error");
                 return null;
             }
             curr = curr.next;
-            index --;
+            index--;
         } while (index >= 0);
         return curr.first;
     }
@@ -72,7 +72,7 @@ public class LinkedListDeque<T> {
     }
     private T getR(Node<T> node, int index) {
         if (node == sentinel) {
-            System.out.println("error");
+//            System.out.println("error");
             return null;
         }
         else if (index == 0) {
@@ -84,24 +84,24 @@ public class LinkedListDeque<T> {
     }
     public T removeFirst() {
         if (size == 0) {
-            System.out.println("error");
+//            System.out.println("error");
             return null;
         }
         T ret = sentinel.next.first;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
-        size --;
+        size--;
         return ret;
     }
     public T removeLast() {
         if (size == 0) {
-            System.out.println("error");
+//            System.out.println("error");
             return null;
         }
         T ret = sentinel.prev.first;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
-        size --;
+        size--;
         return ret;
     }
 }

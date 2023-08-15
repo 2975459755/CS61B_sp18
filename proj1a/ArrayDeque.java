@@ -13,6 +13,9 @@ public class ArrayDeque<T> {
         items = (T []) new Object[startLength];
         size = 0;
         first = 0;
+        /*
+        worth noted: last should not be set to equal first;
+         */
         last = items.length - 1;
     }
 //    public ArrayDeque(T val){
@@ -84,6 +87,9 @@ public class ArrayDeque<T> {
     helper functions;
     */
     private int indices(int start, int step) {
+        /*
+        get index: from <start> by <step>;
+        */
         int i = start + step;
         while (i < 0) {
             i += items.length;
@@ -92,9 +98,9 @@ public class ArrayDeque<T> {
     }
     private void resize(int length) {
         /*
-        create and sign items to a new array sized <length>;
+        create and reassign <items> to a new array sized <length>;
          */
-        T[] newItems = (T []) new Object[length];
+        T [] newItems = (T []) new Object[length];
         System.arraycopy(items, first, newItems, 0, Math.min(items.length - first, size));
         if (first > last) {
             System.arraycopy(items, 0, newItems, items.length - first, last + 1);

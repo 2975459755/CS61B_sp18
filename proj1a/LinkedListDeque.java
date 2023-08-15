@@ -4,16 +4,23 @@ public class LinkedListDeque<T> {
 
     private class Node<T> {
         private T first;
+        /*
+        double-ended;
+         */
         private Node<T> next;
         private Node<T> prev;
         public Node(Node<T> p, T f, Node<T> n) {
-            this.prev = p;
-            this.first = f;
-            this.next = n;
+            prev = p;
+            first = f;
+            next = n;
         }
     }
     public LinkedListDeque() {
         sentinel = new Node<T>(null, null, null);
+        /*
+        circular LLD: when size == 0,
+        sentinel points to itself in either direction;
+         */
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
         size = 0;
@@ -49,7 +56,6 @@ public class LinkedListDeque<T> {
     }
     public T removeFirst() {
         if (size == 0) {
-//            System.out.println("error");
             return null;
         }
         T ret = sentinel.next.first;
@@ -60,7 +66,6 @@ public class LinkedListDeque<T> {
     }
     public T removeLast() {
         if (size == 0) {
-//            System.out.println("error");
             return null;
         }
         T ret = sentinel.prev.first;
@@ -81,7 +86,6 @@ public class LinkedListDeque<T> {
          do{
             curr = curr.next;
             if (curr == sentinel) {
-//                System.out.println("error");
                 return null;
             }
             index--;
@@ -92,8 +96,10 @@ public class LinkedListDeque<T> {
         return getR(sentinel.next, index);
     }
     private T getR(Node<T> node, int index) {
+        /*
+        helper function for getRecursive;
+         */
         if (node == sentinel) {
-//            System.out.println("error");
             return null;
         } else if (index == 0) {
             return node.first;

@@ -33,13 +33,16 @@ public class ArrayDeque<T> {
         return size;
     }
     public void printDeque() {
-        for (int i = first; i < first + size & i < items.length; i++) {
-            System.out.print(items[i] + " ");
-        }
-        if (first > last) {
-            for (int i = 0; i < last + 1; i++) {
-                System.out.print(items[i] + " ");
-            }
+//        for (int i = first; i < first + size & i < items.length; i++) {
+//            System.out.print(items[i] + " ");
+//        }
+//        if (first > last) {
+//            for (int i = 0; i < last + 1; i++) {
+//                System.out.print(items[i] + " ");
+//            }
+//        }
+        for (int i = 0; i < size; i++){
+            System.out.print(items[indices(first, i)] + " ");
         }
     }
     public T get(int index) {
@@ -101,9 +104,12 @@ public class ArrayDeque<T> {
         create and reassign <items> to a new array sized <length>;
          */
         T [] newItems = (T []) new Object[length];
-        System.arraycopy(items, first, newItems, 0, Math.min(items.length - first, size));
-        if (first > last) {
-            System.arraycopy(items, 0, newItems, items.length - first, last + 1);
+//        System.arraycopy(items, first, newItems, 0, Math.min(items.length - first, size));
+//        if (first > last) {
+//            System.arraycopy(items, 0, newItems, items.length - first, last + 1);
+//        }
+        for (int i = 0; i < size; i++){
+            newItems[i] = items[indices(first, i)];
         }
         first = 0;
         last = size - 1;

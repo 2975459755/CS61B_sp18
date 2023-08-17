@@ -10,6 +10,34 @@ public class IntListTest {
      * assertEquals knows how to handle IntLists just fine.
      */
 
+    @Test(timeout = 400)
+    public void testReverse() {
+        /* test null case */
+        assertEquals(null, IntList.reverse(null));
+
+        /**
+         * bellow are tests for perfectly destructive implementations,
+         * which mutates the input IntList successfully;
+         */
+//        IntList one = IntList.of(0, 1, 2);
+//        IntList.reverse(one);
+//        /* test destructiveness */
+//        assertNotEquals(IntList.of(0, 1, 2), one);
+//        /* test basic functionality */
+//        assertEquals(IntList.of(2, 1, 0), one);
+//        assertEquals(IntList.of(0, 1, 2), IntList.reverse(one));
+        /**
+         * tests for my implementation:
+         */
+        IntList one = IntList.of(0, 1, 2);
+        IntList two = IntList.reverse(one);
+        /* showing why this is not true-destructive: */
+        assertNotEquals(one, two);
+        assertEquals(IntList.of(0), one);   /* <one> points to the original object! */
+        /* test basic functionality */
+        assertEquals(IntList.of(2, 1, 0), two);
+        assertEquals(IntList.of(0, 1, 2), IntList.reverse(two));
+    }
     @Test
     public void testList() {
         IntList one = new IntList(1, null);

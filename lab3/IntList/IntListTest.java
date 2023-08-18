@@ -17,7 +17,7 @@ public class IntListTest {
 
         /**
          * bellow are tests for perfectly destructive implementations,
-         * which mutates the input IntList successfully;
+         * which mutate the input IntList successfully;
          */
 //        IntList one = IntList.of(0, 1, 2);
 //        IntList.reverse(one);

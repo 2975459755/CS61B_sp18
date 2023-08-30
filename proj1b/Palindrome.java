@@ -14,8 +14,7 @@ public class Palindrome {
         Implementation not using <Deque>.
          */
 //        int length = word.length();
-//        int l = Math.floorDiv(length, 2);
-//        for (int i = 0; i < l; i++) {
+//        for (int i = 0; i < length / 2; i++) {
 //            if (word.charAt(i) != word.charAt(length - 1 - i)) {
 //                return false;
 //            }

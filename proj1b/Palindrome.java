@@ -8,7 +8,8 @@ public class Palindrome {
     }
     public boolean isPalindrome(String word) {
         Deque w = wordToDeque(word);
-        return helpPal(w);
+        equals eq = new equals();
+        return helpPal(w, eq);
         /*
         Implementation not using <Deque>.
          */
@@ -21,13 +22,27 @@ public class Palindrome {
 //        }
 //        return true;
     }
-    private boolean helpPal(Deque w) {
+    public boolean isPalindrome(String word, CharacterComparator cc) {
+        Deque w = wordToDeque(word);
+        OffByOne obo = new OffByOne();
+        return helpPal(w, obo);
+    }
+    /*
+    Helper functions:
+     */
+    private boolean helpPal(Deque w, CharacterComparator cc) {
         if (w.size() <= 1) {
             return true;
-        } else if (w.removeFirst() == w.removeLast()){
-            return helpPal(w);
+        } else if (cc.equalChars((char)w.removeFirst(), (char)w.removeLast())){
+            return helpPal(w, cc);
         } else {
             return false;
+        }
+    }
+    private class equals implements CharacterComparator {
+        @Override
+        public boolean equalChars(char x, char y) {
+            return x == y;
         }
     }
 }

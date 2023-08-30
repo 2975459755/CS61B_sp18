@@ -34,4 +34,10 @@ public class TestPalindrome {
         assertFalse(palindrome.isPalindrome("aba", obo));
         assertTrue(palindrome.isPalindrome("&&%", obo));
     }
+//    @Test
+//    public void testOffByN() {
+//        OffByN obn = new OffByN(5);
+//        assertTrue(obn.equalChars('b', 'g'));
+//        assertTrue(palindrome.isPalindrome("binding", obn));
+//    }
 }

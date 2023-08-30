@@ -24,8 +24,7 @@ public class Palindrome {
     }
     public boolean isPalindrome(String word, CharacterComparator cc) {
         Deque w = wordToDeque(word);
-        OffByOne obo = new OffByOne();
-        return helpPal(w, obo);
+        return helpPal(w, cc);
     }
     /*
     Helper functions:
@@ -39,6 +38,10 @@ public class Palindrome {
             return false;
         }
     }
+    /*
+    This will have to fail the API check, but I'll ignore that,
+    because this makes my code more consistent.
+     */
     private class equals implements CharacterComparator {
         @Override
         public boolean equalChars(char x, char y) {

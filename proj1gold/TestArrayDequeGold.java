@@ -1,6 +1,6 @@
 import static org.junit.Assert.*;
 import org.junit.Test;
-public class TestArrayDequGold {
+public class TestArrayDequeGold {
     @Test
     public void randomTest() {
         StudentArrayDeque <Integer> std = new StudentArrayDeque <> ();

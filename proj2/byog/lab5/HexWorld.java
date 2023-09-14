@@ -16,11 +16,11 @@ public class HexWorld {
     private static final int height = 40;
     private static final Random RANDOM = new Random();
 
-    private static final int s = 6; // The length of the side of hexagons
+    private static final int s = 5; // The length of the side of hexagons
     private static final int length = s + (s - 1) * 2; // The length of the rows
-    private static final int n = 15; // number of hexagons
+    private static final int n = (int) (width / s * 1.6) + 1; // number of hexagons
 
-    public static void addHexagon(int s, int w, int h, TETile[][] world, int c) {
+    private static void addHexagon(int s, int w, int h, TETile[][] world, int c) {
         // view a hexagon as a rectangle with spaces
         // c determines the type of tiles to draw
         for (int y = h; y < h + 2 * s; y++) { // y: rows of a hexagon
@@ -46,6 +46,11 @@ public class HexWorld {
             case 1: return Tileset.FLOWER;
             case 2: return Tileset.GRASS;
             case 3: return Tileset.WATER;
+            case 4: return Tileset.SAND;
+            case 5: return Tileset.MOUNTAIN;
+            case 6: return Tileset.PLAYER;
+            case 7: return Tileset.TREE;
+            case 99: return Tileset.LOCKED_DOOR;
             default: return Tileset.FLOOR;
         }
     }
@@ -66,9 +71,9 @@ public class HexWorld {
         return false;
     }
     /*
-    set the world
+    set the blank world
      */
-    public static void buildWorld(TETile[][] world) {
+    private static void buildWorld(TETile[][] world) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 world[x][y] = Tileset.NOTHING;
@@ -78,16 +83,16 @@ public class HexWorld {
     /*
     draw n hexagons that are side by side
      */
-    public static void hexagons(TETile[][] world) {
+    private static void hexagons(TETile[][] world) {
         /* start point: */
-        int w = 0;
-        int h = 0;
+        int w = Math.floorDiv(width, 2);
+        int h = Math.floorDiv(height, 2);
 
         int count = 0; // number of hexagons
         boolean [][] used = new boolean[width][height]; // store the start points that have been used
 
         while (count < n) {
-            addHexagon(s, w, h, world, RANDOM.nextInt(5)); // use random tile
+            addHexagon(s, w, h, world, RANDOM.nextInt(9)); // use random tile, exclusive bound
             used[w][h] = true;
             while (used[w][h]) {
                 int[] next = next(w, h);
@@ -97,21 +102,20 @@ public class HexWorld {
         }
     }
     /*
-    the next starting point to draw
+    Randomly choose the next starting point to draw
     return a int[] with 2 elements: width and height
      */
     private static int[] next(int w, int h) {
         int[] res = new int[2];
         int c = RANDOM.nextInt(4);
         switch (c) {
-            // go up right
-            case 0: res[0] = w + s; res[1] = h + s;
+            case 0: res[0] = w + 2 * s - 1; res[1] = h + s; // go down right
                 break;
-            case 1: res[0] = w - s; res[1] = h + s;
+            case 1: res[0] = w + 2 * s - 1; res[1] = h - s; // go up right
                 break;
-            case 2: res[0] = w - s; res[1] = h - s;
+            case 2: res[0] = w - 2 * s + 1; res[1] = h + s; // go down left
                 break;
-            default: res[0] = w + s; res[1] = h - s;
+            default: res[0] = w - 2 * s + 1; res[1] = h - s; // go up left
                 break;
         }
         if (outBounds(res[0], res[1])) {

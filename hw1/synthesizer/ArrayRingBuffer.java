@@ -78,6 +78,34 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
         // TODO: Return the first item. None of your instance variables should change.
         return rb[first];
     }
-
     // TODO: When you get to part 5, implement the needed code to support iteration.
+    @Override
+    public Iterator<T> iterator() {
+        return new arbIterator(this);
+    }
+    private class arbIterator<T> implements Iterator<T> {
+        private final T[] stream;
+        private int first;
+        private int n;
+        public arbIterator (ArrayRingBuffer arb) {
+            stream = (T[]) new Object[capacity()];
+            System.arraycopy(arb.rb, 0, stream, 0, arb.capacity());
+            n = arb.fillCount();
+            first = arb.first;
+        }
+        @Override
+        public boolean hasNext() {
+            return n != 0;
+        }
+        @Override
+        public T next() {
+            if (! hasNext()) {
+                throw new RuntimeException();
+            }
+            T ret = stream[first];
+            first = (first + 1) % stream.length;
+            n --;
+            return ret;
+        }
+    }
 }

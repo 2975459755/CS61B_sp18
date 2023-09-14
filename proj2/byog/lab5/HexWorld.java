@@ -20,6 +20,11 @@ public class HexWorld {
     private static final int length = s + (s - 1) * 2; // The length of the rows
     private static final int n = (int) (width / s * 1.6) + 1; // number of hexagons
 
+    /**
+     * I assumed in this lab the 0 point is at top-left;
+     * truned out to be bottom-left
+     * but it does not make sustantial differences.
+     */
     private static void addHexagon(int s, int w, int h, TETile[][] world, int c) {
         // view a hexagon as a rectangle with spaces
         // c determines the type of tiles to draw
@@ -95,7 +100,7 @@ public class HexWorld {
             addHexagon(s, w, h, world, RANDOM.nextInt(9)); // use random tile, exclusive bound
             used[w][h] = true;
             while (used[w][h]) {
-                int[] next = next(w, h);
+                int[] next = next(w, h, RANDOM.nextInt(6)); // go in random direction
                 w = next[0]; h = next[1];
             }
             count ++;
@@ -105,17 +110,16 @@ public class HexWorld {
     Randomly choose the next starting point to draw
     return a int[] with 2 elements: width and height
      */
-    private static int[] next(int w, int h) {
+    private static int[] next(int w, int h, int c) {
         int[] res = new int[2];
-        int c = RANDOM.nextInt(6);
         switch (c) {
-            case 0: res[0] = w + 2 * s - 1; res[1] = h + s; // go down right
+            case 0: res[0] = w - 2 * s + 1; res[1] = h - s; // go up left
                 break;
             case 1: res[0] = w + 2 * s - 1; res[1] = h - s; // go up right
                 break;
             case 2: res[0] = w - 2 * s + 1; res[1] = h + s; // go down left
                 break;
-            case 3: res[0] = w - 2 * s + 1; res[1] = h - s; // go up left
+            case 3: res[0] = w + 2 * s - 1; res[1] = h + s; // go down right
                 break;
             case 4: res[0] = w; res[1] = h + 2 * s; // go straight down
                 break;
@@ -123,7 +127,7 @@ public class HexWorld {
                 break;
         }
         if (outBounds(res[0], res[1])) {
-            return next(w, h);
+            return next(w, h, RANDOM.nextInt(6));
         }
         return res;
     }

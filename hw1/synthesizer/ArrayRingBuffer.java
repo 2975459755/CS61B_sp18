@@ -1,5 +1,6 @@
 // TODO: Make sure to make this class a part of the synthesizer package
 package synthesizer;
+import java.util.Arrays;
 import java.util.Iterator;
 
 //TODO: Make sure to make this class and all of its methods public
@@ -39,13 +40,13 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
             throw new RuntimeException("Ring Buffer Overflow");
         }
         fillCount ++;
-        last = indices(last, 1);
         rb[last] = x;
+        last = indices(last, 1);
     }
     /*
-helper function
-to get the index from `i` after `step`;
- */
+    helper function
+    to get the index from `i` after `step`;
+    */
     private int indices(int i, int step) {
         while (step < 0) {
             step += capacity;
@@ -66,7 +67,7 @@ to get the index from `i` after `step`;
         fillCount --;
         T ret = rb[first];
         rb[first] = null;
-        first = indices(first, -1);
+        first = indices(first, 1);
         return ret;
     }
 
@@ -79,5 +80,4 @@ to get the index from `i` after `step`;
     }
 
     // TODO: When you get to part 5, implement the needed code to support iteration.
-
 }

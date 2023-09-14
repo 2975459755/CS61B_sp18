@@ -16,7 +16,7 @@ public class HexWorld {
     private static final int height = 40;
     private static final Random RANDOM = new Random();
 
-    private static final int s = 5; // The length of the side of hexagons
+    private static final int s = 4; // The length of the side of hexagons
     private static final int length = s + (s - 1) * 2; // The length of the rows
     private static final int n = (int) (width / s * 1.6) + 1; // number of hexagons
 
@@ -107,7 +107,7 @@ public class HexWorld {
      */
     private static int[] next(int w, int h) {
         int[] res = new int[2];
-        int c = RANDOM.nextInt(4);
+        int c = RANDOM.nextInt(6);
         switch (c) {
             case 0: res[0] = w + 2 * s - 1; res[1] = h + s; // go down right
                 break;
@@ -115,7 +115,11 @@ public class HexWorld {
                 break;
             case 2: res[0] = w - 2 * s + 1; res[1] = h + s; // go down left
                 break;
-            default: res[0] = w - 2 * s + 1; res[1] = h - s; // go up left
+            case 3: res[0] = w - 2 * s + 1; res[1] = h - s; // go up left
+                break;
+            case 4: res[0] = w; res[1] = h + 2 * s; // go straight down
+                break;
+            default: res[0] = w; res[1] = h - 2 * s; // go straight up
                 break;
         }
         if (outBounds(res[0], res[1])) {

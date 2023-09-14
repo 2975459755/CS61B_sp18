@@ -8,7 +8,7 @@ public interface BoundedQueue <T> {
     T peek(); // return (but do not delete) item from the front
     default boolean isEmpty() {
         // is the buffer empty?
-        return fillCount() != 0;
+        return fillCount() == 0;
     }
     default boolean isFull() {
         // is the buffer full?

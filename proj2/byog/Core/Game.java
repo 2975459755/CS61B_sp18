@@ -51,6 +51,8 @@ public class Game {
 
         fillWithFLOOR(world, x, y, rand, 0);
         addWALL(world);
+        addDOOR(world, rand);
+        replaceAll(world, Tileset.NOTHING, Tileset.MOUNTAIN);
     }
     public static void fillWithFLOOR(TETile[][] world, int x, int y, Random rand, int n) {
         // n: store the number of filled tiles
@@ -74,6 +76,10 @@ public class Game {
             fillWithFLOOR(world, x, y, rand, n); // this is what `n` is for
         }
     }
+
+    /**
+     * Clear the four edges;
+     */
     public static void clearEdges(TETile[][] world) {
         for (int x = 0; x < WIDTH; x ++) {
             world[x][0] = Tileset.NOTHING;
@@ -96,8 +102,31 @@ public class Game {
             }
         }
     }
+    public static void addDOOR(TETile[][] world, Random rand) {
+        int x, y;
+        do {
+            x = rand.nextInt(WIDTH);
+            y = rand.nextInt(HEIGHT);
+        } while (! (world[x][y] == Tileset.WALL && hasNext(world, x, y, 4, Tileset.FLOOR)));
+        world[x][y] = Tileset.LOCKED_DOOR;
+    }
+
     /**
-     * Search for the not-NOTHING tile next to (x, y);
+     * Replace every `original` in `world` with `tile`;
+     * @param original: tile to be replaced;
+     * @param tile: new tile to fill it;
+     */
+    public static void replaceAll(TETile[][] world, TETile original, TETile tile) {
+        for (int x = 0; x < WIDTH; x ++) {
+            for (int y = 0; y < HEIGHT; y ++) {
+                if (world[x][y] == original) {
+                        world[x][y] = tile;
+                }
+            }
+        }
+    }
+    /**
+     * Search for the NOTHING tile next to (x, y);
      * Always assuming there is one! Use it after `hasNext`;
      * border == 4: 4 directions; border == 8: 8 directions;
      * @param rand: Instance of Random;
@@ -135,7 +164,7 @@ public class Game {
     }
 
     /**
-     * Determine whether there is a not-NOTHING tile next to (x, y);
+     * Determine whether there is a NOTHING tile next to (x, y);
      * border == 4: 4 directions; border == 8: 8 directions;
      * @param border: insert 4 or 8;
      */
@@ -165,7 +194,35 @@ public class Game {
     }
 
     /**
-     *
+     * Upgraded `hasNext`, specifying TETile;
+     */
+    public static boolean hasNext(TETile[][] world, int x, int y, int border, TETile tile) {
+        boolean f = border == 4;
+
+        int[] c0 = next(x, y, 0 % border);
+        int[] c1 = next(x, y, 1 % border);
+        int[] c2 = next(x, y, 2 % border);
+        int[] c3 = next(x, y, 3 % border);
+        /*
+        When border == 4: the next four are identical with the ones above;
+         */
+        int[] c4 = next(x, y, 4 % border);
+        int[] c5 = next(x, y, 5 % border);
+        int[] c6 = next(x, y, 6 % border);
+        int[] c7 = next(x, y, 7 % border);
+
+        return fillable(world, c0[0], c0[1], f, tile)
+                || fillable(world, c1[0], c1[1], f, tile)
+                || fillable(world, c2[0], c2[1], f, tile)
+                || fillable(world, c3[0], c3[1], f, tile)
+                || fillable(world, c4[0], c4[1], f, tile)
+                || fillable(world, c5[0], c5[1], f, tile)
+                || fillable(world, c6[0], c6[1], f, tile)
+                || fillable(world, c7[0], c7[1], f, tile);
+    }
+
+    /**
+     * Determine whether a tile is available for filling;
      * @param f: set to `true` to narrow out the four edges (for filling FLOOR purposes);
      */
     public static boolean fillable(TETile[][] world, int x, int y, boolean f) {
@@ -173,7 +230,15 @@ public class Game {
     }
 
     /**
-     * Determine whether a point is in the world;
+     * Upgraded `fillable`, specifies TETile;
+     */
+    public static boolean fillable(TETile[][] world, int x, int y, boolean f, TETile tile) {
+        return inBound(x, y, f) && world[x][y] == tile;
+    }
+
+    /**
+     * Determine whether a point is in the boundaries;
+     * Usually use `fillable` instead;
      * @param f: set to `true` to narrow out the four edges (for filling FLOOR purposes);
      */
     public static boolean inBound(int x, int y, boolean f) {
@@ -201,7 +266,7 @@ public class Game {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
-        long seed = 66666;
+        long seed = 88888;
         TETile[][] w = buildWorld();
         randomWorld(w, seed);
 

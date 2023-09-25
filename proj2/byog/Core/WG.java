@@ -6,17 +6,18 @@ import byog.TileEngine.Tileset;
 import java.util.Random;
 
 public class WG {
-    private static final int WIDTH = Game.WIDTH;
-    private static final int HEIGHT = Game.HEIGHT;
+    private static int WIDTH = Game.WIDTH;
+    private static int startWIDTH = 0;
+    private static int HEIGHT = Game.HEIGHT;
+    private static int startHEIGHT = 0;
     private TETile[][] world;
     private Random rand;
 
     public WG(long seed) {
         world = new TETile[WIDTH][HEIGHT];
-        buildWorld();
+        newWorld();
         rand = new Random(seed);
         randomWorld();
-
     }
     public TETile[][] getWorld() {
         return world;
@@ -24,7 +25,7 @@ public class WG {
     /**
      * Return a world filled with NOTHING;
      */
-    private void buildWorld() {
+    private void newWorld() {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 world[x][y] = Tileset.NOTHING;
@@ -38,31 +39,59 @@ public class WG {
         int x = Math.floorDiv(WIDTH, 2);
         int y = Math.floorDiv(HEIGHT, 2);
 
-        fillWithFLOOR(x, y, 0);
+        fillWithFLOOR(x, y);
         addWALL();
         addDOOR();
         replaceAll(Tileset.NOTHING, Tileset.NOTHING);
     }
+    /**
+     * First step: generating random FLOOR tiles.
+     */
+    private void fillWithFLOOR(int x, int y) {
+        fillWithFLOOR(x, y, 0);
+    }
     private void fillWithFLOOR(int x, int y, int n) {
-        // n: store the number of filled tiles
+        /*
+        rule out the four edges;
+        because the FLOOR must not be in the edges
+        for aesthetic reasons;
+         */
+        startWIDTH ++;
+        WIDTH --;
+        startHEIGHT ++;
+        HEIGHT --;
+        /*
+        fill with FLOORs;
+         */
+        fillWithFLOORHelper(x, y, n);
+        /*
+        restore the size of the world;
+         */
+        startWIDTH --;
+        WIDTH ++;
+        startHEIGHT --;
+        HEIGHT ++;
+    }
+    private void fillWithFLOORHelper(int x, int y, int n) {
+        // n: store the number of filled tiles;
         int[] coor;
         do {
-            coor = searchNext(world, x, y, rand, 4); // find the next tile to fill
+            coor = searchNext(world, x, y, rand, 4); // find the next tile to fill;
             x = coor[0];
             y = coor[1];
             world[x][y] = Tileset.FLOOR; // fill with FLOOR
             n ++;
         } while (hasNext(world, x, y, 4));
-     /*
-    Inadequate FLOORs: try filling again;
-     */
+         /*
+        Inadequate FLOORs: try filling again;
+         */
         if (n < WIDTH * HEIGHT / 2.5) {
             while (! (hasNext(world, x, y, 4) && world[x][y] == Tileset.FLOOR)) {
-                // reset starting point
+                // reset starting point;
                 x = rand.nextInt(WIDTH);
                 y = rand.nextInt(HEIGHT);
             }
-            fillWithFLOOR(x, y, n); // this is what `n` is for
+            fillWithFLOORHelper(x, y, n); // this is what `n` is for;
         }
     }
 
@@ -100,6 +129,7 @@ public class WG {
      * Replace a random WALL with Door;
      * A Door must have at least one surrounding WALL (4-directioned)
      * for aesthetic purpose;
+     * A Door also must be near to a FLOOR;
      */
     private void addDOOR() {
         int x, y;
@@ -107,7 +137,8 @@ public class WG {
             x = rand.nextInt(WIDTH);
             y = rand.nextInt(HEIGHT);
         } while (! (world[x][y] == Tileset.WALL
-                && hasNext(world, x, y, 4, Tileset.FLOOR)));
+                && hasNext(world, x, y, 4, Tileset.FLOOR)
+                && hasNext(world, x, y, 4, Tileset.WALL)));
         world[x][y] = Tileset.LOCKED_DOOR;
     }
 
@@ -131,32 +162,42 @@ public class WG {
      * border == 4: 4 directions; border == 8: 8 directions;
      * @param rand: Instance of Random;
      * @param border: insert 4 or 8;
-     * @return coordinate (x, y) in int[2];
+     * @return coordinate (x, y) in type of int[2];
      */
     public static int[] searchNext(TETile[][] world, int x, int y, Random rand, int border) {
+        return searchNext(world, x, y, rand, border, Tileset.NOTHING);
+    }
+    /**
+     * Search for the `tile` next to (x, y);
+     * Always assuming there is one! Use it after `hasNext`;
+     * border == 4: 4 directions; border == 8: 8 directions;
+     * @param rand: Instance of Random;
+     * @param border: insert 4 or 8;
+     * @return coordinate (x, y) in type of int[2];
+     */
+    public static int[] searchNext(TETile[][] world, int x, int y, Random rand, int border, TETile tile) {
         int[] coor;
         do {
             coor = next(x, y, rand.nextInt(border));
-        } while (!fillable(world, coor[0], coor[1], border == 4));
+        } while (!fillable(world, coor[0], coor[1], tile));
         return coor;
     }
-
     /**
      * Get the coordinate of a tile next to (x, y) relative to `r`;
-     * @param r: int in range(0, 4);
+     * @param r: int in range(0, 8);
      * @return coordinate (x, y) in int[2];
      */
     public static int[] next(int x, int y, int r) {
         int[] coor = new int[2];
         switch (r) {
-            case 0: x ++; break;
-            case 1: x --; break;
-            case 2: y ++; break;
-            case 3: y --; break;
-            case 4: x ++; y ++; break;
-            case 5: x ++; y --; break;
-            case 6: x --; y --; break;
-            case 7: x --; y ++; break;
+            case 0: x ++; break; // right
+            case 1: x --; break; // left
+            case 2: y ++; break; // up
+            case 3: y --; break; // down
+            case 4: x ++; y ++; break; // up right
+            case 5: x ++; y --; break; // down right
+            case 6: x --; y --; break; // down left
+            case 7: x --; y ++; break; // up left
         }
         coor[0] = x;
         coor[1] = y;
@@ -173,61 +214,57 @@ public class WG {
     }
 
     /**
-     * Upgraded `hasNext`, specifying TETile;
+     * Determine whether there is a `tile` next to (x, y);
+     * border == 4: 4 directions; border == 8: 8 directions;
+     * @param border: insert 4 or 8;
+     * @param tile: any tile object;
      */
     public static boolean hasNext(TETile[][] world, int x, int y, int border, TETile tile) {
-        boolean f = border == 4;
 
-        int[] c0 = next(x, y, 0 % border);
-        int[] c1 = next(x, y, 1 % border);
-        int[] c2 = next(x, y, 2 % border);
-        int[] c3 = next(x, y, 3 % border);
-    /*
-    When border == 4: the next four are identical with the ones above;
-     */
-        int[] c4 = next(x, y, 4 % border);
-        int[] c5 = next(x, y, 5 % border);
-        int[] c6 = next(x, y, 6 % border);
-        int[] c7 = next(x, y, 7 % border);
-
-        return fillable(world, c0[0], c0[1], f, tile)
-                || fillable(world, c1[0], c1[1], f, tile)
-                || fillable(world, c2[0], c2[1], f, tile)
-                || fillable(world, c3[0], c3[1], f, tile)
-                || fillable(world, c4[0], c4[1], f, tile)
-                || fillable(world, c5[0], c5[1], f, tile)
-                || fillable(world, c6[0], c6[1], f, tile)
-                || fillable(world, c7[0], c7[1], f, tile);
+        /*
+        When border == 4: the last four of the loop will be identical
+        to the first four;
+         */
+        for (int i = 0; i < 8; i ++) {
+            if (hasDirec(world, x, y, i % border, tile)) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    /**
+     * Whether (x, y) has a 'tile' next to it, in the specified direction;
+     * @param direction: 0: right; 1: left; 2: up; 3: down;
+     *                 4: up right; 5: down right; 6: down left; 7: up left;
+     * @param tile: any tile object;
+     * @return
+     */
+    public static boolean hasDirec(TETile[][] world, int x, int y, int direction, TETile tile) {
+        int[] coor = next(x, y, direction);
+        return fillable(world, coor[0], coor[1], tile);
+    }
     /**
      * Determine whether a tile is NOTHING(available for filling);
-     * @param f: set to `true` to narrow out the four edges (for filling FLOOR purposes);
      */
-    public static boolean fillable(TETile[][] world, int x, int y, boolean f) {
-        return fillable(world, x, y, f, Tileset.NOTHING);
+    public static boolean fillable(TETile[][] world, int x, int y) {
+        return fillable(world, x, y, Tileset.NOTHING);
     }
 
     /**
-     * Upgraded `fillable`, specifies TETile;
+     * Determine whether a tile is the specified `tile`;
+     * @param tile: any tile object;
      */
-    public static boolean fillable(TETile[][] world, int x, int y, boolean f, TETile tile) {
-        return inBound(x, y, f) && world[x][y] == tile;
+    public static boolean fillable(TETile[][] world, int x, int y, TETile tile) {
+        return inBound(x, y) && world[x][y] == tile;
     }
 
     /**
      * Determine whether a point is in the boundaries;
-     * Usually use `fillable` instead;
-     * @param f: set to `true` to narrow out the four edges (for filling FLOOR purposes);
      */
-    public static boolean inBound(int x, int y, boolean f) {
-        if (f) {
-            return x > 0 && x < WIDTH - 1 && y > 0 && y < HEIGHT - 1;
-        }
-        return inBound(x, y);
-    }
     public static boolean inBound(int x, int y) {
-        return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
+        return x >= startWIDTH && x < WIDTH
+                && y >= startHEIGHT && y < HEIGHT;
     }
 }
 

@@ -11,7 +11,7 @@ public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    public static final int HEIGHT = 40;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -39,16 +39,16 @@ public class Game {
         char start = input.charAt(0);
         long seed = Long.parseLong(input.substring(1, input.indexOf('s')));
 
-        TETile[][] finalWorldFrame = null;
+        TETile[][] finalWorldFrame;
         WG world;
         if (start == 'n') {
             world = new WG(seed);
-            finalWorldFrame = world.getWorld();
         } else if (start == 'l') {
             world = load();
         } else {
-            throw new RuntimeException("Input 'N' or 'L' to start !");
+            throw new RuntimeException("Type 'N' or 'L' to start !");
         }
+        finalWorldFrame = world.getWorld();
         return finalWorldFrame;
     }
 
@@ -61,7 +61,7 @@ public class Game {
         ter.initialize(WIDTH, HEIGHT);
 
         Game g = new Game();
-        TETile[][] world = g.playWithInputString("n111111s");
+        TETile[][] world = g.playWithInputString("n11011s");
 
         ter.renderFrame(world);
     }

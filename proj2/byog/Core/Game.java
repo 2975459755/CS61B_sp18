@@ -4,11 +4,12 @@ import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+import java.awt.*;
 import java.util.Random;
 import edu.princeton.cs.introcs.StdDraw;
 
 public class Game {
-    TERenderer ter = new TERenderer();
+    TERenderer renderer = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 40;
@@ -17,6 +18,37 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        setCanvas();
+
+        WG world = null;
+        char initInput = solicitInitialInput();
+        if (initInput == 'n') {
+            long seed = solicitSeed();
+            world = new WG(seed);
+        } else if(initInput == 'l') {
+            world = load();
+        } else {
+            // input is 'q'
+            System.exit(0);
+        }
+
+        assert world != null;
+        playGame(world);
+    }
+
+    private void playGame(WG world) {
+        renderer.initialize(WIDTH, HEIGHT);
+        renderer.renderFrame(world.getWorld());
+
+        while (true) {
+            clearKeyQueue();
+
+            char input = solicitInputChar();
+            world.player.move(String.valueOf(input));
+            renderer.renderFrame(world.getWorld());
+
+            StdDraw.pause(150);
+        }
     }
 
     /**
@@ -64,13 +96,80 @@ public class Game {
             StdDraw.nextKeyTyped();
         }
     }
+    private char solicitInitialInput() {
+        while(true) {
+            char key = solicitInputChar();
+            if (key == 'n' || key == 'l' || key == 'q') {
+                return key;
+            }
+        }
+    }
+    private char solicitInputChar() {
+        while(true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+                return key;
+            }
+        }
+    }
+
+    /**
+     * Some code I CVed from GitHub;
+     */
+    private void setCanvas() {
+        StdDraw.setCanvasSize(640, 640);
+        StdDraw.setXscale(0, 640);
+        StdDraw.setYscale(0, 640);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+
+        StdDraw.setFont(new Font("Monaco", Font.PLAIN, 30));
+        StdDraw.text(320, 480, "THE GAME");
+
+        StdDraw.setFont(new Font("Monaco", Font.PLAIN, 20));
+        StdDraw.text(320, 345, "New Game (N)");
+        StdDraw.text(320, 320, "Load Game (L)");
+        StdDraw.text(320, 295, "Quit (Q)");
+
+        StdDraw.enableDoubleBuffering();
+        StdDraw.show();
+    }
+
+    /**
+     * Some code I CVed from GitHub;
+     */
+    private long solicitSeed() {
+        StdDraw.clear(Color.BLACK);
+        StdDraw.text(320, 320, "Enter seed. Press S to end.");
+        StdDraw.show();
+
+        StringBuilder builder = new StringBuilder();
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+
+                if (key == 's') {
+                    break;
+                }
+
+                builder.append(key);
+                StdDraw.clear(Color.BLACK);
+                StdDraw.text(320, 320, "Enter seed. Press S to end.");
+                StdDraw.text(320, 300, "Your input: " + builder);
+                StdDraw.show();
+            }
+        }
+
+        return Long.parseLong(builder.toString());
+    }
+
 
     public static void main (String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
         Game g = new Game();
-        TETile[][] world = g.playWithInputString("n123456s");
+        TETile[][] world = g.playWithInputString("n01234567s");
 
         ter.renderFrame(world);
     }

@@ -56,12 +56,21 @@ public class Game {
         return null;
     }
 
+    /**
+     * Clear the key queue in StdDraw;
+     */
+    private void clearKeyQueue() {
+        while (StdDraw.hasNextKeyTyped()) {
+            StdDraw.nextKeyTyped();
+        }
+    }
+
     public static void main (String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
         Game g = new Game();
-        TETile[][] world = g.playWithInputString("n11011s");
+        TETile[][] world = g.playWithInputString("n123456s");
 
         ter.renderFrame(world);
     }

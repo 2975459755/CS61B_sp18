@@ -16,6 +16,53 @@ class Pos {
         return Math.sqrt(Math.pow(this.x - des.x, 2)
                 + Math.pow(this.y - des.y, 2));
     }
+
+    /**
+     * L-shaped distance;
+     */
+    int LDistance(Pos des) {
+        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
+    }
+    int isLuminator(TETile[][] world) {
+        TETile t = world[this.x][this.y];
+
+        if (t == Tileset.PLAYER) {
+            return 3;
+        } else if (t == Tileset.UNLOCKED_DOOR){
+            return 2;
+        } else if (t == Tileset.LAMP_LIT) {
+            return 5;
+        }
+
+        return 0;
+    }
+    boolean collectable(TETile[][] world) {
+        TETile t = world[x][y];
+
+        if (t == Tileset.LAMP_UNLIT) {
+            return true;
+        } else if (t == Tileset.LAMP_LIT) {
+            return true;
+        }
+
+        return false;
+    }
+    void luminate(WG wg) {
+        luminate(wg, isLuminator(wg.world));
+    }
+    void luminate(WG wg, int radius) {
+        if (radius > 0) {
+            for (int i = x - radius; i <= x + radius; i ++) {
+                for (int j = y - radius; j <= y + radius; j ++) {
+                    if (new Pos(i, j).inMap()) {
+                        wg.isVisible[i][j] = true; // update invisibility
+                    }
+                }
+            }
+        } else {
+            wg.isVisible[x][y] = false;
+        }
+    }
     @Override
     public boolean equals(Object obj) {
         if (! (obj instanceof Pos)){
@@ -102,15 +149,14 @@ class Pos {
         return p.isTile(world, tile);
     }
   /**
-   * Get a position next to this;
-   * Direction is relative to `r`;
-   * @param r: 0: right; 1: left; 2: up; 3: down;
+   * Get a position next to this, towards some direction;
+   * @param direct: 0: right; 1: left; 2: up; 3: down;
    *         4: up right; 5: down right; 6: down left; 7: up left;
    */
-  Pos next(int r) {
+  Pos next(int direct) {
         int xC = x;
         int yC = y;
-        switch (r) {
+        switch (direct) {
             case 0: xC ++; break; // right
             case 1: xC --; break; // left
             case 2: yC ++; break; // up

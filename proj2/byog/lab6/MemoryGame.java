@@ -146,7 +146,7 @@ public class MemoryGame {
 
     /**
      * Clear the key queue;
-     * Because StdDraw will store what you typed when and ever;
+     * Because StdDraw will store what you typed at all time;
      * If you don't do this, this game is easy to cheat (try M..G..Solution.java);
      */
     private void clearKeyQueue() {

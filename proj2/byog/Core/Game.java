@@ -14,41 +14,66 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 40;
 
+    WG wg = null;
+
+    public static final int interval = 150;
+    public static final int keyInterval = 70; // interval between two key presses;
+    public static final int miniInterval = 10;
+    static final Character[] validInputs = {'w', 'a', 's', 'd', 'k', 'o'}; // TODO
+    static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
+                              "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
+                                };
+
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
         setCanvas();
 
-        WG world = null;
-        char initInput = solicitInitialInput();
+        char initInput = Input.solicitInitialInput();
         if (initInput == 'n') {
-            long seed = solicitSeed();
-            world = new WG(seed);
+            long seed = Input.solicitSeed();
+            if (seed == -1) {
+                wg = new WG();
+            } else {
+                wg = new WG(seed);
+            }
         } else if(initInput == 'l') {
-            world = load();
+            wg = load();
         } else {
             // input is 'q'
             System.exit(0);
         }
 
-        assert world != null;
-        playGame(world);
+        assert wg != null;
+        playGame(wg);
     }
 
-    private void playGame(WG world) {
+    void playGame(WG wg) {
+        TERenderer renderer = new TERenderer();
         renderer.initialize(WIDTH, HEIGHT);
-        renderer.renderFrame(world.getWorld());
+        renderer.renderFrame(wg.getVisible());
 
         while (true) {
-            clearKeyQueue();
+            Input.clearKeyQueue();
 
-            char input = solicitInputChar();
-            world.player.move(String.valueOf(input));
-            renderer.renderFrame(world.getWorld());
+            StdDraw.pause(interval - keyInterval);
 
-            StdDraw.pause(150);
+            String input = Input.solicitInputString(2);
+            if (input.equals("o")) {
+                cheat(); // TODO
+            }
+            wg.player.act(input);
+            renderer.renderFrame(wg.getVisible());
         }
+    }
+    void cheat() {
+        for (int x = wg.startWIDTH; x < wg.WIDTH; x ++) {
+            for (int y = wg.startHEIGHT; y < wg.HEIGHT; y ++) {
+                wg.isVisible[x][y] = true;
+            }
+        }
+        wg.updateVisible();
     }
 
     /**
@@ -80,7 +105,7 @@ public class Game {
         } else {
             throw new RuntimeException("Type 'N' or 'L' to start !");
         }
-        finalWorldFrame = world.getWorld();
+        finalWorldFrame = world.getVisible();
         return finalWorldFrame;
     }
 
@@ -89,34 +114,9 @@ public class Game {
     }
 
     /**
-     * Clear the key queue in StdDraw;
-     */
-    private void clearKeyQueue() {
-        while (StdDraw.hasNextKeyTyped()) {
-            StdDraw.nextKeyTyped();
-        }
-    }
-    private char solicitInitialInput() {
-        while(true) {
-            char key = solicitInputChar();
-            if (key == 'n' || key == 'l' || key == 'q') {
-                return key;
-            }
-        }
-    }
-    private char solicitInputChar() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                return key;
-            }
-        }
-    }
-
-    /**
      * Some code I CVed from GitHub;
      */
-    private void setCanvas() {
+    private static void setCanvas() {
         StdDraw.setCanvasSize(640, 640);
         StdDraw.setXscale(0, 640);
         StdDraw.setYscale(0, 640);
@@ -133,34 +133,6 @@ public class Game {
 
         StdDraw.enableDoubleBuffering();
         StdDraw.show();
-    }
-
-    /**
-     * Some code I CVed from GitHub;
-     */
-    private long solicitSeed() {
-        StdDraw.clear(Color.BLACK);
-        StdDraw.text(320, 320, "Enter seed. Press S to end.");
-        StdDraw.show();
-
-        StringBuilder builder = new StringBuilder();
-        while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-
-                if (key == 's') {
-                    break;
-                }
-
-                builder.append(key);
-                StdDraw.clear(Color.BLACK);
-                StdDraw.text(320, 320, "Enter seed. Press S to end.");
-                StdDraw.text(320, 300, "Your input: " + builder);
-                StdDraw.show();
-            }
-        }
-
-        return Long.parseLong(builder.toString());
     }
 
 

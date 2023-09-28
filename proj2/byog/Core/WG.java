@@ -8,34 +8,81 @@ import java.util.Random;
 class WG {
     static int WIDTH = Game.WIDTH;
     static int HEIGHT = Game.HEIGHT;
-    private TETile[][] world;
-    private Random rand;
+    TETile[][] world;
+    boolean[][] isVisible;
+    TETile[][] visible;
+    Random rand;
 
-    Pos doorPos;
-    Pos keyPos;
-    Player player;
+    static Pos doorPos;
+    static Pos keyPos;
+    static Player player;
+    private static int maxLamps = 5;
+    static Pos[] Lamps = new Pos[maxLamps];
+    int numLamps = 0;
 
     /*
-    For special usages:
+    For special uses:
      */
     static int startWIDTH = 0;
     static int startHEIGHT = 0;
     private static double minFLOORCount = WIDTH * HEIGHT / 2.5;
     private static double keyDoorDis = (WIDTH + HEIGHT) / 4;
+    private static double lampDis = (WIDTH + HEIGHT) / 10;
 
-    public WG(long seed) {
+    WG(long seed) {
         world = new TETile[WIDTH][HEIGHT];
-        newWorld();
+
         rand = new Random(seed);
+
         randomWorld();
     }
-    public TETile[][] getWorld() {
-        return world;
+    WG() {
+        world = new TETile[WIDTH][HEIGHT];
+
+        rand = new Random();
+
+        randomWorld();
+    }
+    public TETile[][] getVisible() {
+        return visible;
+    }
+    void updateVisible() {
+        for (int i = startWIDTH; i < WIDTH; i ++) {
+            for (int j = startHEIGHT; j < HEIGHT; j ++) {
+                if (isVisible[i][j]) {
+                    visible[i][j] = world[i][j];
+                } else {
+                    visible[i][j] = Tileset.NOTHING;
+                }
+            }
+        }
+    }
+    void luminateAll() {
+        isVisible = new boolean[WIDTH][HEIGHT];
+
+//        for (int i = 0; i < numLamps; i ++) {
+//            // If a LAMP_UNLIT is spotted, it is lit up;
+//            Pos lamp = Lamps[i];
+//            if (isVisible[lamp.x][lamp.y]) {
+//                world[lamp.x][lamp.y] = Tileset.LAMP_LIT;
+//            }
+//        }
+
+        for (int x = startWIDTH; x < WIDTH; x ++) {
+            for (int y = startHEIGHT; y < HEIGHT; y ++) {
+                Pos pos = new Pos(x, y);
+                if (pos.isLuminator(world) > 0) {
+                    pos.luminate(this);
+                }
+            }
+        }
+
+        updateVisible();
     }
     /**
-     * Return a world filled with NOTHING;
+     * Fill the `world` with NOTHING;
      */
-    private void newWorld() {
+    private void newWorld(TETile[][] world) {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 world[x][y] = Tileset.NOTHING;
@@ -45,7 +92,13 @@ class WG {
     /**
      * Pseudo-randomly generate a world;
      */
-    private void randomWorld() {
+    void randomWorld() {
+        isVisible = new boolean[WIDTH][HEIGHT];
+        visible = new TETile[WIDTH][HEIGHT];
+
+        newWorld(world);
+        newWorld(visible);
+
         Pos start = new Pos
                 (Math.floorDiv(WIDTH, 2), Math.floorDiv(HEIGHT, 2));
 
@@ -54,7 +107,15 @@ class WG {
         doorPos = addDOOR();
         keyPos = addKEY();
         player = addPLAYER();
+
+        numLamps = 0;
+        for (int i = 0; i < rand.nextInt(maxLamps); i++) {
+            Lamps[i] = addLAMP();
+        }
+
         replaceAll(Tileset.NOTHING, Tileset.NOTHING);
+
+        luminateAll(); // TODO
     }
     /**
      * Randomly fill with FLOOR tiles;
@@ -192,9 +253,28 @@ class WG {
         do {
             pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
         } while (! pos.isFLOOR(world));
-
         world[pos.x][pos.y] = Tileset.PLAYER;
-        return new Player(world, pos);
+
+        return new Player(this, pos);
+    }
+    private Pos addLAMP() {
+        Pos pos;
+        do {
+            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
+        } while (! (pos.isFLOOR(world) && validLamp(pos)));
+        world[pos.x][pos.y] = Tileset.LAMP_UNLIT;
+
+        numLamps ++;
+        return pos;
+    }
+    private boolean validLamp(Pos pos) {
+        // lamps should not be too close to each other
+        for (int i = 0; i < numLamps; i ++) {
+            if (pos.LDistance(Lamps[i]) < lampDis) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

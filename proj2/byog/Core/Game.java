@@ -5,24 +5,19 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 import java.awt.*;
-import java.util.Random;
 import edu.princeton.cs.introcs.StdDraw;
 
 public class Game {
-    TERenderer renderer = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 40;
 
     WG wg = null;
 
-    public static final int interval = 150;
-    public static final int keyInterval = 70; // interval between two key presses;
-    public static final int miniInterval = 10;
-    static final Character[] validInputs = {'w', 'a', 's', 'd', 'k', 'o'}; // TODO
-    static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
-                              "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
-                                };
+    public static final int actionInterval = 120;
+    public static final int inComboInterval = 45;
+    public static final int miniInterval = 30;
+    public static final int comboLength = 2;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -54,17 +49,36 @@ public class Game {
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
 
+        Intervals in = new Intervals();
+
+        String input;
+        boolean f; // whether something has changed during a miniInterval
         while (true) {
-            Input.clearKeyQueue();
+            StdDraw.pause(miniInterval);
+            f = false;
 
-            StdDraw.pause(interval - keyInterval);
+            /*
+            Process keyboard input:
+             */
+            input = Input.tryValidCombo(comboLength, in.canPlayerAct());
+            if (in.canPlayerAct() && !input.equals("")) { // valid input, and player can act
+                if (input.equals("o")) {
+                    cheat();
+                } else {
+                    wg.player.act(input);
+                }
 
-            String input = Input.solicitInputString(2);
-            if (input.equals("o")) {
-                cheat(); // TODO
+                in.update(input);
+                f = true;
+                Input.clearKeyQueue();
             }
-            wg.player.act(input);
-            renderer.renderFrame(wg.getVisible());
+
+            if (f) {
+                wg.luminateAll();
+                renderer.renderFrame(wg.getVisible());
+            }
+
+            in.update();
         }
     }
     void cheat() {

@@ -15,22 +15,28 @@ class WG {
 
     static Pos doorPos;
     static Pos keyPos;
-    static Player player;
-    private static int maxLamps = 5;
+    private static final int minLamps = 2;
+    private static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
     static Pos[] Lamps = new Pos[maxLamps];
-    int numLamps = 0;
+    static int numLamps = 0;
+
+    static Player player;
+    static final int maxNumRoMo = 1;
+    static RockMonster[] RoMos = new RockMonster[maxNumRoMo];
+    static int numRoMo;
 
     /*
     For special uses:
      */
     static int startWIDTH = 0;
     static int startHEIGHT = 0;
-    private static double minFLOORCount = WIDTH * HEIGHT / 2.5;
-    private static double keyDoorDis = (WIDTH + HEIGHT) / 4;
-    private static double lampDis = (WIDTH + HEIGHT) / 10;
+    private static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
+    private static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
+    private static final double lampDis = (WIDTH + HEIGHT) / 10;
 
     WG(long seed) {
         world = new TETile[WIDTH][HEIGHT];
+        visible = new TETile[WIDTH][HEIGHT];
 
         rand = new Random(seed);
 
@@ -38,6 +44,7 @@ class WG {
     }
     WG() {
         world = new TETile[WIDTH][HEIGHT];
+        visible = new TETile[WIDTH][HEIGHT];
 
         rand = new Random();
 
@@ -60,14 +67,6 @@ class WG {
     void luminateAll() {
         isVisible = new boolean[WIDTH][HEIGHT];
 
-//        for (int i = 0; i < numLamps; i ++) {
-//            // If a LAMP_UNLIT is spotted, it is lit up;
-//            Pos lamp = Lamps[i];
-//            if (isVisible[lamp.x][lamp.y]) {
-//                world[lamp.x][lamp.y] = Tileset.LAMP_LIT;
-//            }
-//        }
-
         for (int x = startWIDTH; x < WIDTH; x ++) {
             for (int y = startHEIGHT; y < HEIGHT; y ++) {
                 Pos pos = new Pos(x, y);
@@ -82,7 +81,7 @@ class WG {
     /**
      * Fill the `world` with NOTHING;
      */
-    private void newWorld(TETile[][] world) {
+    private void emptyWorld(TETile[][] world) {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 world[x][y] = Tileset.NOTHING;
@@ -93,14 +92,10 @@ class WG {
      * Pseudo-randomly generate a world;
      */
     void randomWorld() {
-        isVisible = new boolean[WIDTH][HEIGHT];
-        visible = new TETile[WIDTH][HEIGHT];
-
-        newWorld(world);
-        newWorld(visible);
+        renew();
 
         Pos start = new Pos
-                (Math.floorDiv(WIDTH, 2), Math.floorDiv(HEIGHT, 2));
+                (Math.floorDiv(WIDTH, 2), Math.floorDiv(HEIGHT, 2)); // start point is at the center
 
         fillWithFLOOR(start); // First step: Randomly fill with FLOOR tiles;
         addWALL();
@@ -108,15 +103,31 @@ class WG {
         keyPos = addKEY();
         player = addPLAYER();
 
+        /*
+        Generate a random number of lamps;
+         */
         numLamps = 0;
-        for (int i = 0; i < rand.nextInt(maxLamps); i++) {
+        for (int i = 0; i < rand.nextInt(minLamps, maxLamps + 1); i++) {
             Lamps[i] = addLAMP();
         }
 
+//        RoMos[0] = addRoMo();
+
         replaceAll(Tileset.NOTHING, Tileset.NOTHING);
 
-        luminateAll(); // TODO
+        luminateAll();
     }
+
+    /**
+     * Method for renewing a WG world;
+     */
+    void renew() {
+        isVisible = new boolean[WIDTH][HEIGHT];
+
+        emptyWorld(world);
+        emptyWorld(visible);
+    }
+
     /**
      * Randomly fill with FLOOR tiles;
      * Number of FLOOR must be above minFLOORCount;
@@ -234,6 +245,16 @@ class WG {
         }
     }
 
+    private Pos searchFLOOR() {
+        return searchTile(Tileset.FLOOR);
+    }
+    private Pos searchTile(TETile tile) {
+        Pos pos;
+        do {
+            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
+        } while (! pos.isTile(world, tile));
+        return pos;
+    }
     /**
      * Replace a random FLOOR with KEY;
      * @return Position object of the KEY;
@@ -241,27 +262,24 @@ class WG {
     private Pos addKEY() {
         Pos pos;
         do {
-            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! (pos.isFLOOR(world)
-                && pos.distance(doorPos) > keyDoorDis));
-
+            pos = searchFLOOR();
+        } while (! validKEY(pos));
         world[pos.x][pos.y] = Tileset.FLOWER;
         return pos;
     }
+    private boolean validKEY(Pos pos) {
+        return pos.distance(doorPos) >= keyDoorDis;
+    }
     private Player addPLAYER() {
-        Pos pos;
-        do {
-            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! pos.isFLOOR(world));
+        Pos pos = searchFLOOR();
         world[pos.x][pos.y] = Tileset.PLAYER;
-
         return new Player(this, pos);
     }
     private Pos addLAMP() {
         Pos pos;
         do {
-            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! (pos.isFLOOR(world) && validLamp(pos)));
+            pos = searchFLOOR();
+        } while (! validLamp(pos));
         world[pos.x][pos.y] = Tileset.LAMP_UNLIT;
 
         numLamps ++;
@@ -275,6 +293,10 @@ class WG {
             }
         }
         return true;
+    }
+    private RockMonster addRoMo() {
+        Pos pos = searchFLOOR();
+        return new RockMonster(this, pos);
     }
 }
 

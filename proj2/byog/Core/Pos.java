@@ -52,8 +52,10 @@ class Pos {
     }
     void luminate(WG wg, int radius) {
         if (radius > 0) {
+
             for (int i = x - radius; i <= x + radius; i ++) {
                 for (int j = y - radius; j <= y + radius; j ++) {
+
                     if (new Pos(i, j).inMap()) {
                         wg.isVisible[i][j] = true; // update invisibility
                     }

@@ -3,35 +3,43 @@ package byog.Core;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+import java.io.Serializable;
 import java.util.Random;
 
-class WG {
+class WG implements Serializable {
     static int WIDTH = Game.WIDTH;
     static int HEIGHT = Game.HEIGHT;
     Random rand;
 
-    static TETile[][] world;
-    static boolean[][] isVisible;
-    static TETile[][] visible;
+    static TETile[][] world = new TETile[WIDTH][HEIGHT];
+    static boolean[][] isVisible = new boolean[WIDTH][HEIGHT];
+    static TETile[][] visible = new TETile[WIDTH][HEIGHT];
+    /*
+    Before saving, make a copy of changeable statics,
+    because Serialization does not work for statics;
+     */
+    TETile[][] Sworld;
+    boolean[][] SisVisible;
+    TETile[][] Svisible;
 
 
-    static Pos doorPos;
-    static Pos keyPos;
+    Pos doorPos;
+    Pos keyPos;
     private static final int minLamps = 2;
     private static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
-    static Pos[] Lamps = new Pos[maxLamps];
-    static int numLamps = 0;
+    Pos[] Lamps = new Pos[maxLamps];
+    int numLamps = 0;
 
     /*
     MovingThings:
      */
-    static Player player;
+    Player player;
     static final int maxNumRoMo = 1;
-    static RockMonster[] RoMos = new RockMonster[maxNumRoMo];
-    static int numRoMo = 0;
+    RockMonster[] RoMos = new RockMonster[maxNumRoMo];
+    int numRoMo = 0;
 
-    static MovingThings[] MTs = new MovingThings[100]; // Keep track of all MovingThings
-    static int moving = 0; // the number of existing MovingThings
+    MovingThings[] MTs = new MovingThings[100]; // Keep track of all MovingThings
+    int moving = 0; // the number of existing MovingThings
 
     /*
     For special uses:
@@ -43,21 +51,27 @@ class WG {
     private static final double lampDis = (WIDTH + HEIGHT) / 10;
 
     WG(long seed) {
-        world = new TETile[WIDTH][HEIGHT];
-        visible = new TETile[WIDTH][HEIGHT];
-
         rand = new Random(seed);
 
         randomWorld();
     }
     WG() {
-        world = new TETile[WIDTH][HEIGHT];
-        visible = new TETile[WIDTH][HEIGHT];
-
         rand = new Random();
 
         randomWorld();
     }
+
+    void save() {
+        Sworld = world;
+        SisVisible = isVisible;
+        Svisible = visible;
+    }
+    void load() {
+        world = Sworld;
+        isVisible = SisVisible;
+        visible = Svisible;
+    }
+
     public TETile[][] getVisible() {
         return visible;
     }
@@ -85,9 +99,10 @@ class WG {
     void luminateAll() {
         isVisible = new boolean[WIDTH][HEIGHT]; // reset isVisible to all false;
 
+        Pos pos;
         for (int x = startWIDTH; x < WIDTH; x ++) {
             for (int y = startHEIGHT; y < HEIGHT; y ++) {
-                Pos pos = new Pos(x, y);
+                pos = new Pos(x, y);
                 if (pos.isLuminator() > 0) {
                     pos.luminate();
                 }
@@ -248,7 +263,7 @@ class WG {
         Inadequate FLOORs: try filling again;
          */
         if (n < minFLOORCount) {
-            while (! (pos.hasNextNOTHING(4) && pos.isFLOOR(world))) {
+            while (! (pos.hasNextNOTHING(4) && pos.isFLOOR())) {
                 // reset starting point;
                 pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
             }
@@ -281,7 +296,7 @@ class WG {
             for (int y = 0; y < HEIGHT; y ++) {
 
                 Pos pos = new Pos(x, y);
-                if (pos.isFLOOR(world)) {
+                if (pos.isFLOOR()) {
                     while (pos.hasNextNOTHING(border)) {
                         Pos p = pos.searchNextNOTHING(new Random(), border);
                         world[p.x][p.y] = Tileset.WALL;

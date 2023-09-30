@@ -3,9 +3,10 @@ package byog.Core;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+import java.io.Serializable;
 import java.util.Random;
 
-class Pos {
+class Pos implements Serializable {
     int x;
     int y;
     Pos (int xCoor, int yCoor) {
@@ -173,11 +174,11 @@ class Pos {
         return new Pos(xC, yC);
     }
 
-    boolean isFLOOR(TETile[][] world) {
+    boolean isFLOOR() {
         return isTile(Tileset.FLOOR);
     }
 
-    boolean isNOTHING(TETile[][] world) {
+    boolean isNOTHING() {
         return isTile(Tileset.NOTHING);
     }
 

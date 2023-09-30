@@ -1,10 +1,13 @@
 package byog.Core;
 
+import byog.SaveDemo.World;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 import java.awt.*;
+import java.io.*;
+
 import edu.princeton.cs.introcs.StdDraw;
 
 public class Game {
@@ -31,7 +34,7 @@ public class Game {
             } else {
                 wg = new WG(seed);
             }
-        } else if(initInput == 'l') {
+        } else if (initInput == 'l') {
             wg = load();
         } else {
             // input is 'q'
@@ -39,10 +42,10 @@ public class Game {
         }
 
         assert wg != null;
-        playGame(wg);
+        playGame();
     }
 
-    void playGame(WG wg) {
+    void playGame() {
         TERenderer renderer = new TERenderer();
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
@@ -61,6 +64,8 @@ public class Game {
             if (canPlayerAct && !input.equals("")) { // valid input, and player can act
                 if (input.equals("o")) {
                     cheat();
+                } else if (input.equals("q")) {
+                    save();
                 } else {
                     wg.player.act(input);
                     cheatMode = false;
@@ -88,9 +93,9 @@ public class Game {
         }
     }
     void cheat() {
-        for (int x = wg.startWIDTH; x < wg.WIDTH; x ++) {
-            for (int y = wg.startHEIGHT; y < wg.HEIGHT; y ++) {
-                wg.isVisible[x][y] = true;
+        for (int x = WG.startWIDTH; x < WG.WIDTH; x ++) {
+            for (int y = WG.startHEIGHT; y < WG.HEIGHT; y ++) {
+                WG.isVisible[x][y] = true;
             }
         }
         wg.updateVisible();
@@ -130,8 +135,55 @@ public class Game {
         return finalWorldFrame;
     }
 
+    private void save() {
+
+        wg.save(); //
+
+        File f = new File("./save.ser");
+        try {
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            FileOutputStream fs = new FileOutputStream(f);
+            ObjectOutputStream os = new ObjectOutputStream(fs);
+            os.writeObject(wg);
+            os.close();
+        }  catch (FileNotFoundException e) {
+            System.out.println("file not found");
+            System.exit(0);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+
+        System.exit(0); //
+    }
     private WG load () {
-        return null;
+        File f = new File("./save.ser");
+        if (f.exists()) {
+            try {
+                FileInputStream fs = new FileInputStream(f);
+                ObjectInputStream os = new ObjectInputStream(fs);
+                WG loadWorld = (WG) os.readObject();
+                os.close();
+
+                loadWorld.load(); //
+
+                return loadWorld;
+            } catch (FileNotFoundException e) {
+                System.out.println("file not found");
+                System.exit(0);
+            } catch (IOException e) {
+                System.out.println(e);
+                System.exit(0);
+            } catch (ClassNotFoundException e) {
+                System.out.println("class not found");
+                System.exit(0);
+            }
+        }
+
+        /* In the case no World has been saved yet, we return a new one. */
+        return new WG();
     }
 
     /**
@@ -155,7 +207,6 @@ public class Game {
         StdDraw.enableDoubleBuffering();
         StdDraw.show();
     }
-
 
     public static void main (String[] args) {
         TERenderer ter = new TERenderer();

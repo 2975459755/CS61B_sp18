@@ -2,7 +2,9 @@ package byog.Core;
 
 import byog.TileEngine.Tileset;
 
-class Player extends MovingThings{
+import java.io.Serializable;
+
+class Player extends MovingThings {
     static final int actionInterval = 150;
 
     Player(WG wg, Pos position) {
@@ -10,7 +12,7 @@ class Player extends MovingThings{
         this.pos = position;
         this.avatar = Tileset.PLAYER;
 
-        this.actIn = new Interval(0, 0);
+        this.actIn = new Interval(0);
         this.ins = new Interval[]{actIn};
 
         this.health = 5;
@@ -48,15 +50,15 @@ class Player extends MovingThings{
     @Override
     int goAt(Pos des) {
         if (des.isTile(Tileset.FLOWER)) {
-            wg.world[des.x][des.y] = Tileset.FLOOR;
-            Pos d = WG.doorPos;
-            wg.world[d.x][d.y] = Tileset.UNLOCKED_DOOR;
+            WG.world[des.x][des.y] = Tileset.FLOOR;
+            Pos d = wg.doorPos;
+            WG.world[d.x][d.y] = Tileset.UNLOCKED_DOOR;
             return 1;
         } else if (des.isTile(Tileset.UNLOCKED_DOOR)) {
             wg.randomWorld(); // enters a new world
             return -1;
         } else if (des.isTile(Tileset.LAMP_UNLIT)) {
-            wg.world[des.x][des.y] = Tileset.LAMP_LIT;
+            WG.world[des.x][des.y] = Tileset.LAMP_LIT;
             return 0;
         }
         return 1;
@@ -66,15 +68,16 @@ class Player extends MovingThings{
     }
     void interact(Pos des) {
         if (des.collectable()) { // collectable item
-            wg.world[des.x][des.y] = Tileset.FLOOR;
+            WG.world[des.x][des.y] = Tileset.FLOOR;
         }
     }
     void attack(int direc) {
         Pos des = pos.next(direc);
-        if (des.isFLOOR(wg.world)) {
+        if (des.isFLOOR()) {
             Bullet b = new Bullet(wg, des, direc);
             wg.updateMTs(b);
-            wg.world[des.x][des.y] = b.avatar;
+            WG.world[des.x][des.y] = b.avatar;
+            b.goAt(des);
         }
     }
 

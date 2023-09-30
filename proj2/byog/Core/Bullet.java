@@ -2,6 +2,8 @@ package byog.Core;
 
 import byog.TileEngine.Tileset;
 
+import java.io.Serializable;
+
 public class Bullet extends MovingThings {
     static final int actionInterval = 240;
     static final int moveDistance = 4;
@@ -14,8 +16,8 @@ public class Bullet extends MovingThings {
         this.direction = direction;
 
         this.avatar = Tileset.WATER;
-        this.actIn = new Interval(0, actionInterval);
-        this.survival = new Interval(0, actionInterval * moveDistance);
+        this.actIn = new Interval(actionInterval);
+        this.survival = new Interval(actionInterval * moveDistance);
         this.ins = new Interval[] {actIn, survival};
         this.health = 1; // this does not mean anything;
     }
@@ -45,7 +47,7 @@ public class Bullet extends MovingThings {
 
     @Override
     int goAt(Pos des) {
-        if (des.isFLOOR(wg.world)) {
+        if (des.isFLOOR()) {
             return 1;
         }
         return 0;

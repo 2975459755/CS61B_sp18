@@ -1,11 +1,17 @@
 package byog.Core;
 
-class Interval {
+import java.io.Serializable;
+
+class Interval implements Serializable {
     static final int miniInterval = Game.miniInterval;
 
     int start;
     int end;
 
+    Interval(int end) {
+        this.start = 0;
+        this.end = end;
+    }
     Interval(int start, int end) {
         this.start = start;
         this.end = end;

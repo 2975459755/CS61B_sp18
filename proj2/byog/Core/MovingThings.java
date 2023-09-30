@@ -3,7 +3,9 @@ package byog.Core;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-abstract class MovingThings {
+import java.io.Serializable;
+
+abstract class MovingThings implements Serializable {
     WG wg;
     Pos pos;
     TETile avatar;
@@ -19,12 +21,12 @@ abstract class MovingThings {
         if (c == -1) {
             return; // player enters a new world;
         } else if (c == 1) { // destination is available for entering;
-            if (des.isFLOOR(wg.world)) {
+            if (des.isFLOOR()) {
             /*
             Swap two tiles;
              */
-                wg.world[pos.x][pos.y] = Tileset.FLOOR;
-                wg.world[des.x][des.y] = avatar;
+                WG.world[pos.x][pos.y] = Tileset.FLOOR;
+                WG.world[des.x][des.y] = avatar;
             /*
             Update status;
              */
@@ -73,7 +75,7 @@ abstract class MovingThings {
      */
     int remove() {
         wg.updateMTs(this);
-        wg.world[pos.x][pos.y] = Tileset.FLOOR;
+        WG.world[pos.x][pos.y] = Tileset.FLOOR;
         return 1;
     }
 }

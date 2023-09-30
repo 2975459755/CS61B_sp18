@@ -5,8 +5,8 @@ import edu.princeton.cs.introcs.StdDraw;
 import java.awt.*;
 
 public class Input {
-    static final int inComboInterval = Game.inComboInterval;
-    static final int miniInterval = Game.miniInterval;
+    static final int inComboInterval = 45;
+    static final int comboLength = 2;
     static final int nanoInterval = 15;
     static final Character[] validInputs = {'w', 'a', 's', 'd', 'k', 'o'};
     static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
@@ -107,7 +107,8 @@ public class Input {
                     ret = input;
                 }
                 // pause for the rest of inComboInterval; and exit the loop;
-                StdDraw.pause(nanoInterval * (Math.floorDiv(inComboInterval, nanoInterval) - t - 1));
+                StdDraw.pause(nanoInterval *
+                        (Math.floorDiv(inComboInterval, nanoInterval) - (t + 1)));
                 break;
             }
         }
@@ -138,7 +139,7 @@ public class Input {
      * If player typed in valid inputs, but they are not a valid combo, return the first input;
      * If player input < length (during inComboInterval), still returns the inputs;
      * @param length maximum combo length, should be >= 1;
-     * @param canAct whether asks for combo (when player can't act, this should be false)
+     * @param canAct whether asks for combo (when player can't act, asking for combo causes meaningless pause)
      */
     static String tryValidCombo(int length, boolean canAct) {
         assert length > 0;

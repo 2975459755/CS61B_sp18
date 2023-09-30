@@ -3,10 +3,21 @@ package byog.Core;
 import byog.TileEngine.Tileset;
 
 class Player extends MovingThings{
+    static final int actionInterval = 150;
+
+    Interval actIn;
+
     Player(WG wg, Pos position) {
         this.wg = wg;
         this.pos = position;
         this.avatar = Tileset.PLAYER;
+
+        actIn = new Interval(0, 0);
+        ins = new Interval[]{actIn};
+    }
+
+    boolean canAct() {
+        return actIn.ended();
     }
     void act(String command) {
         switch (command) {
@@ -28,6 +39,9 @@ class Player extends MovingThings{
             case "wk", "kw" -> interact(2);
             case "sk", "ks" -> interact(3);
         }
+
+        actIn.renew(command); // TODO: don't creat a new instance, instead, update the original
+
     }
     @Override
     int goAt(Pos des) {
@@ -53,4 +67,5 @@ class Player extends MovingThings{
             wg.world[des.x][des.y] = Tileset.FLOOR;
         }
     }
+
 }

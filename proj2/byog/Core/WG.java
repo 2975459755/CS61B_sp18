@@ -20,10 +20,16 @@ class WG {
     static Pos[] Lamps = new Pos[maxLamps];
     static int numLamps = 0;
 
+    /*
+    MovingThings:
+     */
     static Player player;
     static final int maxNumRoMo = 1;
     static RockMonster[] RoMos = new RockMonster[maxNumRoMo];
-    static int numRoMo;
+    static int numRoMo = 0;
+
+    static MovingThings[] MTs = new MovingThings[100]; // Keep track of all MovingThings
+    static int moving = 0; // the number of existing MovingThings
 
     /*
     For special uses:
@@ -53,6 +59,11 @@ class WG {
     public TETile[][] getVisible() {
         return visible;
     }
+
+    /**
+     * Given that `isVisible` is properly updated,
+     * update `Visible` in accordance to that;
+     */
     void updateVisible() {
         for (int i = startWIDTH; i < WIDTH; i ++) {
             for (int j = startHEIGHT; j < HEIGHT; j ++) {
@@ -64,8 +75,13 @@ class WG {
             }
         }
     }
+
+    /**
+     * Iterate through all luminators in the world,
+     * and luminate;
+     */
     void luminateAll() {
-        isVisible = new boolean[WIDTH][HEIGHT];
+        isVisible = new boolean[WIDTH][HEIGHT]; // reset isVisible to all false;
 
         for (int x = startWIDTH; x < WIDTH; x ++) {
             for (int y = startHEIGHT; y < HEIGHT; y ++) {
@@ -78,6 +94,25 @@ class WG {
 
         updateVisible();
     }
+
+    /**
+     * Use MTs array to update the intervals of all existing MovingThings;
+     */
+    void update() {
+        for (int i = 0; i < moving; i ++) {
+            MTs[i].update();
+        }
+    }
+
+    /**
+     * Add a new MovingThings to array MTs, so that we can track it;
+     * Increment `moving`;
+     */
+    void updateMTs(MovingThings m) {
+        MTs[moving] = m;
+        moving ++;
+    }
+
     /**
      * Fill the `world` with NOTHING;
      */
@@ -111,7 +146,7 @@ class WG {
             Lamps[i] = addLAMP();
         }
 
-//        RoMos[0] = addRoMo();
+        RoMos[0] = addRoMo();
 
         replaceAll(Tileset.NOTHING, Tileset.NOTHING);
 
@@ -126,6 +161,21 @@ class WG {
 
         emptyWorld(world);
         emptyWorld(visible);
+
+        /*
+        Renew MTs;
+         */
+        int players = 0;
+        for (int i = 0; i < moving; i ++) {
+            if (MTs[i] instanceof Player) {
+                MTs[players] = MTs[i];
+                players ++;
+            }
+            if (i != players - 1) {
+                MTs[i] = null;
+            }
+        }
+        moving = players;
     }
 
     /**
@@ -273,7 +323,11 @@ class WG {
     private Player addPLAYER() {
         Pos pos = searchFLOOR();
         world[pos.x][pos.y] = Tileset.PLAYER;
-        return new Player(this, pos);
+
+        Player player = new Player(this, pos);
+        updateMTs(player);
+
+        return player;
     }
     private Pos addLAMP() {
         Pos pos;
@@ -296,7 +350,12 @@ class WG {
     }
     private RockMonster addRoMo() {
         Pos pos = searchFLOOR();
-        return new RockMonster(this, pos);
+        world[pos.x][pos.y] = Tileset.MOUNTAIN;
+
+        RockMonster rm = new RockMonster(this, pos);
+        updateMTs(rm);
+
+        return rm;
     }
 }
 

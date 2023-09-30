@@ -7,6 +7,7 @@ abstract class MovingThings {
     WG wg;
     Pos pos;
     TETile avatar;
+    Interval[] ins;
 
     void move(int direc) {
         move(pos.next(direc));
@@ -38,5 +39,11 @@ abstract class MovingThings {
      */
     int goAt(Pos des) {
         return 1;
+    }
+
+    void update() {
+        for (Interval in: ins) {
+            in.update();
+        }
     }
 }

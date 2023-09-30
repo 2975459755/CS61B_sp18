@@ -13,11 +13,9 @@ public class Game {
     public static final int HEIGHT = 40;
 
     WG wg = null;
+    boolean cheatMode = false;
 
-    public static final int actionInterval = 120;
-    public static final int inComboInterval = 45;
     public static final int miniInterval = 30;
-    public static final int comboLength = 2;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -49,8 +47,6 @@ public class Game {
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
 
-        Intervals in = new Intervals();
-
         String input;
         boolean f; // whether something has changed during a miniInterval
         while (true) {
@@ -60,25 +56,28 @@ public class Game {
             /*
             Process keyboard input:
              */
-            input = Input.tryValidCombo(comboLength, in.canPlayerAct());
-            if (in.canPlayerAct() && !input.equals("")) { // valid input, and player can act
+            boolean canPlayerAct = wg.player.canAct();
+            input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
+            if (canPlayerAct && !input.equals("")) { // valid input, and player can act
                 if (input.equals("o")) {
                     cheat();
                 } else {
                     wg.player.act(input);
+                    cheatMode = false;
                 }
 
-                in.update(input);
                 f = true;
                 Input.clearKeyQueue();
             }
 
             if (f) {
-                wg.luminateAll();
+                if (!cheatMode) {
+                    wg.luminateAll();
+                }
                 renderer.renderFrame(wg.getVisible());
             }
 
-            in.update();
+            wg.update();
         }
     }
     void cheat() {
@@ -88,6 +87,7 @@ public class Game {
             }
         }
         wg.updateVisible();
+        cheatMode = true;
     }
 
     /**

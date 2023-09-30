@@ -8,10 +8,12 @@ import java.util.Random;
 class WG {
     static int WIDTH = Game.WIDTH;
     static int HEIGHT = Game.HEIGHT;
-    TETile[][] world;
-    boolean[][] isVisible;
-    TETile[][] visible;
     Random rand;
+
+    static TETile[][] world;
+    static boolean[][] isVisible;
+    static TETile[][] visible;
+
 
     static Pos doorPos;
     static Pos keyPos;
@@ -109,8 +111,36 @@ class WG {
      * Increment `moving`;
      */
     void updateMTs(MovingThings m) {
-        MTs[moving] = m;
-        moving ++;
+        int f = contains(MTs, m, moving);
+        if (f < 0) {
+            MTs[moving] = m;
+            moving ++;
+        } else {
+            if (f != moving - 1) {
+                MTs[f] = MTs[moving - 1];
+            }
+            MTs[moving - 1] = null;
+            moving --;
+        }
+    }
+
+    /**
+     * bound is exclusive;
+     */
+    static <T> int contains(T[] arr, T c, int bound) {
+        for (int i = 0; i < bound; i ++) {
+            if (arr[i].equals(c)) { // use .equals!
+                return i;
+            }
+        }
+        return -1;
+    }
+    int moveMT() {
+        int ret = 0;
+        for (int i = 0; i < moving; i++) {
+            ret += MTs[i].randomAction();
+        }
+        return ret;
     }
 
     /**

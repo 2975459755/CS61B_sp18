@@ -61,6 +61,7 @@ class Pos {
                     }
                 }
             }
+
         } else {
             wg.isVisible[x][y] = false;
         }
@@ -150,12 +151,13 @@ class Pos {
         Pos p = next(direction);
         return p.isTile(world, tile);
     }
-  /**
-   * Get a position next to this, towards some direction;
-   * @param direct: 0: right; 1: left; 2: up; 3: down;
-   *         4: up right; 5: down right; 6: down left; 7: up left;
-   */
-  Pos next(int direct) {
+
+    /**
+     * Get a position next to this, towards some direction;
+     * @param direct: 0: right; 1: left; 2: up; 3: down;
+     *         4: up right; 5: down right; 6: down left; 7: up left;
+     */
+    Pos next(int direct) {
         int xC = x;
         int yC = y;
         switch (direct) {
@@ -170,9 +172,11 @@ class Pos {
         }
         return new Pos(xC, yC);
     }
+
     boolean isFLOOR(TETile[][] world) {
         return isTile(world, Tileset.FLOOR);
     }
+
     boolean isNOTHING(TETile[][] world) {
         return isTile(world, Tileset.NOTHING);
     }
@@ -192,4 +196,5 @@ class Pos {
         return x >= WG.startWIDTH && x < WG.WIDTH
                 && y >= WG.startHEIGHT && y < WG.HEIGHT;
     }
+
 }

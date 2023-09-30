@@ -10,6 +10,9 @@ class Interval {
         this.start = start;
         this.end = end;
     }
+    void renew(int end) {
+        renew(0, end);
+    }
     void renew(int start, int end) {
         this.start = start;
         this.end = end;
@@ -21,14 +24,9 @@ class Interval {
      * so this should not start at 0;
      */
     void renew(String playerInput) {
-        int l = playerInput.length();
-        if (l == Input.comboLength) {
-            this.start = (l - 1) * Input.inComboInterval;
-        } else {
-            this.start = l * Input.inComboInterval;
-        }
+        int st = playerInput.length() * Input.inComboInterval;
 
-        this.end = Player.actionInterval;
+        renew(st, Player.actionInterval);
     }
 
     /**

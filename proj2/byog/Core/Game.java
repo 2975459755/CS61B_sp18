@@ -70,6 +70,13 @@ public class Game {
                 Input.clearKeyQueue();
             }
 
+            /*
+            Move all MovingThings;
+             */
+            if (wg.moveMT() > 0) {
+                f = true;
+            }
+
             if (f) {
                 if (!cheatMode) {
                     wg.luminateAll();

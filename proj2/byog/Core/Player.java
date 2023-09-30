@@ -5,19 +5,15 @@ import byog.TileEngine.Tileset;
 class Player extends MovingThings{
     static final int actionInterval = 150;
 
-    Interval actIn;
-
     Player(WG wg, Pos position) {
         this.wg = wg;
         this.pos = position;
         this.avatar = Tileset.PLAYER;
 
-        actIn = new Interval(0, 0);
-        ins = new Interval[]{actIn};
-    }
+        this.actIn = new Interval(0, 0);
+        this.ins = new Interval[]{actIn};
 
-    boolean canAct() {
-        return actIn.ended();
+        this.health = 5;
     }
     void act(String command) {
         switch (command) {
@@ -38,6 +34,12 @@ class Player extends MovingThings{
             case "ak", "ka" -> interact(1);
             case "wk", "kw" -> interact(2);
             case "sk", "ks" -> interact(3);
+
+            // attack
+            case "dj", "jd" -> attack(0);
+            case "aj", "ja" -> attack(1);
+            case "wj", "jw" -> attack(2);
+            case "sj", "js" -> attack(3);
         }
 
         actIn.renew(command); // TODO: don't creat a new instance, instead, update the original
@@ -65,6 +67,14 @@ class Player extends MovingThings{
     void interact(Pos des) {
         if (des.collectable(wg.world)) { // collectable item
             wg.world[des.x][des.y] = Tileset.FLOOR;
+        }
+    }
+    void attack(int direc) {
+        Pos des = pos.next(direc);
+        if (des.isFLOOR(wg.world)) {
+            Bullet b = new Bullet(wg, des, direc);
+            wg.updateMTs(b);
+            wg.world[des.x][des.y] = b.avatar;
         }
     }
 

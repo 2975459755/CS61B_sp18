@@ -5,10 +5,10 @@ import edu.princeton.cs.introcs.StdDraw;
 import java.awt.*;
 
 public class Input {
-    static final int inComboInterval = 45;
+    static final int inComboInterval = 75;
     static final int comboLength = 2;
     static final int nanoInterval = 15;
-    static final Character[] validInputs = {'w', 'a', 's', 'd', 'k', 'o'};
+    static final Character[] validInputs = {'w', 'a', 's', 'd', 'j', 'k', 'o'};
     static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
                             "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
     };

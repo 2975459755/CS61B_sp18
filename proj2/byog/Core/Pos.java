@@ -23,8 +23,8 @@ class Pos {
     int LDistance(Pos des) {
         return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
     }
-    int isLuminator(TETile[][] world) {
-        TETile t = world[this.x][this.y];
+    int isLuminator() {
+        TETile t = WG.world[this.x][this.y];
 
         if (t == Tileset.PLAYER) {
             return 3;
@@ -36,8 +36,8 @@ class Pos {
 
         return 0;
     }
-    boolean collectable(TETile[][] world) {
-        TETile t = world[x][y];
+    boolean collectable() {
+        TETile t = WG.world[x][y];
 
         if (t == Tileset.LAMP_UNLIT) {
             return true;
@@ -47,23 +47,23 @@ class Pos {
 
         return false;
     }
-    void luminate(WG wg) {
-        luminate(wg, isLuminator(wg.world));
+    void luminate() {
+        luminate(isLuminator());
     }
-    void luminate(WG wg, int radius) {
+    void luminate(int radius) {
         if (radius > 0) {
 
             for (int i = x - radius; i <= x + radius; i ++) {
                 for (int j = y - radius; j <= y + radius; j ++) {
 
                     if (new Pos(i, j).inMap()) {
-                        wg.isVisible[i][j] = true; // update invisibility
+                        WG.isVisible[i][j] = true; // update invisibility
                     }
                 }
             }
 
         } else {
-            wg.isVisible[x][y] = false;
+            WG.isVisible[x][y] = false;
         }
     }
     @Override
@@ -88,8 +88,8 @@ class Pos {
      * @param rand: Instance of Random;
      * @param border: insert 4 or 8;
      */
-    Pos searchNextNOTHING(TETile[][] world, Random rand, int border) {
-        return searchNext(world, rand, border, Tileset.NOTHING);
+    Pos searchNextNOTHING(Random rand, int border) {
+        return searchNext(rand, border, Tileset.NOTHING);
     }
     /**
      * Search for a random `tile` next to this;
@@ -98,11 +98,11 @@ class Pos {
      * @param rand: Instance of Random;
      * @param border: insert 4 or 8;
      */
-    Pos searchNext(TETile[][] world, Random rand, int border, TETile tile) {
+    Pos searchNext(Random rand, int border, TETile tile) {
         Pos p;
         do {
             p = next(rand.nextInt(border));
-        } while (! p.isTile(world, tile));
+        } while (! p.isTile(tile));
         return p;
     }
     /**
@@ -110,16 +110,16 @@ class Pos {
      * border == 4: 4 directions; border == 8: 8 directions;
      * @param border: insert 4 or 8;
      */
-    boolean hasNextNOTHING(TETile[][] world, int border) {
-        return hasNext(world, border, Tileset.NOTHING);
+    boolean hasNextNOTHING(int border) {
+        return hasNext(border, Tileset.NOTHING);
     }
     /**
      * Whether there is a FLOOR tile next to this;
      * border == 4: 4 directions; border == 8: 8 directions;
      * @param border: insert 4 or 8;
      */
-    boolean hasNextFLOOR(TETile[][] world, int border) {
-        return hasNext(world, border, Tileset.FLOOR);
+    boolean hasNextFLOOR(int border) {
+        return hasNext(border, Tileset.FLOOR);
     }
 
     /**
@@ -128,13 +128,13 @@ class Pos {
      * @param border: insert 4 or 8;
      * @param tile: any tile object;
      */
-    boolean hasNext(TETile[][] world, int border, TETile tile) {
+    boolean hasNext(int border, TETile tile) {
         /*
         When border == 4: the last four of the loop will be identical
         to the first four;
          */
         for (int i = 0; i < 8; i ++) {
-            if (hasDirec(world, i % border, tile)) {
+            if (hasDirec(i % border, tile)) {
                 return true;
             }
         }
@@ -147,9 +147,9 @@ class Pos {
      *                 4: up right; 5: down right; 6: down left; 7: up left;
      * @param tile: any tile object;
      */
-    boolean hasDirec(TETile[][] world, int direction, TETile tile) {
+    boolean hasDirec(int direction, TETile tile) {
         Pos p = next(direction);
-        return p.isTile(world, tile);
+        return p.isTile(tile);
     }
 
     /**
@@ -174,19 +174,19 @@ class Pos {
     }
 
     boolean isFLOOR(TETile[][] world) {
-        return isTile(world, Tileset.FLOOR);
+        return isTile(Tileset.FLOOR);
     }
 
     boolean isNOTHING(TETile[][] world) {
-        return isTile(world, Tileset.NOTHING);
+        return isTile(Tileset.NOTHING);
     }
 
     /**
      * Whether this position is the specified `tile`;
      * @param tile: any tile object;
      */
-    boolean isTile(TETile[][] world, TETile tile) {
-        return inMap() && world[x][y] == tile;
+    boolean isTile(TETile tile) {
+        return inMap() && WG.world[x][y] == tile;
     }
 
     /**

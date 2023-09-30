@@ -88,8 +88,8 @@ class WG {
         for (int x = startWIDTH; x < WIDTH; x ++) {
             for (int y = startHEIGHT; y < HEIGHT; y ++) {
                 Pos pos = new Pos(x, y);
-                if (pos.isLuminator(world) > 0) {
-                    pos.luminate(this);
+                if (pos.isLuminator() > 0) {
+                    pos.luminate();
                 }
             }
         }
@@ -240,15 +240,15 @@ class WG {
     private void fillWithFLOORHelper(Pos pos, int n) {
         // n: store the number of filled tiles;
         do {
-            pos = pos.searchNextNOTHING(world, rand, 4); // find the next tile to fill;
+            pos = pos.searchNextNOTHING(rand, 4); // find the next tile to fill;
             world[pos.x][pos.y] = Tileset.FLOOR;
             n ++;
-        } while (pos.hasNextNOTHING(world, 4));
+        } while (pos.hasNextNOTHING(4));
          /*
         Inadequate FLOORs: try filling again;
          */
         if (n < minFLOORCount) {
-            while (! (pos.hasNextNOTHING(world, 4) && pos.isFLOOR(world))) {
+            while (! (pos.hasNextNOTHING(4) && pos.isFLOOR(world))) {
                 // reset starting point;
                 pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
             }
@@ -282,8 +282,8 @@ class WG {
 
                 Pos pos = new Pos(x, y);
                 if (pos.isFLOOR(world)) {
-                    while (pos.hasNextNOTHING(world, border)) {
-                        Pos p = pos.searchNextNOTHING(world, new Random(), border);
+                    while (pos.hasNextNOTHING(border)) {
+                        Pos p = pos.searchNextNOTHING(new Random(), border);
                         world[p.x][p.y] = Tileset.WALL;
                     }
                 }
@@ -303,9 +303,9 @@ class WG {
         Pos pos;
         do {
             pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! (pos.isTile(world, Tileset.WALL)
-                && pos.hasNextFLOOR(world, 4)
-                && pos.hasNext(world, 4, Tileset.WALL)));
+        } while (! (pos.isTile(Tileset.WALL)
+                && pos.hasNextFLOOR(4)
+                && pos.hasNext(4, Tileset.WALL)));
         world[pos.x][pos.y] = Tileset.LOCKED_DOOR;
         return pos;
     }
@@ -318,7 +318,7 @@ class WG {
     private void replaceAll(TETile original, TETile tile) {
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
-                if (new Pos(x, y).isTile(world, original)) {
+                if (new Pos(x, y).isTile(original)) {
                     world[x][y] = tile;
                 }
             }
@@ -332,7 +332,7 @@ class WG {
         Pos pos;
         do {
             pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! pos.isTile(world, tile));
+        } while (! pos.isTile(tile));
         return pos;
     }
     /**

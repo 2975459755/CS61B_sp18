@@ -47,15 +47,15 @@ class Player extends MovingThings{
     }
     @Override
     int goAt(Pos des) {
-        if (des.isTile(wg.world, Tileset.FLOWER)) {
+        if (des.isTile(Tileset.FLOWER)) {
             wg.world[des.x][des.y] = Tileset.FLOOR;
             Pos d = WG.doorPos;
             wg.world[d.x][d.y] = Tileset.UNLOCKED_DOOR;
             return 1;
-        } else if (des.isTile(wg.world, Tileset.UNLOCKED_DOOR)) {
+        } else if (des.isTile(Tileset.UNLOCKED_DOOR)) {
             wg.randomWorld(); // enters a new world
             return -1;
-        } else if (des.isTile(wg.world, Tileset.LAMP_UNLIT)) {
+        } else if (des.isTile(Tileset.LAMP_UNLIT)) {
             wg.world[des.x][des.y] = Tileset.LAMP_LIT;
             return 0;
         }
@@ -65,7 +65,7 @@ class Player extends MovingThings{
         interact(pos.next(direc));
     }
     void interact(Pos des) {
-        if (des.collectable(wg.world)) { // collectable item
+        if (des.collectable()) { // collectable item
             wg.world[des.x][des.y] = Tileset.FLOOR;
         }
     }

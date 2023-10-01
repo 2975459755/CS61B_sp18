@@ -62,6 +62,7 @@ public class Game {
             boolean canPlayerAct = wg.player.canAct();
             input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
             if (canPlayerAct && !input.equals("")) { // valid input, and player can act
+
                 if (input.equals("o")) {
                     cheat();
                 } else if (input.equals("q")) {
@@ -71,11 +72,10 @@ public class Game {
                     cheatMode = false;
                 }
 
-                wg.update(input);
-
+                wg.update(input); // update all MTs for the time Input spent soliciting combo input;
                 f = true;
-                Input.clearKeyQueue();
             }
+            Input.clearKeyQueue();
 
             /*
             Move all MovingThing;

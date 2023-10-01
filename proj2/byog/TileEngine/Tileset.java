@@ -34,8 +34,10 @@ public class Tileset {
     public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain");
     public static final TETile TREE = new TETile('♠', Color.green, Color.black, "tree");
 
-    public static final TETile LAMP_LIT = new TETile('♠', Color.orange, Color.black, "lamp");
-    public static final TETile LAMP_UNLIT = new TETile('♠', Color.white, Color.black, "lamp");
+    public static final TETile LAMP_LIT = new TETile('♠', Color.orange, Color.black, "lit lamp");
+    public static final TETile LAMP_UNLIT = new TETile('♠', Color.white, Color.black, "unlit lamp");
+    public static final TETile WALL_BREAKABLE = new TETile('#', new Color(255, 168, 82), Color.darkGray,
+            "breakable wall");
 }
 
 

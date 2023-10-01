@@ -1,12 +1,14 @@
 package byog.Core.Objects;
 
+import byog.Core.Objects.Headers.Collectable;
 import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Lamp extends StaticThing {
+public class Lamp extends StaticThing implements Collectable {
     public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
     public static TETile avatar_lit = Tileset.LAMP_LIT;
     public static int lumiRange = 6;
@@ -44,6 +46,18 @@ public class Lamp extends StaticThing {
         return true;
     }
 
+    @Override
+    public void touchedBy(Thing thing) {
+        if (thing instanceof Player) {
+            lightUp();
+        }
+    }
+
+    @Override
+    public void collectedBy(Thing thing) {
+
+    }
+
     public Lamp(WG wg, Place place) {
         this.wg = wg;
         this.place = place;
@@ -58,4 +72,5 @@ public class Lamp extends StaticThing {
             litUp = true;
         }
     }
+
 }

@@ -16,27 +16,21 @@ public abstract class MovingThing extends Thing {
     public void move(Place des) {
         int c = goAt(des);
         if (c == 1) { // destination is available for entering;
-            if (des.nowIs(new Floor())) {
-                /*
-                Swap `present` of two places;
-                 */
-                des.addNew(this);
-                place.restore();
-                /*
-                Update status;
-                 */
-                place = des;
-            }
+            enter(des);
         }
     }
     /**
-     *
+     * Try to enter some place;
      * @return 1: Destination is available for entering;
      * 0: Can't go to destination;
      * -1: something special happens;
      */
     public int goAt(Place des) {
-        return 1;
+        des.touchedBy(this);
+        if (des.canEnter()) {
+            return 1;
+        }
+        return 0;
     }
 
     public void update() {

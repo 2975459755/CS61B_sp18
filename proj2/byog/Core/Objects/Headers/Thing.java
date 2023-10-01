@@ -16,18 +16,41 @@ public abstract class Thing implements Serializable {
      * the special arrays should be updated (like wg.MTs);
      */
     public abstract void updateArrays();
+
+    /**
+     * @return the TETile representation of the instance;
+     */
     public abstract TETile avatar();
+
+    /**
+     * @return whether the instance blocks way;
+     */
     public abstract boolean isObstacle();
+
+    /**
+     * @return The range that instance luminates its surroundings;
+     * 0 is only itself; -1 is none;
+     */
     public int isLuminator() {
         return -1;
     }
+
+    /**
+     * @return whether the instance is collectable;
+     */
     public boolean collectable() {
         return false;
     }
-    public void walkedTo() {
-        // TODO
+    public void enter(Place des) {
+        des.addNew(this);
+        place.restore();
+
+        place = des;
     }
+    public abstract void touchedBy(Thing thing);
     /**
+     * Remove it from the world;
+     * Currently Walls can't be removed;
      * Use after dead() !
      */
     public int remove() {

@@ -1,6 +1,7 @@
 package byog.Core.Objects;
 
 import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
@@ -40,6 +41,14 @@ public class Door extends StaticThing {
         }
     }
 
+    @Override
+    public void touchedBy(Thing thing) {
+        if (open && (thing instanceof Player)) {
+            // enters a new world
+            newWorld();
+        }
+    }
+
     public Door(WG wg, Place place) {
         this.wg = wg;
         this.place = place;
@@ -51,5 +60,8 @@ public class Door extends StaticThing {
 
     public void open() {
         open = true;
+    }
+    private void newWorld() {
+        wg.randomWorld(false);
     }
 }

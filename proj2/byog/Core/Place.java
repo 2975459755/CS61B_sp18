@@ -1,6 +1,7 @@
 package byog.Core;
 
 import byog.Core.Objects.Floor;
+import byog.Core.Objects.Headers.Collectable;
 import byog.Core.Objects.Nothing;
 import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
@@ -32,6 +33,7 @@ public class Place implements Serializable {
         intrinsic = thing;
         present = intrinsic;
     }
+
     public void fill(Thing thing) {
         intrinsic = thing;
         present = thing;
@@ -42,6 +44,7 @@ public class Place implements Serializable {
     public void restore() {
         present = intrinsic;
     }
+
     TETile getVisible() {
         if (visible) {
             return present.avatar();
@@ -51,25 +54,19 @@ public class Place implements Serializable {
     public boolean collectable() {
         return present.collectable();
     }
-    public boolean canEnter() {
-        return !(intrinsic.isObstacle() && present.isObstacle());
+    public void collect(Thing thing) {
+        ((Collectable) present).collectedBy(thing);
     }
+    public boolean canEnter() {
+        return !(intrinsic.isObstacle() || present.isObstacle());
+    }
+    public void touchedBy(Thing thing) {
+        present.touchedBy(thing);
+    }
+
     public int isLuminator() {
         return Math.max(intrinsic.isLuminator(), present.isLuminator());
     }
-    public double distance(Place des) {
-        return Math.sqrt(Math.pow(this.x - des.x, 2)
-                + Math.pow(this.y - des.y, 2));
-    }
-
-    /**
-     * L-shaped distance;
-     */
-    public int LDistance(Place des) {
-        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
-    }
-
-
     public void luminate() {
         luminate(isLuminator());
     }
@@ -88,6 +85,16 @@ public class Place implements Serializable {
         }
     }
 
+    public double distance(Place des) {
+        return Math.sqrt(Math.pow(this.x - des.x, 2)
+                + Math.pow(this.y - des.y, 2));
+    }
+    /**
+     * L-shaped distance;
+     */
+    public int LDistance(Place des) {
+        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
+    }
 
     public Place randomSearchNextNothing(Random rand, int sides) {
         return randomSearchNext(rand, sides, new Nothing());

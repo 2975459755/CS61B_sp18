@@ -7,8 +7,8 @@ import java.io.Serializable;
 public class Interval implements Serializable {
     static final int miniInterval = Game.miniInterval;
 
-    int start;
-    int end;
+    private int start;
+    private int end;
 
     public Interval(int end) {
         this.start = 0;

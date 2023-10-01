@@ -64,12 +64,14 @@ public class Game {
             if (canPlayerAct && !input.equals("")) { // valid input, and player can act
                 if (input.equals("o")) {
                     cheat();
-                } else if (input.equals("qq")) {
+                } else if (input.equals("q")) {
                     save();
                 } else {
                     wg.player.act(input);
                     cheatMode = false;
                 }
+
+                wg.update(input);
 
                 f = true;
                 Input.clearKeyQueue();

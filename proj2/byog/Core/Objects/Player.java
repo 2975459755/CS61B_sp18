@@ -1,21 +1,35 @@
-package byog.Core;
+package byog.Core.Objects;
 
+import byog.Core.Interval;
+import byog.Core.Objects.Headers.Mortal;
+import byog.Core.Objects.Headers.MovingThing;
+import byog.Core.Place;
+import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-import java.io.Serializable;
+public class Player extends MovingThing implements Mortal {
+    public static final int actionInterval = 150;
+    public static final int attackInterval = 500;
 
-class Player extends MovingThing {
-    static final int actionInterval = 150;
-    static final TETile default_avatar = Tileset.PLAYER;
-    static final boolean isObstable = true;
-    static final int default_lumiRange = 3;
-    static final int default_health = 5;
-    int lumiRange;
-    TETile avatar;
+    public static final TETile default_avatar = Tileset.PLAYER;
+    private static final boolean isObstable = true;
+    public static final int default_lumiRange = 3;
+    public final int default_health = 5;
+    public int lumiRange;
+    private int health;
+    private TETile avatar;
+    Interval attackIn;
 
     Player() {}
-    Player(WG wg, Place place) {
+
+    @Override
+    public void updateArrays() {
+        wg.updMTs(this); // player is mts
+        wg.updLuminators(this); // player is luminator
+    }
+
+    public Player(WG wg, Place place) {
         this.wg = wg;
         this.place = place;
 
@@ -24,10 +38,13 @@ class Player extends MovingThing {
         this.health = default_health;
 
         this.actIn = new Interval(0);
-        this.ins = new Interval[]{actIn};
+        this.attackIn = new Interval(0);
+        this.ins = new Interval[]{actIn, attackIn};
+
+        updateArrays();
     }
     @Override
-    TETile avatar() {
+    public TETile avatar() {
         if (avatar == null) {
             return Player.default_avatar;
         }
@@ -35,15 +52,19 @@ class Player extends MovingThing {
     }
 
     @Override
-    boolean isObstacle() {
+    public boolean isObstacle() {
         return Player.isObstable;
     }
     @Override
-    int isLuminator() {
+    public int isLuminator() {
         return lumiRange;
     }
+    @Override
+    public int getHealth() {
+        return health;
+    }
 
-    void act(String command) {
+    public void act(String command) {
         switch (command) {
             // four-direction movements
             case "d", "right" -> move(0);
@@ -70,11 +91,11 @@ class Player extends MovingThing {
             case "sj", "js" -> attack(3);
         }
 
-        actIn.renew(command); // TODO: don't creat a new instance, instead, update the original
+        actIn.renew(actionInterval); // TODO: don't creat a new instance, instead, update the original
 
     }
     @Override
-    int goAt(Place des) {
+    public int goAt(Place des) {
         if (des.nowIs(new Key())) {
             des.restore();
             wg.door.open();
@@ -88,15 +109,21 @@ class Player extends MovingThing {
         }
         return 1;
     }
-    void interact(int direc) {
+
+    @Override
+    public int randomAction() {
+        return 0;
+    }
+
+    public void interact(int direc) {
         interact(place.next(direc));
     }
-    void interact(Place des) {
+    public void interact(Place des) {
         if (des.collectable()) { // collectable item
             des.restore();
         }
     }
-    void attack(int direc) {
+    public void attack(int direc) {
         Place des = place.next(direc);
         if (des.nowIs(new Floor())) {
             Bullet b = new Bullet(wg, des, direc);
@@ -104,4 +131,9 @@ class Player extends MovingThing {
             b.goAt(des);
         }
     }
+    public boolean canAttack() {
+        return attackIn.ended();
+    }
+
+
 }

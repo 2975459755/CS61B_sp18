@@ -12,7 +12,6 @@ public class Input {
     static final Character[] validInputs = {'w', 'a', 's', 'd', 'j', 'k', 'o', 'q'};
     static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
                             "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
-                            "qq",
     };
 
     /**

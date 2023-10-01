@@ -1,25 +1,27 @@
 package byog.Core;
 
+import byog.Core.Objects.Player;
+
 import java.io.Serializable;
 
-class Interval implements Serializable {
+public class Interval implements Serializable {
     static final int miniInterval = Game.miniInterval;
 
     int start;
     int end;
 
-    Interval(int end) {
+    public Interval(int end) {
         this.start = 0;
         this.end = end;
     }
-    Interval(int start, int end) {
+    public Interval(int start, int end) {
         this.start = start;
         this.end = end;
     }
-    void renew(int end) {
+    public void renew(int end) {
         renew(0, end);
     }
-    void renew(int start, int end) {
+    public void renew(int start, int end) {
         this.start = start;
         this.end = end;
     }
@@ -29,7 +31,8 @@ class Interval implements Serializable {
      * during which the player can't act again,
      * so this should not start at 0;
      */
-    void renew(String playerInput) {
+    @Deprecated
+    public void renew(String playerInput) {
         int st = playerInput.length() * Input.inComboInterval;
 
         renew(st, Player.actionInterval);
@@ -38,12 +41,21 @@ class Interval implements Serializable {
     /**
      * Update after each miniInterval;
      */
-    void update() {
+    public void update() {
+        update(miniInterval);
+    }
+    public <T> void update(T intOrString) {
+        int time;
+        if (intOrString instanceof String s) {
+            time = s.length() * Input.inComboInterval;
+        } else {
+            time = (int) intOrString;
+        }
         if (!ended()) {
-            start += miniInterval;
+            start += time;
         }
     }
-    boolean ended() {
+    public boolean ended() {
         return start >= end;
     }
 

@@ -64,7 +64,7 @@ public class Game {
             if (canPlayerAct && !input.equals("")) { // valid input, and player can act
                 if (input.equals("o")) {
                     cheat();
-                } else if (input.equals("q")) {
+                } else if (input.equals("qq")) {
                     save();
                 } else {
                     wg.player.act(input);
@@ -76,7 +76,7 @@ public class Game {
             }
 
             /*
-            Move all MovingThings;
+            Move all MovingThing;
              */
             if (wg.moveMT() > 0) {
                 f = true;
@@ -93,9 +93,9 @@ public class Game {
         }
     }
     void cheat() {
-        for (int x = WG.startWIDTH; x < WG.WIDTH; x ++) {
-            for (int y = WG.startHEIGHT; y < WG.HEIGHT; y ++) {
-                WG.isVisible[x][y] = true;
+        for (int x = 0; x < WG.WIDTH; x ++) {
+            for (int y = 0; y < WG.HEIGHT; y ++) {
+                WG.places[x][y].visible = true;
             }
         }
         wg.updateVisible();
@@ -131,6 +131,7 @@ public class Game {
         } else {
             throw new RuntimeException("Type 'N' or 'L' to start !");
         }
+        world.updateVisible();
         finalWorldFrame = world.getVisible();
         return finalWorldFrame;
     }

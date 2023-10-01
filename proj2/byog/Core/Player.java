@@ -1,22 +1,48 @@
 package byog.Core;
 
+import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 import java.io.Serializable;
 
-class Player extends MovingThings {
+class Player extends MovingThing {
     static final int actionInterval = 150;
+    static final TETile default_avatar = Tileset.PLAYER;
+    static final boolean isObstable = true;
+    static final int default_lumiRange = 3;
+    static final int default_health = 5;
+    int lumiRange;
+    TETile avatar;
 
-    Player(WG wg, Pos position) {
+    Player() {}
+    Player(WG wg, Place place) {
         this.wg = wg;
-        this.pos = position;
-        this.avatar = Tileset.PLAYER;
+        this.place = place;
+
+        this.avatar = default_avatar;
+        this.lumiRange = default_lumiRange;
+        this.health = default_health;
 
         this.actIn = new Interval(0);
         this.ins = new Interval[]{actIn};
-
-        this.health = 5;
     }
+    @Override
+    TETile avatar() {
+        if (avatar == null) {
+            return Player.default_avatar;
+        }
+        return avatar;
+    }
+
+    @Override
+    boolean isObstacle() {
+        return Player.isObstable;
+    }
+    @Override
+    int isLuminator() {
+        return lumiRange;
+    }
+
     void act(String command) {
         switch (command) {
             // four-direction movements
@@ -48,37 +74,34 @@ class Player extends MovingThings {
 
     }
     @Override
-    int goAt(Pos des) {
-        if (des.isTile(Tileset.FLOWER)) {
-            WG.world[des.x][des.y] = Tileset.FLOOR;
-            Pos d = wg.doorPos;
-            WG.world[d.x][d.y] = Tileset.UNLOCKED_DOOR;
+    int goAt(Place des) {
+        if (des.nowIs(new Key())) {
+            des.restore();
+            wg.door.open();
             return 1;
-        } else if (des.isTile(Tileset.UNLOCKED_DOOR)) {
-            wg.randomWorld(); // enters a new world
+        } else if (des.nowIs(new Door()) && wg.door.open) {
+            wg.randomWorld(false); // enters a new world
             return -1;
-        } else if (des.isTile(Tileset.LAMP_UNLIT)) {
-            WG.world[des.x][des.y] = Tileset.LAMP_LIT;
+        } else if (des.nowIs(new Lamp())) {
+            ((Lamp) des.present).lightUp();
             return 0;
         }
         return 1;
     }
     void interact(int direc) {
-        interact(pos.next(direc));
+        interact(place.next(direc));
     }
-    void interact(Pos des) {
+    void interact(Place des) {
         if (des.collectable()) { // collectable item
-            WG.world[des.x][des.y] = Tileset.FLOOR;
+            des.restore();
         }
     }
     void attack(int direc) {
-        Pos des = pos.next(direc);
-        if (des.isFLOOR()) {
+        Place des = place.next(direc);
+        if (des.nowIs(new Floor())) {
             Bullet b = new Bullet(wg, des, direc);
-            wg.updateMTs(b);
-            WG.world[des.x][des.y] = b.avatar;
+            des.addNew(b);
             b.goAt(des);
         }
     }
-
 }

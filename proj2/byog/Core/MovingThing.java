@@ -5,32 +5,30 @@ import byog.TileEngine.Tileset;
 
 import java.io.Serializable;
 
-abstract class MovingThings implements Serializable {
-    WG wg;
-    Pos pos;
-    TETile avatar;
+abstract class MovingThing extends Thing {
     Interval actIn;
     Interval[] ins;
     int health;
 
+    MovingThing() {}
     void move(int direc) {
-        move(pos.next(direc));
+        move(place.next(direc));
     }
-    void move(Pos des) {
+    void move(Place des) {
         int c = goAt(des);
         if (c == -1) {
             return; // player enters a new world;
         } else if (c == 1) { // destination is available for entering;
-            if (des.isFLOOR()) {
+            if (des.nowIs(new Floor())) {
             /*
             Swap two tiles;
              */
-                WG.world[pos.x][pos.y] = Tileset.FLOOR;
-                WG.world[des.x][des.y] = avatar;
+                place.restore();
+                des.addNew(this);
             /*
             Update status;
              */
-                pos = des;
+                place = des;
             }
         }
     }
@@ -40,7 +38,7 @@ abstract class MovingThings implements Serializable {
      * 0: Can't go to destination;
      * -1: something special happens;
      */
-    int goAt(Pos des) {
+    int goAt(Place des) {
         return 1;
     }
 
@@ -74,8 +72,8 @@ abstract class MovingThings implements Serializable {
      * Use after dead() !!!
      */
     int remove() {
-        wg.updateMTs(this);
-        WG.world[pos.x][pos.y] = Tileset.FLOOR;
+        wg.updMTs(this); // RoMo is mts;
+        place.restore();
         return 1;
     }
 }

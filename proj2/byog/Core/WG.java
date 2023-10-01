@@ -11,35 +11,33 @@ class WG implements Serializable {
     static int HEIGHT = Game.HEIGHT;
     Random rand;
 
-    static TETile[][] world = new TETile[WIDTH][HEIGHT];
-    static boolean[][] isVisible = new boolean[WIDTH][HEIGHT];
-    static TETile[][] visible = new TETile[WIDTH][HEIGHT];
     /*
     Before saving, make a copy of changeable statics,
     because Serialization does not work for statics;
      */
-    TETile[][] Sworld;
-    boolean[][] SisVisible;
-    TETile[][] Svisible;
+
+    static Place[][] places = new Place[WIDTH][HEIGHT];
+    Place[][] Splaces;
+    TETile[][] visibleWorld;
 
 
-    Pos doorPos;
-    Pos keyPos;
+    Door door;
+    Key key;
     private static final int minLamps = 2;
     private static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
-    Pos[] Lamps = new Pos[maxLamps];
-    int numLamps = 0;
+    Thing[] luminators = new Thing[50]; // TODO: renew
+    int lumis = 0; // TODO: renew
 
     /*
-    MovingThings:
+    MovingThing:
      */
     Player player;
     static final int maxNumRoMo = 1;
-    RockMonster[] RoMos = new RockMonster[maxNumRoMo];
-    int numRoMo = 0;
+    RockMonster[] RoMos = new RockMonster[maxNumRoMo]; // TODO:renew
+    int numRoMo = 0; // TODO: renew
 
-    MovingThings[] MTs = new MovingThings[100]; // Keep track of all MovingThings
-    int moving = 0; // the number of existing MovingThings
+    MovingThing[] MTs = new MovingThing[100]; // Keep track of all MovingThing TODO: renew
+    int movings = 0; // the number of existing MovingThing TODO: renew
 
     /*
     For special uses:
@@ -62,32 +60,27 @@ class WG implements Serializable {
     }
 
     void save() {
-        Sworld = world;
-        SisVisible = isVisible;
-        Svisible = visible;
+        Splaces = places;
     }
     void load() {
-        world = Sworld;
-        isVisible = SisVisible;
-        visible = Svisible;
+        places = Splaces;
     }
 
     public TETile[][] getVisible() {
-        return visible;
+        return visibleWorld;
     }
 
     /**
-     * Given that `isVisible` is properly updated,
-     * update `Visible` in accordance to that;
+     * Given that visible is properly updated,
+     * update visible world in accordance to that;
      */
     void updateVisible() {
-        for (int i = startWIDTH; i < WIDTH; i ++) {
-            for (int j = startHEIGHT; j < HEIGHT; j ++) {
-                if (isVisible[i][j]) {
-                    visible[i][j] = world[i][j];
-                } else {
-                    visible[i][j] = Tileset.NOTHING;
-                }
+        visibleWorld = new TETile[WIDTH][HEIGHT];
+        for (int i = 0; i < WIDTH; i ++) {
+            for (int j = 0; j < HEIGHT; j++) {
+
+                visibleWorld[i][j] = places[i][j].getVisible();
+
             }
         }
     }
@@ -97,54 +90,63 @@ class WG implements Serializable {
      * and luminate;
      */
     void luminateAll() {
-        isVisible = new boolean[WIDTH][HEIGHT]; // reset isVisible to all false;
+        for (int i = 0; i < WIDTH; i ++) {
+            for (int j = 0; j < HEIGHT; j++) { // reset visible to all false;
 
-        Pos pos;
-        for (int x = startWIDTH; x < WIDTH; x ++) {
-            for (int y = startHEIGHT; y < HEIGHT; y ++) {
-                pos = new Pos(x, y);
-                if (pos.isLuminator() > 0) {
-                    pos.luminate();
-                }
+                places[i][j].visible = false;
+
             }
+        }
+
+        for (int i = 0; i < lumis; i ++) {
+            luminators[i].place.luminate();
         }
 
         updateVisible();
     }
 
     /**
-     * Use MTs array to update the intervals of all existing MovingThings;
+     * Use MTs array to update the intervals of all existing MovingThing;
      */
     void update() {
-        for (int i = 0; i < moving; i ++) {
+        for (int i = 0; i < movings; i ++) {
             MTs[i].update();
         }
     }
 
-    /**
-     * Add a new MovingThings to array MTs, so that we can track it;
-     * Increment `moving`;
-     */
-    void updateMTs(MovingThings m) {
-        int f = contains(MTs, m, moving);
-        if (f < 0) {
-            MTs[moving] = m;
-            moving ++;
-        } else {
-            if (f != moving - 1) {
-                MTs[f] = MTs[moving - 1];
-            }
-            MTs[moving - 1] = null;
-            moving --;
-        }
+
+    void updLuminators(Thing l) {
+        lumis += updArray(luminators, l, lumis);
+    }
+    void updMTs(MovingThing mt) {
+        movings += updArray(MTs, mt, movings);
     }
 
     /**
+     * When item not in array, add it, return 1;
+     * When item is in array, remove it, return -1;
+     * @param currentCount We declare array size larger than we actually need,
+     *                     this will prevent null-pointer exception;
+     */
+    <T> int updArray(T[] arr, T item, int currentCount) {
+        int f = contains(arr, item, currentCount);
+        if (f < 0) {
+            arr[currentCount] = item;
+            return 1;
+        } else {
+            if (f != currentCount - 1) {
+                arr[f] = arr[currentCount - 1];
+            }
+            arr[currentCount - 1] = null;
+            return -1;
+        }
+    }
+    /**
      * bound is exclusive;
      */
-    static <T> int contains(T[] arr, T c, int bound) {
+    static <T> int contains(T[] arr, T item, int bound) {
         for (int i = 0; i < bound; i ++) {
-            if (arr[i].equals(c)) { // use .equals!
+            if (arr[i].equals(item)) { // use .equals!
                 return i;
             }
         }
@@ -152,85 +154,89 @@ class WG implements Serializable {
     }
     int moveMT() {
         int ret = 0;
-        for (int i = 0; i < moving; i++) {
+        for (int i = 0; i < movings; i++) {
             ret += MTs[i].randomAction();
         }
         return ret;
     }
 
-    /**
-     * Fill the `world` with NOTHING;
-     */
-    private void emptyWorld(TETile[][] world) {
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                world[x][y] = Tileset.NOTHING;
-            }
-        }
+    void randomWorld() {
+        randomWorld(true);
     }
     /**
      * Pseudo-randomly generate a world;
+     * @params f First time generate, insert true; otherwise false;
      */
-    void randomWorld() {
-        renew();
+    void randomWorld(boolean f) {
+        renew(f);
 
-        Pos start = new Pos
-                (Math.floorDiv(WIDTH, 2), Math.floorDiv(HEIGHT, 2)); // start point is at the center
+        int xStart = Math.floorDiv(WIDTH, 2);
+        int yStart = Math.floorDiv(HEIGHT, 2); // start point is at the center
 
-        fillWithFLOOR(start); // First step: Randomly fill with FLOOR tiles;
+        fillWithFloor(places[xStart][yStart]); // First step: Randomly fill with FLOOR tiles;
         addWALL();
-        doorPos = addDOOR();
-        keyPos = addKEY();
-        player = addPLAYER();
+        door = addDOOR();
+        key = addKEY();
+        player = addPLAYER(f);
 
         /*
         Generate a random number of lamps;
          */
-        numLamps = 0;
         for (int i = 0; i < rand.nextInt(minLamps, maxLamps + 1); i++) {
-            Lamps[i] = addLAMP();
+            addLAMP();
         }
 
         RoMos[0] = addRoMo();
 
-        replaceAll(Tileset.NOTHING, Tileset.NOTHING);
+        replaceAll(new Nothing(), new Nothing());
 
         luminateAll();
     }
 
     /**
-     * Method for renewing a WG world;
+     * Generate places;
+     * Fill with NOTHING;
      */
-    void renew() {
-        isVisible = new boolean[WIDTH][HEIGHT];
+    private void emptyWorld() {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
 
-        emptyWorld(world);
-        emptyWorld(visible);
+                places[x][y] = new Place(x, y, new Nothing());
 
-        /*
-        Renew MTs;
-         */
-        int players = 0;
-        for (int i = 0; i < moving; i ++) {
-            if (MTs[i] instanceof Player) {
-                MTs[players] = MTs[i];
-                players ++;
-            }
-            if (i != players - 1) {
-                MTs[i] = null;
             }
         }
-        moving = players;
+    }
+    /**
+     * Method for renewing a WG world;
+     */
+    void renew(boolean f) {
+        emptyWorld();
+        if (f) {
+            return; // First time generating: end here;
+        }
+        /*
+        Renew arrays:
+         */
+        MTs = new MovingThing[100];
+        movings = 0;
+        updMTs(player);
+
+        luminators = new Thing[50];
+        lumis = 0;
+        updLuminators(player);
+
+        RoMos = new RockMonster[maxNumRoMo];
+        numRoMo = 0;
     }
 
     /**
      * Randomly fill with FLOOR tiles;
      * Number of FLOOR must be above minFLOORCount;
      */
-    private void fillWithFLOOR(Pos pos) {
-        fillWithFLOOR(pos, 0);
+    private void fillWithFloor(Place place) {
+        fillWithFloor(place, 0);
     }
-    private void fillWithFLOOR(Pos pos, int n) {
+    private void fillWithFloor(Place place, int n) {
         /*
         rule out the four edges;
         because the FLOOR must not be in the edges
@@ -243,7 +249,7 @@ class WG implements Serializable {
         /*
         fill with FLOORs;
          */
-        fillWithFLOORHelper(pos, n);
+        fillWithFloorHelper(place, n);
         /*
         restore the size of the world;
          */
@@ -252,22 +258,22 @@ class WG implements Serializable {
         startHEIGHT --;
         HEIGHT ++;
     }
-    private void fillWithFLOORHelper(Pos pos, int n) {
+    private void fillWithFloorHelper(Place place, int n) {
         // n: store the number of filled tiles;
         do {
-            pos = pos.searchNextNOTHING(rand, 4); // find the next tile to fill;
-            world[pos.x][pos.y] = Tileset.FLOOR;
+            place = place.randomSearchNextNothing(rand, 4); // find the next tile to fill;
+            place.fill(new Floor());
             n ++;
-        } while (pos.hasNextNOTHING(4));
+        } while (place.hasNextNothing(4));
          /*
-        Inadequate FLOORs: try filling again;
+        Inadequate Floors: try filling again;
          */
         if (n < minFLOORCount) {
-            while (! (pos.hasNextNOTHING(4) && pos.isFLOOR())) {
+            while (! (place.hasNextNothing(4) && place.isFloor())) {
                 // reset starting point;
-                pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
+                place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
             }
-            fillWithFLOORHelper(pos, n); // this is what `n` is for;
+            fillWithFloorHelper(place, n); // this is what `n` is for;
         }
     }
 
@@ -276,12 +282,12 @@ class WG implements Serializable {
      */
     private void clearEdges() {
         for (int x = 0; x < WIDTH; x ++) {
-            world[x][0] = Tileset.NOTHING;
-            world[x][HEIGHT - 1] = Tileset.NOTHING;
+            places[x][0].fill(new Nothing());
+            places[x][HEIGHT - 1].fill(new Nothing());
         }
         for (int y = 1; y < HEIGHT - 1; y ++) {
-            world[0][y] = Tileset.NOTHING;
-            world[WIDTH - 1][y] = Tileset.NOTHING;
+            places[0][y].fill(new Nothing());
+            places[WIDTH - 1][y].fill(new Nothing());
         }
     }
 
@@ -291,15 +297,15 @@ class WG implements Serializable {
     private void addWALL() {
         addWALL(8);
     }
-    private void addWALL(int border) {
+    private void addWALL(int sides) {
+        Place place;
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
 
-                Pos pos = new Pos(x, y);
-                if (pos.isFLOOR()) {
-                    while (pos.hasNextNOTHING(border)) {
-                        Pos p = pos.searchNextNOTHING(new Random(), border);
-                        world[p.x][p.y] = Tileset.WALL;
+                place = places[x][y];
+                if (place.isFloor()) {
+                    while (place.hasNextNothing(sides)) {
+                        place.randomSearchNextNothing(rand, sides).fill(new Wall());
                     }
                 }
 
@@ -314,91 +320,115 @@ class WG implements Serializable {
      * A Door also must be near to a FLOOR;
      * @return Position object of the DOOR;
      */
-    private Pos addDOOR() {
-        Pos pos;
+    private Door addDOOR() {
+        Place place;
         do {
-            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! (pos.isTile(Tileset.WALL)
-                && pos.hasNextFLOOR(4)
-                && pos.hasNext(4, Tileset.WALL)));
-        world[pos.x][pos.y] = Tileset.LOCKED_DOOR;
-        return pos;
+            place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
+        } while (! (place.nowIs(new Wall())
+                && place.hasNextFloor(4)
+                && place.hasNext(4, new Wall())));
+
+        Door d = new Door(this, place);
+        place.fill(d);
+
+        updLuminators(d); // door is possible luminator
+
+        return d;
     }
 
     /**
      * Replace every `original` in `world` with `tile`;
      * @param original: tile to be replaced;
-     * @param tile: new tile to fill it;
      */
-    private void replaceAll(TETile original, TETile tile) {
+    private void replaceAll(Thing original, Thing replacer) {
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
-                if (new Pos(x, y).isTile(original)) {
-                    world[x][y] = tile;
+
+                if (places[x][y].nowIs(original)) {
+                    places[x][y].fill(replacer);
                 }
+
             }
         }
     }
 
-    private Pos searchFLOOR() {
-        return searchTile(Tileset.FLOOR);
+    private Place randomSearchFloor() {
+        return randomSearchThing(new Floor());
     }
-    private Pos searchTile(TETile tile) {
-        Pos pos;
+    private Place randomSearchThing(Thing thing) {
+        Place place;
         do {
-            pos = new Pos(rand.nextInt(WIDTH), rand.nextInt(HEIGHT));
-        } while (! pos.isTile(tile));
-        return pos;
+            place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
+        } while (! place.nowIs(thing));
+        return place;
     }
     /**
      * Replace a random FLOOR with KEY;
+     * Use after the Door is added;
      * @return Position object of the KEY;
      */
-    private Pos addKEY() {
-        Pos pos;
+    private Key addKEY() {
+        Place place;
         do {
-            pos = searchFLOOR();
-        } while (! validKEY(pos));
-        world[pos.x][pos.y] = Tileset.FLOWER;
-        return pos;
-    }
-    private boolean validKEY(Pos pos) {
-        return pos.distance(doorPos) >= keyDoorDis;
-    }
-    private Player addPLAYER() {
-        Pos pos = searchFLOOR();
-        world[pos.x][pos.y] = Tileset.PLAYER;
+            place = randomSearchFloor();
+        } while (! validKEY(place));
 
-        Player player = new Player(this, pos);
-        updateMTs(player);
-
-        return player;
+        Key k = new Key(this, place);
+        place.addNew(k);
+        return k;
     }
-    private Pos addLAMP() {
-        Pos pos;
+    private boolean validKEY(Place pos) {
+        return pos.distance(door.place) >= keyDoorDis;
+    }
+    private Player addPLAYER(boolean f) {
+        Player p;
+        Place place;
+        if (f) {
+            place = randomSearchFloor();
+            p = new Player(this, place);
+            place.addNew(p);
+
+            updMTs(p); // player is mts
+            updLuminators(p); // player is luminator
+        } else { // use the existing player instance; update place status;
+            p = player;
+            place = randomSearchFloor();
+            player.place = place;
+            place.addNew(player); // note that the renew world method changed all places;
+        }
+
+        return p;
+    }
+    private Lamp addLAMP() {
+        Place place;
         do {
-            pos = searchFLOOR();
-        } while (! validLamp(pos));
-        world[pos.x][pos.y] = Tileset.LAMP_UNLIT;
+            place = randomSearchFloor();
+        } while (! validLamp(place));
 
-        numLamps ++;
-        return pos;
+        Lamp l = new Lamp(this, place);
+        place.addNew(l);
+
+        updLuminators(l); // lamp is luminator
+
+        return l;
     }
-    private boolean validLamp(Pos pos) {
+    private boolean validLamp(Place place) {
         // lamps should not be too close to each other
-        for (int i = 0; i < numLamps; i ++) {
-            if (pos.LDistance(Lamps[i]) < lampDis) {
-                return false;
+        for (int i = 0; i < lumis; i ++) {
+            if (luminators[i] instanceof Lamp l) {
+                if (place.LDistance(l.place) < lampDis) {
+                    return false;
+                }
             }
         }
         return true;
     }
     private RockMonster addRoMo() {
-        Pos pos = searchFLOOR();
-        world[pos.x][pos.y] = Tileset.MOUNTAIN;
+        Place place = randomSearchFloor();
+        RockMonster rm = new RockMonster(this, place);
+        place.addNew(rm);
 
-        RockMonster rm = new RockMonster(this, pos);
-        updateMTs(rm);
+        updMTs(rm); // RockMonster is mts
 
         return rm;
     }

@@ -80,16 +80,14 @@ public class Game {
             /*
             Move all MovingThing;
              */
-            if (wg.moveMT() > 0) {
+            if (wg.checkChange() > 0) {
                 f = true;
             }
 
-            if (f) {
-                if (!cheatMode) {
-                    wg.luminateAll();
-                }
-                renderer.renderFrame(wg.getVisible());
+            if (!cheatMode) {
+                wg.luminateAll();
             }
+            renderer.renderFrame(wg.getVisible());
 
             wg.update();
         }

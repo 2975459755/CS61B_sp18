@@ -1,13 +1,13 @@
 package byog.Core.Objects;
 
-import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.FixedThing;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Door extends StaticThing {
+public class Door extends FixedThing {
     public static TETile avatar_locked = Tileset.LOCKED_DOOR;
     public static TETile avatar_open = Tileset.UNLOCKED_DOOR;
     public static int lumiRange = 2;
@@ -17,7 +17,7 @@ public class Door extends StaticThing {
 
     @Override
     public void updateArrays() {
-        wg.updLuminators(this); // door is possible luminator
+        wg.updTrack(this); // door is possible luminator
     }
 
     @Override

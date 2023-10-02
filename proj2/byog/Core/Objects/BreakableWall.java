@@ -1,25 +1,20 @@
 package byog.Core.Objects;
 
+import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
+import byog.Core.Objects.Headers.Interfaces.Ally;
+import byog.Core.Objects.Headers.Interfaces.Damager;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class BreakableWall extends StaticThing implements Mortal {
-    public static TETile avatar = Tileset.WALL_BREAKABLE;
+public class BreakableWall extends ImmobileDamageable {
+    public static TETile default_avatar = Tileset.WALL_BREAKABLE;
+    public static TETile damaged_avatar = Tileset.WALL_DAMAGED;
     public static int default_health = 3;
-    private int health;
 
     public BreakableWall() {}
-    @Override
-    public void updateArrays() {
-
-    }
-    @Override
-    public TETile avatar() {
-        return BreakableWall.avatar;
-    }
     @Override
     public boolean isObstacle() {
         return true;
@@ -38,16 +33,13 @@ public class BreakableWall extends StaticThing implements Mortal {
     }
 
     @Override
-    public void damagedBy(Thing thing) {
-
+    public TETile defaultAvatar() {
+        return default_avatar;
     }
 
     @Override
-    public void damagedBy(int atk) {
-        health -= atk;
-        if (health <= 0) {
-            remove();
-        }
+    public TETile damagedAvatar() {
+        return damaged_avatar;
     }
 
     public BreakableWall(WG wg, Place place) {
@@ -55,5 +47,9 @@ public class BreakableWall extends StaticThing implements Mortal {
         this.place = place;
 
         this.health = default_health;
+        this.damaged = new Interval(0);
+        this.ins = new Interval[] {damaged};
+
+        updateArrays();
     }
 }

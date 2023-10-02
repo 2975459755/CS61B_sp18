@@ -1,14 +1,15 @@
 package byog.Core.Objects;
 
-import byog.Core.Objects.Headers.Collectable;
-import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.ImmobileThing;
+import byog.Core.Objects.Headers.Interfaces.Collectable;
+import byog.Core.Objects.Headers.RemovableThing;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Key extends StaticThing implements Collectable {
+public class Key extends ImmobileThing implements Collectable {
     public static TETile avatar = Tileset.FLOWER;
 
     public Key() {}

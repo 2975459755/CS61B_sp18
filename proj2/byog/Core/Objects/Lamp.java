@@ -1,14 +1,14 @@
 package byog.Core.Objects;
 
-import byog.Core.Objects.Headers.Collectable;
-import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.ImmobileThing;
+import byog.Core.Objects.Headers.Interfaces.Collectable;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Lamp extends StaticThing implements Collectable {
+public class Lamp extends ImmobileThing implements Collectable {
     public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
     public static TETile avatar_lit = Tileset.LAMP_LIT;
     public static int lumiRange = 6;
@@ -16,11 +16,11 @@ public class Lamp extends StaticThing implements Collectable {
 
     public Lamp() {}
 
+
     @Override
     public void updateArrays() {
-        wg.updLuminators(this); // lamp is luminator
+        wg.updTrack(this);
     }
-
     @Override
     public TETile avatar() {
         if (litUp) {

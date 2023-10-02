@@ -2,19 +2,18 @@ package byog.Core.Objects;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
+import byog.Core.Objects.Headers.Interfaces.*;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class RockMonster extends MovingThing implements Mortal, Damager {
+public class RockMonster extends MovingDamageable implements Damager, Enemy {
     public static final int actionInterval = 1000;
     static final TETile default_avatar = Tileset.MOUNTAIN;
     static final TETile damaged_avatar = Tileset.DAMAGED_ROMO;
     static int default_health = 3;
     static int atk = 1;
-    private int health;
-    private Interval damaged; // when damaged, avatar changes for a moment;
 
     RockMonster() {}
 
@@ -33,8 +32,13 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
     }
 
     @Override
-    public void updateArrays() {
-        wg.updMTs(this);
+    public TETile defaultAvatar() {
+        return default_avatar;
+    }
+
+    @Override
+    public TETile damagedAvatar() {
+        return damaged_avatar;
     }
 
     @Override
@@ -58,10 +62,13 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
 
     @Override
     public void touchedBy(Thing thing) {
-        if ((thing instanceof Damager d) && (thing instanceof Friendly)) {
+        if ((thing instanceof Damager d) && !(thing instanceof Enemy)) {
+            // None Enemy Damager;
             d.doDamage(this);
-        } else if (thing instanceof Player p) {
-            doDamage(p);
+        }
+        if ((thing instanceof Friendly) && (thing instanceof Mortal m)) {
+            // Mortal Friendly;
+            doDamage(m);
         }
     }
 
@@ -81,18 +88,6 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
         return 1;
     }
 
-
-    @Override
-    public void damagedBy(Thing thing) {
-
-    }
-
-    @Override
-    public void damagedBy(int atk) {
-        health -= atk;
-        damaged.renew(300);
-    }
-
     @Override
     public int getAtk() {
         return atk;
@@ -103,9 +98,5 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
         if (target instanceof Ally) {
             target.damagedBy(getAtk());
         }
-    }
-
-    private boolean duringDamage() {
-        return !damaged.ended();
     }
 }

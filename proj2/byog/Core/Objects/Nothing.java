@@ -1,12 +1,12 @@
 package byog.Core.Objects;
 
-import byog.Core.Objects.Headers.StaticThing;
+import byog.Core.Objects.Headers.FixedThing;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Nothing extends StaticThing {
+public class Nothing extends FixedThing {
     public static TETile avatar = Tileset.NOTHING;
     public static boolean isObstacle = true;
     public Nothing() {}

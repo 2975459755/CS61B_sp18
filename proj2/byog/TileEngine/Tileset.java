@@ -38,6 +38,8 @@ public class Tileset {
     public static final TETile LAMP_UNLIT = new TETile('♠', Color.white, Color.black, "unlit lamp");
     public static final TETile WALL_BREAKABLE = new TETile('#', new Color(255, 168, 82), Color.darkGray,
             "breakable wall");
+    public static final TETile WALL_DAMAGED = new TETile('#', new Color(255, 168, 82), Color.orange,
+            "breakable wall");
     public static final TETile DAMAGED_ROMO = new TETile('▲', Color.magenta, Color.black, "mountain");
     public static final TETile PLAYER_RED = new TETile('@', Color.red, Color.black, "player");
 }

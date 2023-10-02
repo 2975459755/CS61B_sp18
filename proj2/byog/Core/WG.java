@@ -1,12 +1,11 @@
 package byog.Core;
 
 import byog.Core.Objects.*;
-import byog.Core.Objects.Headers.MovingThing;
+import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class WG implements Serializable {
@@ -28,12 +27,7 @@ public class WG implements Serializable {
     public Door door;
     public Key key;
     public Player player;
-//    public Thing[] luminators = new Thing[50];
-//    public int lumis = 0;
-//    public MovingThing[] MTs = new MovingThing[100]; // Keep track of all MovingThing
-//    public int movings = 0; // the number of existing MovingThing
-    public ArrayList <Thing> luminators = new ArrayList <Thing> ();
-    public ArrayList <MovingThing> MTs = new ArrayList <MovingThing> ();
+    public ArrayList <Thing> keepTrackOf = new ArrayList <Thing> (); // All Changeable, luminators;
 
 
 
@@ -140,7 +134,7 @@ public class WG implements Serializable {
             }
         }
 
-        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
+        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
         for (Thing t: a) {
             t.place.luminate();
         }
@@ -149,24 +143,22 @@ public class WG implements Serializable {
     }
 
     /**
-     * Use MTs array to update the intervals of all existing MovingThing;
+     * Use MTs array to update the intervals of all existing Changeable;
      */
     void update() {
         update(Game.miniInterval);
     }
     <T> void update(T t) {
-        MovingThing[] a = MTs.toArray(new MovingThing[MTs.size()]);
-        for (MovingThing mt: a) {
-            mt.update(t);
+        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
+        for (Thing thing: a) {
+            if (thing instanceof Changeable c) {
+                c.update(t);
+            }
         }
     }
 
-
-    public void updLuminators(Thing l) {
-        updArray(luminators, l);
-    }
-    public void updMTs(MovingThing mt) {
-        updArray(MTs, mt);
+    public void updTrack(Thing thing) {
+        updArray(keepTrackOf, thing);
     }
 
     /**
@@ -193,26 +185,29 @@ public class WG implements Serializable {
             arr.add(item);
         }
     }
-//    /**
-//     * bound is exclusive;
-//     */
-//    static <T> int contains(T[] arr, T item, int bound) {
-//        for (int i = 0; i < bound; i ++) {
-//            if (arr[i].equals(item)) { // use .equals!
-//                return i;
-//            }
-//        }
-//        return -1;
-//    }
+    /**
+     * bound is exclusive;
+     */
+    @Deprecated
+    static <T> int contains(T[] arr, T item, int bound) {
+        for (int i = 0; i < bound; i ++) {
+            if (arr[i].equals(item)) { // use .equals!
+                return i;
+            }
+        }
+        return -1;
+    }
 
     /**
-     * All MovingThing in MTs[] take random action;
+     * All Changeable take change, if they do;
      */
-    int moveMT() {
+    int checkChange() {
         int ret = 0;
-        MovingThing[] a = MTs.toArray(new MovingThing[MTs.size()]);
-        for (MovingThing mt: a) {
-            ret += mt.randomAction();
+        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
+        for (Thing thing: a) {
+            if (thing instanceof Changeable c) {
+                ret += c.change();
+            }
         }
         return ret;
     }
@@ -241,11 +236,8 @@ public class WG implements Serializable {
         /*
         Renew arrays:
          */
-        MTs = new ArrayList <MovingThing> ();
-        updMTs(player);
-
-        luminators = new ArrayList <Thing> ();
-        updLuminators(player);
+        keepTrackOf = new ArrayList <Thing> ();
+        updTrack(player);
     }
 
     /**
@@ -420,7 +412,7 @@ public class WG implements Serializable {
     }
     private boolean validLamp(Place place) {
         // lamps should not be too close to each other
-        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
+        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
         for (Thing lumi: a) {
             if (lumi instanceof Lamp l) {
                 if (place.LDistance(l.place) < lampDis) {

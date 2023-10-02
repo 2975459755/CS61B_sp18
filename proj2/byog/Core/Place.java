@@ -1,7 +1,7 @@
 package byog.Core;
 
 import byog.Core.Objects.Floor;
-import byog.Core.Objects.Headers.Collectable;
+import byog.Core.Objects.Headers.Interfaces.Collectable;
 import byog.Core.Objects.Nothing;
 import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
@@ -14,8 +14,6 @@ import static jdk.dynalink.linker.support.Guards.isInstance;
 
 
 public class Place extends Pos implements Serializable {
-//    public Thing intrinsic; // Nothing, Floor, Wall, Door;
-//    public Thing present;
     public boolean visible;
     private ArrayList<Thing> layers;
 
@@ -39,7 +37,6 @@ public class Place extends Pos implements Serializable {
         layers = new ArrayList<Thing> ();
         layers.add(thing);
     }
-
     /**
      * Make the place nowIs some Thing;
      */
@@ -48,15 +45,22 @@ public class Place extends Pos implements Serializable {
     }
 
     /**
-     * Make the place what it originalWas;
+     * Restore the place back to what it originalWas;
      */
     public void restore() {
         layers.removeIf(t -> layers.indexOf(t) > 0); // remove all but the first element;
     }
 
+    /**
+     * Remove one element from layers;
+     */
+    public void remove(Thing thing) {
+        layers.remove(thing);
+    }
+
     TETile getVisible() {
         if (visible) {
-            return getPresent().avatar(); // get the top of layers
+            return getPresent().avatar(); // get the top of layers, return the avatar;
         }
         return Nothing.avatar;
     }

@@ -1,8 +1,8 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Headers.Interfaces;
 
-import java.io.Serializable;
+import byog.Core.Objects.Headers.Thing;
 
-public interface Mortal extends Serializable {
+public interface Mortal extends Changeable {
     public int getHealth();
     public void damagedBy(Thing thing);
     public void damagedBy(int atk);

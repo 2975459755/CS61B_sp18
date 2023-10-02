@@ -1,30 +1,25 @@
 package byog.Core.Objects;
 
 import byog.Core.Interval;
-import byog.Core.Objects.Headers.Ally;
-import byog.Core.Objects.Headers.Mortal;
-import byog.Core.Objects.Headers.MovingThing;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Headers.*;
+import byog.Core.Objects.Headers.Interfaces.Ally;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
-import edu.princeton.cs.introcs.StdDraw;
 
-public class Player extends MovingThing implements Mortal, Ally {
+public class Player extends MovingDamageable implements Ally {
     public static final int actionInterval = 150;
     public static final int attackInterval = 500;
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;
-    private static final boolean isObstable = true;
+    private static final boolean isObstacle = true;
     public static final int default_lumiRange = 3;
     public final int default_health = 5;
     public int lumiRange;
-    private int health;
     private TETile avatar;
     Interval attackIn;
-    private Interval damaged;
 
     /////////////////////////////////////////////////////////////
 
@@ -34,12 +29,6 @@ public class Player extends MovingThing implements Mortal, Ally {
 
     /////////////////////////////////////////////////////////////
     Player() {}
-
-    @Override
-    public void updateArrays() {
-        wg.updMTs(this); // player is mts
-        wg.updLuminators(this); // player is luminator
-    }
 
     public Player(WG wg, Place place) {
         this.wg = wg;
@@ -56,20 +45,31 @@ public class Player extends MovingThing implements Mortal, Ally {
 
         updateArrays();
     }
+
+    @Override
+    public TETile defaultAvatar() {
+        return default_avatar;
+    }
+
+    @Override
+    public TETile damagedAvatar() {
+        return damaged_avatar;
+    }
+
     @Override
     public TETile avatar() {
         if (duringDamage()) {
-            return Player.damaged_avatar;
+            return damagedAvatar();
         }
-        if (avatar == null) {
-            return Player.default_avatar;
+        if (avatar != null) {
+            return avatar;
         }
-        return avatar;
+        return defaultAvatar();
     }
 
     @Override
     public boolean isObstacle() {
-        return Player.isObstable;
+        return Player.isObstacle;
     }
     @Override
     public int isLuminator() {
@@ -92,10 +92,6 @@ public class Player extends MovingThing implements Mortal, Ally {
         return attackIn.ended();
     }
 
-    public boolean duringDamage() {
-        return !damaged.ended();
-    }
-
     /////////////////////////////////////////////////////////////
 
     /*
@@ -106,10 +102,6 @@ public class Player extends MovingThing implements Mortal, Ally {
 
     @Override
     public void touchedBy(Thing thing) {
-
-    }
-    @Override
-    public void damagedBy(Thing thing) {
 
     }
 
@@ -207,9 +199,8 @@ public class Player extends MovingThing implements Mortal, Ally {
     }
     public void shoot(int direc) {
         Place des = place.next(direc);
-        Bullet b = new Bullet(wg, wg.randomSearchFloor(), direc); // TODO : BUG
-        b.move(des);
-//        place.addNew(this);
+        Bullet b = new Bullet(wg, wg.randomSearchFloor(), direc); // set to a random floor;
+        b.move(des); // try to attack and move to the place next to Player;
     }
 
 }

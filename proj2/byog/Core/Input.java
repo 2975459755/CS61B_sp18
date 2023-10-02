@@ -4,15 +4,19 @@ import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Input {
     static final int inComboInterval = 75;
     static final int comboLength = 2;
     static final int nanoInterval = 15;
-    static final Character[] validInputs = {'w', 'a', 's', 'd', 'j', 'k', 'o', 'q'};
-    static final String[] combos = {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
-                            "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
-    };
+    static final ArrayList <Character> validInputs = new ArrayList<>(Arrays.asList(new Character[]
+            {'w', 'a', 's', 'd', 'j', 'k', 'o', 'q'}));
+    static final ArrayList <String> combos = new ArrayList<>(Arrays.asList( new String[]
+            {"wk", "ak", "sk", "dk", "kw", "ka", "ks", "kd", // k with directions
+                    "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd", // j with directions
+    }));
 
     /**
      * Clear the key queue in StdDraw;
@@ -22,81 +26,13 @@ public class Input {
             StdDraw.nextKeyTyped();
         }
     }
-
-    /**
-     * Never ends until the first input;
-     */
-    static char solicitInputChar() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                return key;
-            }
-        }
-    }
-    /**
-     * Never ends until the first VALID input;
-     * This method will remove all invalid inputs, until the first valid input;
-     */
-    @Deprecated
-    static char solicitValidChar() {
-        char input;
-        while (true) {
-            input = solicitInputChar();
-            if (contains(validInputs, input)) {
-                return input;
-            }
-        }
-    }
-    /**
-     * This method is deprecated, use `tryValidCombo` instead;
-     */
-    @Deprecated
-    static String solicitInputString(int n) {
-        assert n > 0;
-
-        Character[] s = new Character[n]; // store input chars
-        int count = 1; // count actual typed length during `keyInterval` (might be less than `n`);
-
-        s[0] = solicitValidChar(); // wait and get the first valid input
-
-        char next;
-        while (count < n) {
-            next = tryComboSuccessor(s);
-
-            if (next != '/') {
-                s[count] = next;
-                count ++;
-            } else {
-                break;
-            }
-        }
-
-        /*
-        collect input chars into String:
-         */
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < count; i ++) {
-            builder.append(s[i]);
-        }
-
-        /*
-        get a valid combo
-         */
-        String res = builder.toString();
-        if (res.length() > 1 && !contains(combos, res)) {
-            res = String.valueOf(res.charAt(0));
-        }
-        return res;
-    }
-
     /**
      * Try to get a following combo key after the keys in 's', during combo interval;
      * If none, return '/';
      * This method will always cause the program to pause for inComboInterval;
      * @param s previous input keys;
      */
-    static char tryComboSuccessor(Character[] s) {
+    static char tryComboSuccessor(ArrayList<Character> s) {
         char ret = '/'; // no valid input during keyInterval: return '/';
         char input;
         for (int t = 0; t < inComboInterval / nanoInterval; t ++) {
@@ -125,7 +61,7 @@ public class Input {
         char input = '/';
         while (StdDraw.hasNextKeyTyped()) {
             input = StdDraw.nextKeyTyped();
-            if (contains(validInputs, input)) {
+            if (validInputs.contains(input)) {
                 break;
             } else {
                 input = '/';
@@ -150,8 +86,8 @@ public class Input {
             return "";
         }
 
-        Character[] s = new Character[length];
-        s[0] = input;
+        ArrayList <Character> s = new ArrayList<> ();
+        s.add(input);
         int count = 1;
 
         /*
@@ -161,7 +97,7 @@ public class Input {
         while (canAct && count < length) {
             next = tryComboSuccessor(s);
             if (next != '/') {
-                s[count] = next;
+                s.add(next);
                 count ++;
             } else {
                 break;
@@ -173,14 +109,14 @@ public class Input {
          */
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < count; i ++) {
-            builder.append(s[i]);
+            builder.append(s.get(i));
         }
 
         /*
         get a valid combo
          */
         String res = builder.toString();
-        if (res.length() > 1 && !contains(combos, res)) {
+        if (res.length() > 1 && !combos.contains(res)) {
             res = String.valueOf(res.charAt(0));
         }
         return res;
@@ -190,7 +126,8 @@ public class Input {
      * A generic method
      * to check whether an element 'c' is in an array 'arr';
      */
-    static <T> boolean contains(T[] arr, T c) {
+    @Deprecated
+    static <T> boolean contains(ArrayList <T> arr, T c) {
         for (T t : arr) {
             if (c.equals(t)) { // use .equals!
                 return true;
@@ -256,4 +193,71 @@ public class Input {
             }
         }
     }
+    /**
+     * Never ends until the first input;
+     */
+    static char solicitInputChar() {
+        while(true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+                return key;
+            }
+        }
+    }
+    /**
+     * Never ends until the first VALID input;
+     * This method will remove all invalid inputs, until the first valid input;
+     */
+    @Deprecated
+    static char solicitValidChar() {
+        char input;
+        while (true) {
+            input = solicitInputChar();
+            if (contains(validInputs, input)) {
+                return input;
+            }
+        }
+    }
+    /**
+     * This method is deprecated, use `tryValidCombo` instead;
+     */
+    @Deprecated
+    static String solicitInputString(int n) {
+        assert n > 0;
+
+        Character[] s = new Character[n]; // store input chars
+        int count = 1; // count actual typed length during `keyInterval` (might be less than `n`);
+
+        s[0] = solicitValidChar(); // wait and get the first valid input
+
+        char next = '/';
+        while (count < n) {
+//            next = tryComboSuccessor(s);
+
+            if (next != '/') {
+                s[count] = next;
+                count ++;
+            } else {
+                break;
+            }
+        }
+
+        /*
+        collect input chars into String:
+         */
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < count; i ++) {
+            builder.append(s[i]);
+        }
+
+        /*
+        get a valid combo
+         */
+        String res = builder.toString();
+        if (res.length() > 1 && !contains(combos, res)) {
+            res = String.valueOf(res.charAt(0));
+        }
+        return res;
+    }
+
 }

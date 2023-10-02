@@ -3,14 +3,68 @@ package byog.Core;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-public class Input implements Serializable {
+public class InputDemo_2 {
+    private int width;
+    private int height;
+
+    public InputDemo_2(int width, int height) {
+        /* Sets up StdDraw so that it has a width by height grid of 16 by 16 squares as its canvas
+         * Also sets up the scale so the top left is (0,0) and the bottom right is (width, height)
+         */
+        this.width = width;
+        this.height = height;
+        StdDraw.setCanvasSize(this.width * 16, this.height * 16);
+        Font font = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setXscale(0, this.width);
+        StdDraw.setYscale(0, this.height);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.enableDoubleBuffering();
+    }
+    public void drawFrame(String s) {
+
+        int midWidth = width / 2;
+        int midHeight = height / 2;
+
+        StdDraw.clear();
+        StdDraw.clear(Color.black);
+
+        Font font = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(midWidth, midHeight, s);
+
+        StdDraw.show();
+    }
+    void startGame() {
+        String input;
+        In in = new In();
+        while (true) {
+            StdDraw.pause(In.miniInterval);
+            input = in.oneTurn();
+            if (input.equals("0")) {
+                continue;
+            }
+            if (!input.isEmpty()) {
+                drawFrame(input);
+                System.out.println(input);
+            }
+
+        }
+    }
+
+    public static void main(String[] args) {
+        InputDemo_2 game = new InputDemo_2(40, 40);
+        game.startGame();
+    }
+}
+
+class In {
     static final int inComboInterval = 120;
     static final int comboLength = 2;
-    static final int miniInterval = Game.miniInterval;
+    static final int miniInterval = 25;
     static final ArrayList<Character> validInputs = new ArrayList<>(Arrays.asList(new Character[]
             {'w', 'a', 's', 'd', 'j', 'k', 'o', 'q'}));
     static final ArrayList <String> combos = new ArrayList<>(Arrays.asList( new String[]
@@ -20,7 +74,7 @@ public class Input implements Serializable {
 
     ArrayList<Character> waitList;
     Interval interval;
-    Input () {
+    In () {
         waitList = new ArrayList<>();
         interval = new Interval(0);
     }
@@ -96,6 +150,12 @@ public class Input implements Serializable {
                 // has only one key;
                 return "0";
             } else {
+//                // there is a possible combo input;
+//                while (waitList.size() > 1 && waitList.get(1) != waitList.get(0)) {
+//                    // from the second item, remove if is same as the first;
+//                    waitList.remove(1);
+//                }
+//                String ret = validatedCombo(firstKeysInWaitList(2));
 
                 StringBuilder b = new StringBuilder();
                 while (!waitList.isEmpty()) {
@@ -112,11 +172,14 @@ public class Input implements Serializable {
         // nothing this turn;
         return "";
     }
-
-    /**
-     * If the combination is not a combo,
-     * return the first element (which should be always valid);
-     */
+    String firstKeysInWaitList(int length) {
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < length && !waitList.isEmpty(); i ++) {
+            ret.append(waitList.get(0));
+            waitList.remove(0);
+        }
+        return ret.toString();
+    }
     String validatedCombo(String s) {
         while (! (s.length() == 1 || combos.contains(s)) ) {
             s = s.substring(0, s.length() - 1);
@@ -127,77 +190,6 @@ public class Input implements Serializable {
     void clearKeyStack() {
         while (StdDraw.hasNextKeyTyped()) {
             StdDraw.nextKeyTyped();
-        }
-    }
-
-    //////////////////////////////////////////////////////
-
-    /**
-     * Some code I CVed from GitHub;
-     */
-    static long solicitSeed() {
-        StdDraw.clear(Color.BLACK);
-        StdDraw.text(320, 320, "Enter seed. Press S to end.");
-        StdDraw.show();
-
-        StringBuilder builder = new StringBuilder();
-        while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-//                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                char key = solicitNumberOrS(); // this line I wrote myself;
-
-                if (key == 's') {
-                    break;
-                }
-
-                builder.append(key);
-                StdDraw.clear(Color.BLACK);
-                StdDraw.text(320, 320, "Enter seed. Press S to end.");
-                StdDraw.text(320, 300, "Your input: " + builder);
-                StdDraw.show();
-            }
-        }
-
-        if (builder.toString().equals("")) { // This line I added myself;
-            return -1; // no input seed
-        }
-        return Long.parseLong(builder.toString());
-    }
-
-    /**
-     * Valid input char for seed should be either a number or 's';
-     */
-    static char solicitNumberOrS() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                int key = (int) Character.toLowerCase(StdDraw.nextKeyTyped());
-                if (key >= 48 && key <= 57 || key == 115) {
-                    return (char) key;
-                }
-            }
-        }
-    }
-
-    /**
-     * The initial input should be 'n' or 'l' or 'q';
-     */
-    static char solicitInitialInput() {
-        while(true) {
-            char key = solicitInputChar();
-            if (key == 'n' || key == 'l' || key == 'q') {
-                return key;
-            }
-        }
-    }
-    /**
-     * Never ends until the first input;
-     */
-    static char solicitInputChar() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                return key;
-            }
         }
     }
 }

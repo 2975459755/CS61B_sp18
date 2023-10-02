@@ -16,9 +16,10 @@ public class Game {
     public static final int HEIGHT = 40;
 
     WG wg = null;
+    Input inputCollector;
     boolean cheatMode = false;
 
-    public static final int miniInterval = 30;
+    public static final int miniInterval = 15;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -45,12 +46,61 @@ public class Game {
         playGame();
     }
 
+//    @Deprecated
+//    void playGame(boolean flag) {
+//        TERenderer renderer = new TERenderer();
+//        renderer.initialize(WIDTH, HEIGHT);
+//        renderer.renderFrame(wg.getVisible());
+//
+//        String input;
+//        boolean f; // whether something has changed during a miniInterval
+//        while (true) {
+//            StdDraw.pause(miniInterval);
+//            f = false;
+//
+//            /*
+//            Process keyboard input:
+//             */
+//            boolean canPlayerAct = wg.canPlayerAct();
+//            input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
+//            if (canPlayerAct && !input.equals("")) { // valid input, and player can act
+//
+//                if (input.equals("o")) {
+//                    cheat();
+//                } else if (input.equals("q")) {
+//                    save();
+//                } else {
+//                    wg.playerAct(input);
+//                    cheatMode = false;
+//                }
+//
+//                wg.update(input); // update all MTs for the time Input spent soliciting combo input;
+//                f = true;
+//            }
+//            Input.clearKeyQueue();
+//
+//            /*
+//            Move all MovingThing;
+//             */
+//            if (wg.checkChange() > 0) {
+//                f = true;
+//            }
+//
+//            if (!cheatMode) {
+//                wg.luminateAll();
+//            }
+//            renderer.renderFrame(wg.getVisible());
+//
+//            wg.update();
+//        }
+//    }
     void playGame() {
         TERenderer renderer = new TERenderer();
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
 
         String input;
+        inputCollector = new Input();
         boolean f; // whether something has changed during a miniInterval
         while (true) {
             StdDraw.pause(miniInterval);
@@ -60,9 +110,9 @@ public class Game {
             Process keyboard input:
              */
             boolean canPlayerAct = wg.canPlayerAct();
-            input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
-            if (canPlayerAct && !input.equals("")) { // valid input, and player can act
-
+            input = inputCollector.oneTurn();
+            if (canPlayerAct && !input.equals("") && !input.equals("0")) {
+                // valid input, and player can act
                 if (input.equals("o")) {
                     cheat();
                 } else if (input.equals("q")) {
@@ -72,10 +122,8 @@ public class Game {
                     cheatMode = false;
                 }
 
-                wg.update(input); // update all MTs for the time Input spent soliciting combo input;
                 f = true;
             }
-            Input.clearKeyQueue();
 
             /*
             Move all MovingThing;
@@ -83,11 +131,12 @@ public class Game {
             if (wg.checkChange() > 0) {
                 f = true;
             }
-
-            if (!cheatMode) {
-                wg.luminateAll();
+            if (f) {
+                if (!cheatMode) {
+                    wg.luminateAll();
+                }
+                renderer.renderFrame(wg.getVisible());
             }
-            renderer.renderFrame(wg.getVisible());
 
             wg.update();
         }
@@ -209,13 +258,13 @@ public class Game {
         StdDraw.show();
     }
 
-    public static void main (String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-
-        Game g = new Game();
-        TETile[][] world = g.playWithInputString("n01234567s");
-
-        ter.renderFrame(world);
-    }
+//    public static void main (String[] args) {
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
+//
+//        Game g = new Game();
+//        TETile[][] world = g.playWithInputString("n01234567s");
+//
+//        ter.renderFrame(world);
+//    }
 }

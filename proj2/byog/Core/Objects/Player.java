@@ -9,8 +9,8 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 public class Player extends MovingDamageable implements Ally {
-    public static final int actionInterval = 150;
-    public static final int attackInterval = 500;
+    public static final int actionInterval = 180;
+    public static final int attackInterval = 400;
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;

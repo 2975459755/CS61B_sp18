@@ -18,6 +18,9 @@ public class Interval implements Serializable {
         this.start = start;
         this.end = end;
     }
+    public int getCurrent() {
+        return start;
+    }
     public void renew(int end) {
         renew(0, end);
     }

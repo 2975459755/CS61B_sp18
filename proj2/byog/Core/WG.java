@@ -450,7 +450,7 @@ public class WG implements Serializable {
     private void addBreakableWall(int num) {
         assert num > 0;
 
-        clearEdges();
+        clearEdges(); // Breakable should not be in the edges;
 
         addBreakableHelper(num);
 

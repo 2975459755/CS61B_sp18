@@ -10,7 +10,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 public class Key extends ImmobileThing implements Collectable {
-    public static TETile avatar = Tileset.FLOWER;
+    public static TETile avatar = Tileset.KEY;
 
     public Key() {}
 

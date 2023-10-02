@@ -9,7 +9,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 public class Bullet extends Attacker implements Ally {
-    public static final TETile default_avatar = Tileset.WATER;
+    public static final TETile default_avatar = Tileset.BULLET;
 
     public Bullet() {}
 

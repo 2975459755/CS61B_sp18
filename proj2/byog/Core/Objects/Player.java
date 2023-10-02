@@ -29,6 +29,11 @@ public class Player extends MovingDamageable implements Ally {
 
     /////////////////////////////////////////////////////////////
     Player() {}
+    @Override
+    public void updateArrays() {
+        wg.updTrack(this);
+        wg.updArray(wg.players, this);
+    }
 
     public Player(WG wg, Place place) {
         this.wg = wg;

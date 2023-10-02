@@ -59,7 +59,7 @@ public class Game {
             /*
             Process keyboard input:
              */
-            boolean canPlayerAct = wg.player.canAct();
+            boolean canPlayerAct = wg.canPlayerAct();
             input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
             if (canPlayerAct && !input.equals("")) { // valid input, and player can act
 
@@ -68,7 +68,7 @@ public class Game {
                 } else if (input.equals("q")) {
                     save();
                 } else {
-                    wg.player.act(input);
+                    wg.playerAct(input);
                     cheatMode = false;
                 }
 

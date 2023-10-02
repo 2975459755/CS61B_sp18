@@ -26,10 +26,8 @@ public class WG implements Serializable {
      */
     public Door door;
     public Key key;
-    public Player player;
+    public ArrayList<Player> players = new ArrayList <> ();
     public ArrayList <Thing> keepTrackOf = new ArrayList <Thing> (); // All Changeable, luminators;
-
-
 
     /*
     Set the number of things:
@@ -65,7 +63,7 @@ public class WG implements Serializable {
         addWALL();
         door = addDOOR();
         key = addKEY();
-        player = addPLAYER(f);
+        addPLAYER(f);
 
         /*
         Generate a random number of lamps;
@@ -167,7 +165,7 @@ public class WG implements Serializable {
      * param currentCount We declare array size larger than we actually need,
      *                     this will prevent null-pointer exception;
      */
-    <T> void updArray(ArrayList <T> arr, T item) {
+    public <T> void updArray(ArrayList <T> arr, T item) {
 //        int f = contains(arr, item, currentCount);
 //        if (f < 0) {
 //            arr[currentCount] = item;
@@ -196,6 +194,22 @@ public class WG implements Serializable {
             }
         }
         return -1;
+    }
+
+    boolean canPlayerAct() {
+        for (Player p: players) {
+            if (p.canAct()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void playerAct(String input) {
+        Player[] a = players.toArray(new Player[players.size()]);
+        for (Player p: a) {
+            p.act(input);
+        }
     }
 
     /**
@@ -237,7 +251,8 @@ public class WG implements Serializable {
         Renew arrays:
          */
         keepTrackOf = new ArrayList <Thing> ();
-        updTrack(player);
+        keepTrackOf.addAll(players);
+//        updTrack(player);
     }
 
     /**
@@ -391,10 +406,12 @@ public class WG implements Serializable {
             p = new Player(this, place);
             place.addNew(p);
         } else { // use the existing player instance; update place status;
-            p = player;
-            place = randomSearchFloor();
-            player.place = place;
-            place.addNew(player); // note that the renew world method changed all places;
+            for (Player player: players) {
+                place = randomSearchFloor();
+                player.place = place;
+                place.addNew(player); // note that the renew method changed all places;
+            }
+            p = null;
         }
 
         return p;

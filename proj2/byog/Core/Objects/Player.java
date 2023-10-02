@@ -9,12 +9,14 @@ import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
+import edu.princeton.cs.introcs.StdDraw;
 
 public class Player extends MovingThing implements Mortal, Ally {
     public static final int actionInterval = 150;
     public static final int attackInterval = 500;
 
     public static final TETile default_avatar = Tileset.PLAYER;
+    public static final TETile damaged_avatar = Tileset.PLAYER_RED;
     private static final boolean isObstable = true;
     public static final int default_lumiRange = 3;
     public final int default_health = 5;
@@ -22,6 +24,7 @@ public class Player extends MovingThing implements Mortal, Ally {
     private int health;
     private TETile avatar;
     Interval attackIn;
+    private Interval damaged;
 
     /////////////////////////////////////////////////////////////
 
@@ -48,12 +51,16 @@ public class Player extends MovingThing implements Mortal, Ally {
 
         this.actIn = new Interval(0);
         this.attackIn = new Interval(0);
-        this.ins = new Interval[]{actIn, attackIn};
+        this.damaged = new Interval(0);
+        this.ins = new Interval[]{actIn, attackIn, damaged};
 
         updateArrays();
     }
     @Override
     public TETile avatar() {
+        if (duringDamage()) {
+            return Player.damaged_avatar;
+        }
         if (avatar == null) {
             return Player.default_avatar;
         }
@@ -85,6 +92,10 @@ public class Player extends MovingThing implements Mortal, Ally {
         return attackIn.ended();
     }
 
+    public boolean duringDamage() {
+        return !damaged.ended();
+    }
+
     /////////////////////////////////////////////////////////////
 
     /*
@@ -104,7 +115,11 @@ public class Player extends MovingThing implements Mortal, Ally {
 
     @Override
     public void damagedBy(int atk) {
-
+        if (!duringDamage()) {
+            health -= atk;
+            damaged.renew(1000);
+//            StdDraw.pause(800);
+        }
     }
 
     /**
@@ -143,11 +158,11 @@ public class Player extends MovingThing implements Mortal, Ally {
 
     @Override
     public int goAt(Place des) {
-        if (des.collectable()) {
-            des.collect(this);
-        }
         des.touchedBy(this);
         if (des.canEnter()) {
+            if (des.collectable()) {
+                des.collect(this);
+            }
             return 1;
         }
         return 0;
@@ -155,6 +170,9 @@ public class Player extends MovingThing implements Mortal, Ally {
 
     @Override
     public int randomAction() {
+        if (dead()) {
+            System.exit(0); // end the game;
+        }
         return 0;
     }
 
@@ -175,7 +193,7 @@ public class Player extends MovingThing implements Mortal, Ally {
     }
     public void interact(Place des) {
         if (des.collectable()) { // collectable item
-            des.present.remove();
+            des.collect(this);
         }
     }
     public void attack(int direc) {
@@ -189,9 +207,9 @@ public class Player extends MovingThing implements Mortal, Ally {
     }
     public void shoot(int direc) {
         Place des = place.next(direc);
-        Bullet b = new Bullet(wg, place, direc); // TODO : BUG
+        Bullet b = new Bullet(wg, wg.randomSearchFloor(), direc); // TODO : BUG
         b.move(des);
-        place.addNew(this);
+//        place.addNew(this);
     }
 
 }

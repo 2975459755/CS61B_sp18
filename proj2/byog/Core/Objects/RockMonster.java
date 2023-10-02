@@ -10,9 +10,11 @@ import byog.TileEngine.Tileset;
 public class RockMonster extends MovingThing implements Mortal, Damager {
     public static final int actionInterval = 1000;
     static final TETile default_avatar = Tileset.MOUNTAIN;
+    static final TETile damaged_avatar = Tileset.DAMAGED_ROMO;
     static int default_health = 3;
     static int atk = 1;
     private int health;
+    private Interval damaged; // when damaged, avatar changes for a moment;
 
     RockMonster() {}
 
@@ -21,7 +23,10 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
         this.place = place;
 
         this.actIn = new Interval(0);
-        this.ins = new Interval[] {actIn};
+
+        this.damaged = new Interval(0);
+
+        this.ins = new Interval[] {actIn, damaged};
         this.health = default_health;
 
         updateArrays();
@@ -34,6 +39,9 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
 
     @Override
     public TETile avatar() {
+        if (duringDamage()) {
+            return RockMonster.damaged_avatar;
+        }
         return RockMonster.default_avatar;
     }
 
@@ -50,8 +58,10 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
 
     @Override
     public void touchedBy(Thing thing) {
-        if (thing instanceof Bullet b) {
-            b.doDamage(this);
+        if ((thing instanceof Damager d) && (thing instanceof Friendly)) {
+            d.doDamage(this);
+        } else if (thing instanceof Player p) {
+            doDamage(p);
         }
     }
 
@@ -80,6 +90,7 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
     @Override
     public void damagedBy(int atk) {
         health -= atk;
+        damaged.renew(300);
     }
 
     @Override
@@ -92,5 +103,9 @@ public class RockMonster extends MovingThing implements Mortal, Damager {
         if (target instanceof Ally) {
             target.damagedBy(getAtk());
         }
+    }
+
+    private boolean duringDamage() {
+        return !damaged.ended();
     }
 }

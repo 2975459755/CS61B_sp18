@@ -6,8 +6,8 @@ import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Random;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class WG implements Serializable {
     public static int WIDTH = Game.WIDTH;
@@ -28,10 +28,10 @@ public class WG implements Serializable {
     public Door door;
     public Key key;
     public Player player;
-//    public Thing[] luminators = new Thing[50]; // TODO: renew
-    public int lumis = 0; // TODO: renew
-//    public MovingThing[] MTs = new MovingThing[100]; // Keep track of all MovingThing TODO: renew
-    public int movings = 0; // the number of existing MovingThing TODO: renew
+//    public Thing[] luminators = new Thing[50];
+//    public int lumis = 0;
+//    public MovingThing[] MTs = new MovingThing[100]; // Keep track of all MovingThing
+//    public int movings = 0; // the number of existing MovingThing
     public ArrayList <Thing> luminators = new ArrayList <Thing> ();
     public ArrayList <MovingThing> MTs = new ArrayList <MovingThing> ();
 
@@ -41,7 +41,7 @@ public class WG implements Serializable {
     Set the number of things:
      */
     private static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
-    private static final int maxNumRoMo = 1;
+    private static final int maxRoMos = 12;
     private static final int minLamps = 1;
     private static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
     private static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
@@ -80,7 +80,9 @@ public class WG implements Serializable {
             addLAMP();
         }
 
-        RockMonster rm = addRoMo();
+        for (int i = 0; i < rand.nextInt(3, maxRoMos + 1); i++) {
+            addRoMo();
+        }
 
         addBreakableWall(numBreakableWalls);
 
@@ -138,9 +140,9 @@ public class WG implements Serializable {
             }
         }
 
-        Thing t;
-        for (int i = 0; i < lumis; i ++) {
-            luminators.get(i).place.luminate();
+        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
+        for (Thing t: a) {
+            t.place.luminate();
         }
 
         updateVisible();
@@ -153,57 +155,64 @@ public class WG implements Serializable {
         update(Game.miniInterval);
     }
     <T> void update(T t) {
-        for (int i = 0; i < movings; i ++) {
-            MTs[i].update(t);
+        MovingThing[] a = MTs.toArray(new MovingThing[MTs.size()]);
+        for (MovingThing mt: a) {
+            mt.update(t);
         }
     }
 
 
     public void updLuminators(Thing l) {
-        lumis += updArray(luminators, l, lumis);
+        updArray(luminators, l);
     }
     public void updMTs(MovingThing mt) {
-        movings += updArray(MTs, mt, movings);
+        updArray(MTs, mt);
     }
 
     /**
      * When item not in array, add it, return 1;
      * When item is in array, remove it, return -1;
-     * @param currentCount We declare array size larger than we actually need,
+     * param currentCount We declare array size larger than we actually need,
      *                     this will prevent null-pointer exception;
      */
-    <T> int updArray(T[] arr, T item, int currentCount) {
-        int f = contains(arr, item, currentCount);
-        if (f < 0) {
-            arr[currentCount] = item;
-            return 1;
+    <T> void updArray(ArrayList <T> arr, T item) {
+//        int f = contains(arr, item, currentCount);
+//        if (f < 0) {
+//            arr[currentCount] = item;
+//            return 1;
+//        } else {
+//            if (f != currentCount - 1) {
+//                arr[f] = arr[currentCount - 1];
+//            }
+//            arr[currentCount - 1] = null;
+//            return -1;
+//        }
+        if (arr.contains(item)) {
+            arr.remove(item);
         } else {
-            if (f != currentCount - 1) {
-                arr[f] = arr[currentCount - 1];
-            }
-            arr[currentCount - 1] = null;
-            return -1;
+            arr.add(item);
         }
     }
-    /**
-     * bound is exclusive;
-     */
-    static <T> int contains(T[] arr, T item, int bound) {
-        for (int i = 0; i < bound; i ++) {
-            if (arr[i].equals(item)) { // use .equals!
-                return i;
-            }
-        }
-        return -1;
-    }
+//    /**
+//     * bound is exclusive;
+//     */
+//    static <T> int contains(T[] arr, T item, int bound) {
+//        for (int i = 0; i < bound; i ++) {
+//            if (arr[i].equals(item)) { // use .equals!
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
 
     /**
      * All MovingThing in MTs[] take random action;
      */
     int moveMT() {
         int ret = 0;
-        for (int i = 0; i < movings; i++) {
-            ret += MTs[i].randomAction();
+        MovingThing[] a = MTs.toArray(new MovingThing[MTs.size()]);
+        for (MovingThing mt: a) {
+            ret += mt.randomAction();
         }
         return ret;
     }
@@ -232,12 +241,10 @@ public class WG implements Serializable {
         /*
         Renew arrays:
          */
-        MTs = new MovingThing[100];
-        movings = 0;
+        MTs = new ArrayList <MovingThing> ();
         updMTs(player);
 
-        luminators = new Thing[50];
-        lumis = 0;
+        luminators = new ArrayList <Thing> ();
         updLuminators(player);
     }
 
@@ -413,8 +420,9 @@ public class WG implements Serializable {
     }
     private boolean validLamp(Place place) {
         // lamps should not be too close to each other
-        for (int i = 0; i < lumis; i ++) {
-            if (luminators[i] instanceof Lamp l) {
+        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
+        for (Thing lumi: a) {
+            if (lumi instanceof Lamp l) {
                 if (place.LDistance(l.place) < lampDis) {
                     return false;
                 }

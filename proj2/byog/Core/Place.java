@@ -7,65 +7,90 @@ import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static jdk.dynalink.linker.support.Guards.isInstance;
 
 
-public class Place implements Serializable {
-    int x;
-    int y;
-    public Thing intrinsic; // Nothing, Floor, Wall, Door;
-    public Thing present;
+public class Place extends Pos implements Serializable {
+//    public Thing intrinsic; // Nothing, Floor, Wall, Door;
+//    public Thing present;
     public boolean visible;
+    private ArrayList<Thing> layers;
 
     public Place(int xCoor, int yCoor, Thing thing) {
         x = xCoor;
         y = yCoor;
-        intrinsic = thing;
-        present = intrinsic;
+        fill(thing);
     }
     public Place(int xCoor, int yCoor) {
         x = xCoor;
         y = yCoor;
     }
     public Place(Thing thing) {
-        intrinsic = thing;
-        present = intrinsic;
+        fill(thing);
     }
 
+    /**
+     * Make the place originalWas some Thing;
+     */
     public void fill(Thing thing) {
-        intrinsic = thing;
-        present = thing;
+        layers = new ArrayList<Thing> ();
+        layers.add(thing);
     }
+
+    /**
+     * Make the place nowIs some Thing;
+     */
     public void addNew(Thing thing) {
-        present = thing;
+        layers.add(thing);
     }
+
+    /**
+     * Make the place what it originalWas;
+     */
     public void restore() {
-        present = intrinsic;
+        layers.removeIf(t -> layers.indexOf(t) > 0); // remove all but the first element;
     }
 
     TETile getVisible() {
         if (visible) {
-            return present.avatar();
+            return getPresent().avatar(); // get the top of layers
         }
         return Nothing.avatar;
     }
     public boolean collectable() {
-        return present.collectable();
+        return getPresent().collectable();
     }
+
+    /**
+     * Use after collectable();
+     */
     public void collect(Thing thing) {
-        ((Collectable) present).collectedBy(thing);
+        while (layers.size() > 1) {
+            if (getPresent() instanceof Collectable c) {
+                c.collectedBy(thing);
+            } else {
+                break;
+            }
+        }
     }
     public boolean canEnter() {
-        return !(intrinsic.isObstacle() || present.isObstacle());
+        return !getPresent().isObstacle();
     }
     public void touchedBy(Thing thing) {
-        present.touchedBy(thing);
+        getPresent().touchedBy(thing);
     }
 
     public int isLuminator() {
-        return Math.max(intrinsic.isLuminator(), present.isLuminator());
+        int res = -1;
+        for (Thing t: layers) {
+            if (t.isLuminator() > res) {
+                res = t.isLuminator();
+            }
+        }
+        return res;
     }
     public void luminate() {
         luminate(isLuminator());
@@ -85,16 +110,7 @@ public class Place implements Serializable {
         }
     }
 
-    public double distance(Place des) {
-        return Math.sqrt(Math.pow(this.x - des.x, 2)
-                + Math.pow(this.y - des.y, 2));
-    }
-    /**
-     * L-shaped distance;
-     */
-    public int LDistance(Place des) {
-        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
-    }
+
 
     public Place randomSearchNextNothing(Random rand, int sides) {
         return randomSearchNext(rand, sides, new Nothing());
@@ -147,17 +163,22 @@ public class Place implements Serializable {
         return nowIs(new Floor(null));
     }
     public boolean originalWas(Thing thing) {
-        return thing.getClass().isInstance(intrinsic);
+        return thing.getClass().isInstance(getIntrinsic());
     }
     public boolean nowIs(Thing thing) {
-        if (present != null) {
-            return thing.getClass().isInstance(present);
+        if (layers != null) {
+            return thing.getClass().isInstance(getPresent());
         }
-        return thing.getClass().isInstance(intrinsic);
+        return false;
     }
-
-    public boolean inMap() {
-        return x >= WG.startWIDTH && x < WG.WIDTH
-                && y >= WG.startHEIGHT && y < WG.HEIGHT;
+    /**
+     *
+     * @return the top of the layers;
+     */
+    public Thing getPresent() {
+        return layers.get(layers.size() - 1);
+    }
+    public Thing getIntrinsic() {
+        return layers.get(0);
     }
 }

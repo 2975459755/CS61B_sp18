@@ -55,7 +55,9 @@ public class Lamp extends StaticThing implements Collectable {
 
     @Override
     public void collectedBy(Thing thing) {
-
+        if (thing instanceof Player) {
+            remove();
+        }
     }
 
     public Lamp(WG wg, Place place) {

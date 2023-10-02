@@ -25,7 +25,7 @@ public class Key extends StaticThing implements Collectable {
 
     @Override
     public boolean isObstacle() {
-        return true;
+        return false;
     }
 
     @Override

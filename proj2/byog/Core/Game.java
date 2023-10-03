@@ -30,10 +30,13 @@ public class Game {
         char initInput = Input.solicitInitialInput();
         if (initInput == 'n') {
             long seed = Input.solicitSeed();
+
+            int numPlayers = Input.solicitNumPlayers();
+
             if (seed == -1) {
-                wg = new WG();
+                wg = new WG(numPlayers);
             } else {
-                wg = new WG(seed);
+                wg = new WG(seed, numPlayers);
             }
         } else if (initInput == 'l') {
             wg = load();
@@ -42,7 +45,6 @@ public class Game {
             System.exit(0);
         }
 
-        assert wg != null;
         playGame();
     }
 
@@ -99,8 +101,8 @@ public class Game {
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
 
-        String input;
-        inputCollector = new Input();
+        inputCollector = new Input(this, wg.numPlayers);
+
         boolean f; // whether something has changed during a miniInterval
         while (true) {
             StdDraw.pause(miniInterval);
@@ -109,20 +111,20 @@ public class Game {
             /*
             Process keyboard input:
              */
-            boolean canPlayerAct = wg.canPlayerAct();
-            input = inputCollector.oneTurn();
-            if (canPlayerAct && !input.equals("") && !input.equals("0")) {
-                // valid input, and player can act
-                if (input.equals("o")) {
+            int input  = inputCollector.oneTurn();
+            if (input != 0) {
+                // something happened
+                f = true;
+                if (input > 10) {
+                    // cheat mode;
                     cheat();
-                } else if (input.equals("q")) {
+                } else if (input < 0) {
+                    // quit and save;
                     save();
                 } else {
-                    wg.playerAct(input);
+                    // player entered normal input;
                     cheatMode = false;
                 }
-
-                f = true;
             }
 
             /*
@@ -174,7 +176,7 @@ public class Game {
         TETile[][] finalWorldFrame;
         WG world;
         if (start == 'n') {
-            world = new WG(seed);
+            world = new WG(seed, 1);
         } else if (start == 'l') {
             world = load();
         } else {
@@ -233,7 +235,8 @@ public class Game {
         }
 
         /* In the case no World has been saved yet, we return a new one. */
-        return new WG();
+        int numPlayers = Input.solicitNumPlayers();
+        return new WG(numPlayers);
     }
 
     /**

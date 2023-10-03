@@ -8,44 +8,14 @@ import byog.TileEngine.TETile;
 import java.io.Serializable;
 import java.util.*;
 
-public class WG implements Serializable {
-    public static int WIDTH = Game.WIDTH;
-    public static int HEIGHT = Game.HEIGHT;
-    public Random rand;
-
-    /*
-    Before saving, make a copy of changeable statics,
-    because Serialization does not work for statics;
+public class WG extends Generator {
+    /**
+     * World generation is seperated into Generator class;
+     * But the generation methods have to be called in WG class,
+     * because those objects only allow WG instance as parameter
+     * (we cast this to WG in Generator methods);
      */
-    public static Place[][] places = new Place[WIDTH][HEIGHT];
-    Place[][] Splaces;
-    TETile[][] visibleWorld;
-
-    /*
-    What we keep track of:
-     */
-    public Door door;
-    public Key key;
-    public ArrayList<Player> players = new ArrayList <> ();
-    public ArrayList <Thing> keepTrackOf = new ArrayList <Thing> (); // All Changeable, luminators;
-
-    /*
-    Set the number of things:
-     */
-    private static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
-    private static final int maxRoMos = 12;
-    private static final int minLamps = 1;
-    private static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
-    private static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
-
-    /*
-    For special uses:
-     */
-    public static int startWIDTH = 0;
-    public static int startHEIGHT = 0;
-    private static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
-    private static final double lampDis = (WIDTH + HEIGHT) / 10;
-
+    // This class is all about how WG _interacts_ with the game;
     void randomWorld() {
         randomWorld(true);
     }
@@ -63,7 +33,7 @@ public class WG implements Serializable {
         addWALL();
         door = addDOOR();
         key = addKEY();
-        addPLAYER(f);
+        addPLAYER(f, numPlayers);
 
         /*
         Generate a random number of lamps;
@@ -82,13 +52,15 @@ public class WG implements Serializable {
 
         luminateAll();
     }
-    public WG(long seed) {
+    public WG(long seed, int players) {
         rand = new Random(seed);
+        numPlayers = players;
 
         randomWorld();
     }
-    public WG() {
+    public WG(int players) {
         rand = new Random();
+        numPlayers = players;
 
         randomWorld();
     }
@@ -166,17 +138,6 @@ public class WG implements Serializable {
      *                     this will prevent null-pointer exception;
      */
     public <T> void updArray(ArrayList <T> arr, T item) {
-//        int f = contains(arr, item, currentCount);
-//        if (f < 0) {
-//            arr[currentCount] = item;
-//            return 1;
-//        } else {
-//            if (f != currentCount - 1) {
-//                arr[f] = arr[currentCount - 1];
-//            }
-//            arr[currentCount - 1] = null;
-//            return -1;
-//        }
         if (arr.contains(item)) {
             arr.remove(item);
         } else {
@@ -226,11 +187,54 @@ public class WG implements Serializable {
         return ret;
     }
 
+}
+
+class Generator implements Serializable {
+
+    public static int WIDTH = Game.WIDTH;
+    public static int HEIGHT = Game.HEIGHT;
+    public Random rand;
+
+    /*
+    Before saving, make a copy of changeable statics,
+    because Serialization does not work for statics;
+     */
+    public static Place[][] places = new Place[WIDTH][HEIGHT];
+    protected Place[][] Splaces;
+    protected TETile[][] visibleWorld;
+
+    /*
+    What we keep track of:
+     */
+    public Door door;
+    public Key key;
+    public Player p1;
+    public Player p2;
+    public int numPlayers;
+    public ArrayList <Player> players = new ArrayList <> ();
+    public ArrayList <Thing> keepTrackOf = new ArrayList <> (); // All Changeable, luminators;
+
+    /*
+    Set the number of things:
+     */
+    protected static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
+    protected static final int maxRoMos = 12;
+    protected static final int minLamps = 1;
+    protected static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
+    protected static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
+
+    /*
+    For special uses:
+     */
+    public static int startWIDTH = 0;
+    public static int startHEIGHT = 0;
+    protected static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
+    protected static final double lampDis = (WIDTH + HEIGHT) / 10;
     /**
      * Generate places;
      * Fill with NOTHING;
      */
-    private void emptyWorld() {
+    protected void emptyWorld() {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
 
@@ -242,7 +246,7 @@ public class WG implements Serializable {
     /**
      * Method for renewing a WG world;
      */
-    void renew(boolean f) {
+    protected void renew(boolean f) {
         emptyWorld();
         if (f) {
             return; // First time generating: end here;
@@ -252,17 +256,16 @@ public class WG implements Serializable {
          */
         keepTrackOf = new ArrayList <Thing> ();
         keepTrackOf.addAll(players);
-//        updTrack(player);
     }
 
     /**
      * Randomly fill with FLOOR tiles;
      * Number of FLOOR must be above minFLOORCount;
      */
-    private void fillWithFloor(Place place) {
+    protected void fillWithFloor(Place place) {
         fillWithFloor(place, 0);
     }
-    private void fillWithFloor(Place place, int n) {
+    protected void fillWithFloor(Place place, int n) {
         /*
         rule out the four edges;
         because the FLOOR must not be in the edges
@@ -278,7 +281,7 @@ public class WG implements Serializable {
          */
         restoreEdges();
     }
-    private void fillWithFloorHelper(Place place, int n) {
+    protected void fillWithFloorHelper(Place place, int n) {
         // n: store the number of filled tiles;
         do {
             place = place.randomSearchNextNothing(rand, 4); // find the next place to fill;
@@ -300,13 +303,13 @@ public class WG implements Serializable {
     /**
      * Clear the four edges by narrowing the boundaries;
      */
-    private void clearEdges() {
+    protected void clearEdges() {
         startWIDTH ++;
         WIDTH --;
         startHEIGHT ++;
         HEIGHT --;
     }
-    private void restoreEdges() {
+    protected void restoreEdges() {
         startWIDTH --;
         WIDTH ++;
         startHEIGHT --;
@@ -316,7 +319,7 @@ public class WG implements Serializable {
      * Replace every `original` in `world` with `tile`;
      * @param original: tile to be replaced;
      */
-    private void replaceAll(Thing original, Thing replacer) {
+    protected void replaceAll(Thing original, Thing replacer) {
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
 
@@ -330,7 +333,7 @@ public class WG implements Serializable {
     public Place randomSearchFloor() {
         return randomSearchThing(new Floor());
     }
-    public Place randomSearchThing(Thing thing) {
+    public  Place randomSearchThing(Thing thing) {
         Place place;
         do {
             place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
@@ -341,10 +344,10 @@ public class WG implements Serializable {
     /**
      * Surround the FLOORs with WALLs (in 8 directions);
      */
-    private void addWALL() {
+    protected void addWALL() {
         addWALL(8);
     }
-    private void addWALL(int sides) {
+    protected void addWALL(int sides) {
         Place place;
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
@@ -367,7 +370,7 @@ public class WG implements Serializable {
      * A Door also must be near to a FLOOR;
      * @return Position object of the DOOR;
      */
-    private Door addDOOR() {
+    protected Door addDOOR() {
         Place place;
         do {
             place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
@@ -375,7 +378,7 @@ public class WG implements Serializable {
                 && place.hasNextFloor(4)
                 && place.hasNext(4, new Wall())));
 
-        Door d = new Door(this, place);
+        Door d = new Door((WG)this, place);
         place.fill(d);
 
         return d;
@@ -385,49 +388,62 @@ public class WG implements Serializable {
      * Use after the Door is added;
      * @return Position object of the KEY;
      */
-    private Key addKEY() {
+    protected Key addKEY() {
         Place place;
         do {
             place = randomSearchFloor();
         } while (! validKEY(place));
 
-        Key k = new Key(this, place);
+        Key k = new Key((WG)this, place);
         place.addNew(k);
         return k;
     }
-    private boolean validKEY(Place pos) {
+    protected boolean validKEY(Place pos) {
         return pos.distance(door.place) >= keyDoorDis;
     }
-    private Player addPLAYER(boolean f) {
+    protected Player addPLAYER(boolean f, int number) {
         Player p;
         Place place;
         if (f) {
+            // add first player;
             place = randomSearchFloor();
-            p = new Player(this, place);
+            p = new Player((WG)this, place);
             place.addNew(p);
-        } else { // use the existing player instance; update place status;
+
+            p1 = p;
+            players = new ArrayList<> (Arrays.asList(p1));
+            if (number > 1) {
+                // add second player;
+                place = randomSearchFloor();
+                Player player2 = new Player((WG)this, place);
+                place.addNew(player2);
+
+                p2 = player2;
+                players.add(p2);
+            }
+        } else { // use the existing player instances; update place status;
             for (Player player: players) {
                 place = randomSearchFloor();
                 player.place = place;
-                place.addNew(player); // note that the renew method changed all places;
+                place.addNew(player); // note that the re-new method changed all places;
             }
             p = null;
         }
 
         return p;
     }
-    private Lamp addLAMP() {
+    protected Lamp addLAMP() {
         Place place;
         do {
             place = randomSearchFloor();
         } while (! validLamp(place));
 
-        Lamp l = new Lamp(this, place);
+        Lamp l = new Lamp((WG)this, place);
         place.addNew(l);
 
         return l;
     }
-    private boolean validLamp(Place place) {
+    protected boolean validLamp(Place place) {
         // lamps should not be too close to each other
         Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
         for (Thing lumi: a) {
@@ -439,15 +455,15 @@ public class WG implements Serializable {
         }
         return true;
     }
-    private RockMonster addRoMo() {
+    protected RockMonster addRoMo() {
         Place place = randomSearchFloor();
-        RockMonster rm = new RockMonster(this, place);
+        RockMonster rm = new RockMonster((WG)this, place);
         place.addNew(rm);
 
         return rm;
     }
 
-    private void addBreakableWall(int num) {
+    protected void addBreakableWall(int num) {
         assert num > 0;
 
         clearEdges(); // Breakable should not be in the edges;
@@ -457,7 +473,7 @@ public class WG implements Serializable {
         restoreEdges();
 
     }
-    private void addBreakableHelper(int num) {
+    protected void addBreakableHelper(int num) {
         Place place;
         do {
             place = randomSearchThing(new Wall());
@@ -466,7 +482,7 @@ public class WG implements Serializable {
                         (place.hasNext(4, new Floor()) || place.hasNext(4, new BreakableWall()))
                 )
         ); // should be next to a Wall, not next to Nothing, and should be next to a Floor or another Breakable;
-        BreakableWall bw = new BreakableWall(this, place);
+        BreakableWall bw = new BreakableWall((WG)this, place);
 
         place.fill(new Floor()); // when it's broken, it should be Floor, not Wall;
         place.addNew(bw);

@@ -123,12 +123,16 @@ public class Player extends MovingDamageable implements Ally {
      * Works directly with keyboard input getter;
      */
     public void act(String command) {
+        if (command.equals("")) {
+            return;
+        }
         switch (command) {
+
             // four-direction movements
-            case "d", "right" -> move(0);
-            case "a", "left" -> move(1);
-            case "w", "up" -> move(2);
-            case "s", "down" -> move(3);
+            case "d", "right", "h" -> move(0);
+            case "a", "left", "f" -> move(1);
+            case "w", "up", "t" -> move(2);
+            case "s", "down", "g" -> move(3);
 
             // eight-direction movements
             case "up-right" -> move(4);
@@ -137,16 +141,16 @@ public class Player extends MovingDamageable implements Ally {
             case "up-left" -> move(7);
 
             // interact
-            case "dk", "kd" -> interact(0);
-            case "ak", "ka" -> interact(1);
-            case "wk", "kw" -> interact(2);
-            case "sk", "ks" -> interact(3);
+            case "dk", "kd", "h'", "'h" -> interact(0);
+            case "ak", "ka", "f'", "'f" -> interact(1);
+            case "wk", "kw", "t'", "'t" -> interact(2);
+            case "sk", "ks", "g'", "'g" -> interact(3);
 
             // attack
-            case "dj", "jd" -> attack(0);
-            case "aj", "ja" -> attack(1);
-            case "wj", "jw" -> attack(2);
-            case "sj", "js" -> attack(3);
+            case "dj", "jd", "h;", ";h" -> attack(0);
+            case "aj", "ja", "f;", ";f" -> attack(1);
+            case "wj", "jw", "t;", ";t" -> attack(2);
+            case "sj", "js", "g;", ";g" -> attack(3);
         }
 
         actIn.renew(actionInterval); // don't creat a new instance, instead, update the original

@@ -47,6 +47,7 @@ public class Place extends Pos implements Serializable {
     /**
      * Restore the place back to what it originalWas;
      */
+    @Deprecated
     public void restore() {
         layers.removeIf(t -> layers.indexOf(t) > 0); // remove all but the first element;
     }

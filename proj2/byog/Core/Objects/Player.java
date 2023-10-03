@@ -3,28 +3,45 @@ package byog.Core.Objects;
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
 import byog.Core.Objects.Headers.Interfaces.Ally;
+import byog.Core.Objects.Headers.Interfaces.Damager;
+import byog.Core.Objects.Headers.Interfaces.Friendly;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+/*
+When a player dies, and the other is still alive,
+we set ghosted to true, remove from its place;
+and he becomes a ghost in the next world;
+
+when the other enters a new world, the ghost is alive:
+it has health (so that dead() is false, and therefore canAct() is true),
+it has its place, and it can see the around,
+but is not an obstacle, and can't but move;
+
+Also, the ghost doesn't need to enter the door in order to get to the next world;
+ */
 public class Player extends MovingDamageable implements Ally {
     public static final int actionInterval = 180;
     public static final int attackInterval = 400;
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;
-    private static final boolean isObstacle = true;
     public static final int default_lumiRange = 3;
     public final int default_health = 5;
-    public int lumiRange;
-    private TETile avatar;
-    Interval attackIn;
+
+    protected boolean isObstacle = true;
+    protected int lumiRange;
+    protected TETile avatar;
+    protected Interval attackIn;
+    protected boolean ghosted; // when there is another player alive, don't remove thoroughly;
+    protected boolean inDoor;
 
     /////////////////////////////////////////////////////////////
 
     /*
-     * Constructors, getter methods
+     * Constructors, getter methods, .etc
      */
 
     /////////////////////////////////////////////////////////////
@@ -33,6 +50,52 @@ public class Player extends MovingDamageable implements Ally {
     public void updateArrays() {
         wg.updTrack(this);
         wg.updArray(wg.players, this);
+    }
+
+    /**
+     * In two-player mode, when one is dead, he should become a ghost;
+     */
+    @Override
+    public int remove() {
+        // don't remove from wg.players;
+        place.remove(this);
+        ghosted = true;
+        return 1;
+    }
+
+    /**
+     * Override it to check in every game loop
+     * that there is player alive;
+     * if not, game over;
+     */
+    @Override
+    public int change() {
+        wg.checkGameOver();
+        return randomAction();
+    }
+
+    public boolean ghosted() {
+        return ghosted;
+    }
+
+    /**
+     * Enters a new world;
+     */
+    public void newWorld() {
+        place = wg.randomSearchFloor();
+        place.addNew(this);
+        inDoor = false;
+
+        // the dead player becomes a ghost;
+        if (ghosted() && dead()) {
+            setHealth(1);
+            lumiRange = 1;
+            isObstacle = false;
+        }
+    }
+
+    public boolean inDoor() {
+        return inDoor;
     }
 
     public Player(WG wg, Place place) {
@@ -74,7 +137,7 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public boolean isObstacle() {
-        return Player.isObstacle;
+        return isObstacle;
     }
     @Override
     public int isLuminator() {
@@ -88,13 +151,16 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public boolean canAct() {
-        return canMove() || canAttack();
+        return !inDoor && !dead() && (canMove() || canAttack());
     }
     public boolean canMove() {
         return actIn.ended();
     }
     public boolean canAttack() {
-        return attackIn.ended();
+        return !ghosted && attackIn.ended();
+    }
+    public boolean canInteract() {
+        return !ghosted && actIn.ended();
     }
 
     /////////////////////////////////////////////////////////////
@@ -107,12 +173,14 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public void touchedBy(Thing thing) {
-
+        if (!(thing instanceof Friendly) && (thing instanceof Damager d)) {
+            d.doDamage(this);
+        }
     }
 
     @Override
     public void damagedBy(int atk) {
-        if (!duringDamage()) {
+        if (!ghosted() && !duringDamage()) {
             health -= atk;
             damaged.renew(1000);
 //            StdDraw.pause(800);
@@ -123,9 +191,6 @@ public class Player extends MovingDamageable implements Ally {
      * Works directly with keyboard input getter;
      */
     public void act(String command) {
-        if (command.equals("")) {
-            return;
-        }
         switch (command) {
 
             // four-direction movements
@@ -172,7 +237,7 @@ public class Player extends MovingDamageable implements Ally {
     @Override
     public int randomAction() {
         if (dead()) {
-            System.exit(0); // end the game;
+            remove(); // become a ghost;
         }
         return 0;
     }
@@ -193,11 +258,19 @@ public class Player extends MovingDamageable implements Ally {
         interact(place.next(direc));
     }
     public void interact(Place des) {
+        if (!canInteract()) {
+            return;
+        }
+
+        if (des.getPresent() instanceof Lamp lamp) {
+            lamp.lightUp();
+        }
         if (des.collectable()) { // collectable item
             des.collect(this);
         }
     }
     public void attack(int direc) {
+
         if (!canAttack()) {
             return;
         }
@@ -212,4 +285,19 @@ public class Player extends MovingDamageable implements Ally {
         b.move(des); // try to attack and move to the place next to Player;
     }
 
+    public void restoreHealth() {
+        setHealth(default_health);
+    }
+    public void setHealth(int value) {
+        health = value;
+    }
+
+    public void enterDoor() {
+        inDoor = true;
+        place.remove(this);
+    }
+
+    public void reflesh() {
+
+    }
 }

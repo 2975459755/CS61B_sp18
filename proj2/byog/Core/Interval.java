@@ -10,6 +10,11 @@ public class Interval implements Serializable {
     private int start;
     private int end;
 
+    /**
+     * An interval serves as a time tracker,
+     * and it should be updated after each game loop;
+     * The outside can access whether it's ended;
+     */
     public Interval(int end) {
         this.start = 0;
         this.end = end;
@@ -21,6 +26,13 @@ public class Interval implements Serializable {
     public int getCurrent() {
         return start;
     }
+
+    /**
+     * When a new interval is needed, we don't create a new instance;
+     * because the instance fields we use to store intervals
+     * are actually fixated to the original one;
+     * so instead, we always renew;
+     */
     public void renew(int end) {
         renew(0, end);
     }
@@ -42,7 +54,7 @@ public class Interval implements Serializable {
     }
 
     /**
-     * Update after each miniInterval;
+     * Update after each game loop;
      */
     public void update() {
         update(miniInterval);

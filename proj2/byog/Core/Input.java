@@ -11,41 +11,54 @@ import java.util.Arrays;
 public class Input implements Serializable {
     static final int inComboInterval = Individual.inComboInterval;
     boolean twoPlayers;
-    Individual in1;
-    Individual in2;
-    ArrayList<Individual> players;
+    Individual in1; // player 1's input collector;
+    Individual in2; // player 2's input collector;
+    ArrayList<Individual> all; // all input collectors
     Game game;
 
+    /**
+     * Input collector serves as a pub,
+     * that distributes input keys to the right input collector,
+     * and make each collector process its allocated inputs;
+     */
     Input(Game g, int numPlayers) {
         assert numPlayers == 1 || numPlayers == 2;
         twoPlayers = numPlayers > 1;
         game = g;
 
         in1 = new Individual(1, game.wg.p1);
-        players = new ArrayList<> ();
-        players.add(in1);
+        all = new ArrayList<> ();
+        all.add(in1);
 
         if (twoPlayers) {
             in2 = new Individual(2, game.wg.p2);
-            players.add(in2);
+            all.add(in2);
         }
     }
 
     int oneTurn() {
-        for (Individual in: players) {
-            in.interval.update(Game.miniInterval);
+        Individual[] a = all.toArray(new Individual[all.size()]);
+
+        // update time;
+        for (Individual in: a) {
+            in.updateTime();
         }
 
+        // distribute input keys;
         distributeKeys();
 
+        // all collectors process inputs;
         int c = 0;
         if (game.wg.canPlayerAct()) {
-            for (Individual in: players) {
+            for (Individual in: a) {
                 c += in.playerAct();
             }
         }
 
+        // distribution ends at the first invalid input,
+        // so make sure to clear the rest;
         clearKeyStack();
+
         return c;
     }
 
@@ -59,14 +72,14 @@ public class Input implements Serializable {
             }
 
             boolean validKey = false;
-            for (Individual in: players) {
+            for (Individual in: all) {
                 if (in.retrieveOneKey(key)) {
                     validKey = true;
                     break;
                 }
             }
             if (!validKey) {
-                for (Individual in: players) {
+                for (Individual in: all) {
                     in.interval.renew(0);
                 }
             }
@@ -211,7 +224,7 @@ class Individual implements Serializable {
             "wj", "aj", "sj", "dj", "jw", "ja", "js", "jd" // j with directions
     ));
     static final ArrayList<Character> validInputs_2 = new ArrayList<>(Arrays.asList(
-            't', 'f', 'g', 'h', ';', '\''));
+            't', 'f', 'g', 'h', ';', '\'', '='));
     static final ArrayList <String> combos_2 = new ArrayList<>(Arrays.asList(
             "t;", ";t", "f;", ";f", "g;", ";g", "h;", ";h", // ; with directions
             "t'", "'t", "f'", "'f", "g'", "'g", "h'", "'h" // ' with directions
@@ -250,13 +263,17 @@ class Individual implements Serializable {
         if (input.equals("o")) {
             // cheat mode on
             return 16;
-        } else if (input.equals("q")) {
+        } else if (input.equals("q") || input.equals("=")) {
             // save game
             return -8;
         } else {
             player.act(input);
             return 1;
         }
+    }
+
+    void updateTime() {
+        interval.update(Game.miniInterval);
     }
 
     boolean retrieveOneKey(char key) {
@@ -275,42 +292,42 @@ class Individual implements Serializable {
      * otherwise -> the combo (or one key, if no valid combo);
      */
     String parseWaitList() {
-        if (!waitList.isEmpty()) {
-
-            if (interval.ended()) {
-                // the previous key waited too long (no combo), return only that key;
-                String ret = String.valueOf(waitList.get(0));
-                waitList.remove(0);
-
-                // Let the next key start waiting;
-                interval.renew(inComboInterval);
-
-                return ret;
-
-            } else if (waitList.size() == 1) {
-                // Some key is still waiting;
-
-                return "0";
-
-            } else {
-                // There exists a possible combo;
-                StringBuilder b = new StringBuilder();
-
-                while (!waitList.isEmpty()) {
-                    char c = waitList.get(0);
-                    b.append(c);
-
-                    while (waitList.contains(c)) {
-                        waitList.remove((Object) c);
-                    }
-                }
-
-                return validatedCombo(b.toString());
-            }
+        if (waitList.isEmpty()) {
+            // nothing this turn;
+            return "";
         }
 
-        // nothing this turn;
-        return "";
+        if (interval.ended()) {
+            // the previous key waited too long (no combo), return only that key;
+            String ret = String.valueOf(waitList.get(0));
+            waitList.remove(0);
+
+            // Let the next key start waiting;
+            interval.renew(inComboInterval);
+
+            return ret;
+
+        } else if (waitList.size() == 1) {
+            // Some key is still waiting;
+
+            return "0";
+
+        } else {
+            // There exists a possible combo;
+            StringBuilder b = new StringBuilder();
+
+            while (!waitList.isEmpty()) {
+                char c = waitList.get(0);
+                b.append(c);
+
+                while (waitList.contains(c)) {
+                    waitList.remove((Object) c);
+                }
+            }
+
+            return validatedCombo(b.toString());
+        }
+
     }
 
     /**

@@ -122,17 +122,21 @@ public class Game {
                     // quit and save;
                     save();
                 } else {
-                    // player entered normal input;
+                    // player made a usual action;
                     cheatMode = false;
                 }
             }
 
             /*
-            Move all MovingThing;
+            Everything changes over time;
              */
             if (wg.checkChange() > 0) {
                 f = true;
             }
+
+            /*
+            Get the appearance of the world, and render frame;
+             */
             if (f) {
                 if (!cheatMode) {
                     wg.luminateAll();
@@ -140,6 +144,9 @@ public class Game {
                 renderer.renderFrame(wg.getVisible());
             }
 
+            /*
+            Update time;
+             */
             wg.update();
         }
     }

@@ -8,14 +8,22 @@ import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Lamp extends ImmobileThing implements Collectable {
+/*
+Normally a lamp is like an obstacle;
+but when it's interacted, it lights up,
+and if interacted again, it's removed (because it could be in the way);
+
+Future thoughts:
+When a player becomes a ghost in the next world,
+the other player will have to lit up all lamps to reflesh the ghost;
+ */
+public class Lamp extends ImmobileThing {
     public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
     public static TETile avatar_lit = Tileset.LAMP_LIT;
     public static int lumiRange = 6;
     public boolean litUp;
 
     public Lamp() {}
-
 
     @Override
     public void updateArrays() {
@@ -48,16 +56,6 @@ public class Lamp extends ImmobileThing implements Collectable {
 
     @Override
     public void touchedBy(Thing thing) {
-        if (thing instanceof Player) {
-            lightUp();
-        }
-    }
-
-    @Override
-    public void collectedBy(Thing thing) {
-        if (thing instanceof Player) {
-            remove();
-        }
     }
 
     public Lamp(WG wg, Place place) {
@@ -72,6 +70,8 @@ public class Lamp extends ImmobileThing implements Collectable {
     public void lightUp() {
         if (! litUp) {
             litUp = true;
+        } else {
+            remove();
         }
     }
 

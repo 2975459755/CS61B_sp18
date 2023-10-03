@@ -187,6 +187,26 @@ public class WG extends Generator {
         return ret;
     }
 
+    /**
+     * This method is invoked by player.change() in every game loop;
+     */
+    public void checkGameOver() {
+        boolean f = false;
+        for (Player p: players) {
+            if (!p.ghosted()) {
+                f = true;
+                break;
+            }
+        }
+        if (!f) {
+            endGame();
+        }
+    }
+
+    public void endGame() {
+        System.exit(1);
+    }
+
 }
 
 class Generator implements Serializable {
@@ -405,27 +425,24 @@ class Generator implements Serializable {
         Player p;
         Place place;
         if (f) {
+            players = new ArrayList<> ();
             // add first player;
             place = randomSearchFloor();
             p = new Player((WG)this, place);
             place.addNew(p);
 
             p1 = p;
-            players = new ArrayList<> (Arrays.asList(p1));
             if (number > 1) {
                 // add second player;
                 place = randomSearchFloor();
-                Player player2 = new Player((WG)this, place);
-                place.addNew(player2);
+                p = new Player((WG)this, place);
+                place.addNew(p);
 
-                p2 = player2;
-                players.add(p2);
+                p2 = p;
             }
         } else { // use the existing player instances; update place status;
             for (Player player: players) {
-                place = randomSearchFloor();
-                player.place = place;
-                place.addNew(player); // note that the re-new method changed all places;
+                player.newWorld();
             }
             p = null;
         }

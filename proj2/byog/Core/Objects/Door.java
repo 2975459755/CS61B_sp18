@@ -1,13 +1,14 @@
 package byog.Core.Objects;
 
 import byog.Core.Objects.Headers.FixedThing;
+import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Door extends FixedThing {
+public class Door extends FixedThing implements Changeable {
     public static TETile avatar_locked = Tileset.LOCKED_DOOR;
     public static TETile avatar_open = Tileset.UNLOCKED_DOOR;
     public static int lumiRange = 2;
@@ -43,10 +44,21 @@ public class Door extends FixedThing {
 
     @Override
     public void touchedBy(Thing thing) {
-        if (open && (thing instanceof Player)) {
-            // enters a new world
-            newWorld();
+        if (open && (thing instanceof Player p)) {
+            p.enterDoor();
+            check();
         }
+    }
+
+    protected int check() {
+        for (Player player: wg.players) {
+            if (!player.ghosted() && !player.inDoor()) {
+                return 0;
+            }
+        }
+        // enters a new world
+        newWorld();
+        return 1;
     }
 
     public Door(WG wg, Place place) {
@@ -63,5 +75,15 @@ public class Door extends FixedThing {
     }
     private void newWorld() {
         wg.randomWorld(false);
+    }
+
+    @Override
+    public int change() {
+        return check();
+    }
+
+    @Override
+    public <T> void update(T t) {
+
     }
 }

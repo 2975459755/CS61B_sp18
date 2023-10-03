@@ -28,6 +28,7 @@ public class Player extends MovingDamageable implements Ally {
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;
+    public static final TETile ghosted_avatar = Tileset.PLAYER_GHOSTED;
     public static final int default_lumiRange = 3;
     public final int default_health = 5;
 
@@ -128,6 +129,8 @@ public class Player extends MovingDamageable implements Ally {
     public TETile avatar() {
         if (duringDamage()) {
             return damagedAvatar();
+        } else if (ghosted()) {
+            return ghosted_avatar;
         }
         if (avatar != null) {
             return avatar;
@@ -183,7 +186,7 @@ public class Player extends MovingDamageable implements Ally {
         if (!ghosted() && !duringDamage()) {
             health -= atk;
             damaged.renew(1000);
-//            StdDraw.pause(800);
+//            StdDraw.pause(800);jj
         }
     }
 
@@ -297,7 +300,12 @@ public class Player extends MovingDamageable implements Ally {
         place.remove(this);
     }
 
+    /**
+     * The ghost becomes a human again;
+     */
     public void reflesh() {
-
+        ghosted = false;
+        lumiRange = default_lumiRange;
+        isObstacle = true;
     }
 }

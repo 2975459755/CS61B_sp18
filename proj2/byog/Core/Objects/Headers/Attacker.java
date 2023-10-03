@@ -41,7 +41,7 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
         if (isTarget(thing)) {
             // when target walks into this
             doDamage((Mortal) thing);
-        } else {
+        } else if (thing.isObstacle()) {
             vanish();
         }
     }

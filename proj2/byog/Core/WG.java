@@ -188,6 +188,24 @@ public class WG extends Generator {
     }
 
     /**
+     * When a lamp is interacted, check if all lamps are lit;
+     * If so, reflesh the ghost;
+     */
+    public void checkAllLamps() {
+        for (Thing t: keepTrackOf) {
+            if ((t instanceof Lamp l) && (!l.isLitUp())) {
+                return;
+            }
+        }
+        // All lamps are lit;
+        for (Player p: players) {
+            if (p.ghosted() && !p.dead()) { // if it's dead, it is not a true ghost;
+                p.reflesh();
+            }
+        }
+    }
+
+    /**
      * This method is invoked by player.change() in every game loop;
      */
     public void checkGameOver() {
@@ -209,10 +227,25 @@ public class WG extends Generator {
 
 }
 
-class Generator implements Serializable {
-
+class World implements Serializable {
+    // Store static data;
     public static int WIDTH = Game.WIDTH;
     public static int HEIGHT = Game.HEIGHT;
+    public static int startWIDTH = 0;
+    public static int startHEIGHT = 0;
+    protected static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
+    protected static final double lampDis = (WIDTH + HEIGHT) / 10;
+
+    // number of things:
+    protected static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
+    protected static final int maxRoMos = 12;
+    protected static final int minLamps = 1;
+    protected static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
+    protected static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
+
+}
+
+class Generator extends World {
     public Random rand;
 
     /*
@@ -234,22 +267,6 @@ class Generator implements Serializable {
     public ArrayList <Player> players = new ArrayList <> ();
     public ArrayList <Thing> keepTrackOf = new ArrayList <> (); // All Changeable, luminators;
 
-    /*
-    Set the number of things:
-     */
-    protected static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
-    protected static final int maxRoMos = 12;
-    protected static final int minLamps = 1;
-    protected static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
-    protected static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
-
-    /*
-    For special uses:
-     */
-    public static int startWIDTH = 0;
-    public static int startHEIGHT = 0;
-    protected static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
-    protected static final double lampDis = (WIDTH + HEIGHT) / 10;
     /**
      * Generate places;
      * Fill with NOTHING;

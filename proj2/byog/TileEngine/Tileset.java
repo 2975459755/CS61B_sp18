@@ -43,7 +43,8 @@ public class Tileset {
     public static final TETile DAMAGED_ROMO = new TETile('▲', Color.magenta, Color.black, "mountain");
     public static final TETile PLAYER_RED = new TETile('@', Color.red, Color.black, "player");
     public static final TETile BULLET = new TETile('⚪', Color.white, Color.black, "bullet");
-  public static final TETile KEY = new TETile('☆', Color.yellow, Color.pink, "key");
+    public static final TETile KEY = new TETile('☆', Color.yellow, Color.pink, "key");
+    public static final TETile PLAYER_GHOSTED = new TETile('@', Color.gray, Color.gray, "player");
 }
 
 

@@ -13,15 +13,14 @@ Normally a lamp is like an obstacle;
 but when it's interacted, it lights up,
 and if interacted again, it's removed (because it could be in the way);
 
-Future thoughts:
-When a player becomes a ghost in the next world,
+When a player becomes a ghost (but not dead),
 the other player will have to lit up all lamps to reflesh the ghost;
  */
 public class Lamp extends ImmobileThing {
     public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
     public static TETile avatar_lit = Tileset.LAMP_LIT;
     public static int lumiRange = 6;
-    public boolean litUp;
+    protected boolean litUp;
 
     public Lamp() {}
 
@@ -73,6 +72,12 @@ public class Lamp extends ImmobileThing {
         } else {
             remove();
         }
+
+        // check whether all lamps are lit;
+        wg.checkAllLamps();
     }
 
+    public boolean isLitUp() {
+        return litUp;
+    }
 }

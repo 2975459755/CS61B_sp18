@@ -5,6 +5,7 @@ import byog.Core.Objects.Headers.*;
 import byog.Core.Objects.Headers.Interfaces.Ally;
 import byog.Core.Objects.Headers.Interfaces.Damager;
 import byog.Core.Objects.Headers.Interfaces.Friendly;
+import byog.Core.Objects.Headers.Interfaces.Interactable;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
@@ -23,21 +24,22 @@ but is not an obstacle, and can't but move;
 Also, the ghost doesn't need to enter the door in order to get to the next world;
  */
 public class Player extends MovingDamageable implements Ally {
-    public static final int actionInterval = 180;
+    public static final int actionInterval = 200;
     public static final int attackInterval = 400;
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;
     public static final TETile ghosted_avatar = Tileset.PLAYER_GHOSTED;
     public static final int default_lumiRange = 3;
-    public final int default_health = 5;
+    public static final int default_health = 5;
+    public static final int default_damageTime = 1000;
 
     protected boolean isObstacle = true;
     protected int lumiRange;
     protected TETile avatar;
     protected Interval attackIn;
     protected boolean ghosted; // when there is another player alive, don't remove thoroughly;
-    protected boolean inDoor;
+    protected boolean inEntrance;
 
     /////////////////////////////////////////////////////////////
 
@@ -47,6 +49,8 @@ public class Player extends MovingDamageable implements Ally {
 
     /////////////////////////////////////////////////////////////
     Player() {}
+
+
     @Override
     public void updateArrays() {
         wg.updTrack(this);
@@ -85,7 +89,7 @@ public class Player extends MovingDamageable implements Ally {
     public void newWorld() {
         place = wg.randomSearchFloor();
         place.addNew(this);
-        inDoor = false;
+        inEntrance = false;
 
         // the dead player becomes a ghost;
         if (ghosted() && dead()) {
@@ -95,8 +99,8 @@ public class Player extends MovingDamageable implements Ally {
         }
     }
 
-    public boolean inDoor() {
-        return inDoor;
+    public boolean inEntrance() {
+        return inEntrance;
     }
 
     public Player(WG wg, Place place) {
@@ -116,6 +120,11 @@ public class Player extends MovingDamageable implements Ally {
     }
 
     @Override
+    public int maxHealth() {
+        return default_health;
+    }
+
+    @Override
     public TETile defaultAvatar() {
         return default_avatar;
     }
@@ -123,6 +132,11 @@ public class Player extends MovingDamageable implements Ally {
     @Override
     public TETile damagedAvatar() {
         return damaged_avatar;
+    }
+
+    @Override
+    public int damageTime() {
+        return default_damageTime;
     }
 
     @Override
@@ -148,13 +162,8 @@ public class Player extends MovingDamageable implements Ally {
     }
 
     @Override
-    public int getHealth() {
-        return health;
-    }
-
-    @Override
     public boolean canAct() {
-        return !inDoor && !dead() && (canMove() || canAttack());
+        return !inEntrance() && !dead() && (canMove() || canAttack());
     }
     public boolean canMove() {
         return actIn.ended();
@@ -178,15 +187,6 @@ public class Player extends MovingDamageable implements Ally {
     public void touchedBy(Thing thing) {
         if (!(thing instanceof Friendly) && (thing instanceof Damager d)) {
             d.doDamage(this);
-        }
-    }
-
-    @Override
-    public void damagedBy(int atk) {
-        if (!ghosted() && !duringDamage()) {
-            health -= atk;
-            damaged.renew(1000);
-//            StdDraw.pause(800);jj
         }
     }
 
@@ -221,8 +221,6 @@ public class Player extends MovingDamageable implements Ally {
             case "sj", "js", "g;", ";g" -> attack(3);
         }
 
-        actIn.renew(actionInterval); // don't creat a new instance, instead, update the original
-
     }
 
     @Override
@@ -240,7 +238,8 @@ public class Player extends MovingDamageable implements Ally {
     @Override
     public int randomAction() {
         if (dead()) {
-            remove(); // become a ghost;
+            remove(); // ready to become a ghost;
+            return 1;
         }
         return 0;
     }
@@ -255,6 +254,8 @@ public class Player extends MovingDamageable implements Ally {
         if (c == 1) { // destination is available for entering;
             enter(des);
         }
+
+        actIn.renew(actionInterval);
     }
 
     public void interact(int direc) {
@@ -265,12 +266,14 @@ public class Player extends MovingDamageable implements Ally {
             return;
         }
 
-        if (des.getPresent() instanceof Lamp lamp) {
-            lamp.lightUp();
+        if (des.getPresent() instanceof Interactable i) {
+            i.interactedBy(this);
         }
         if (des.collectable()) { // collectable item
             des.collect(this);
         }
+
+        actIn.renew(actionInterval);
     }
     public void attack(int direc) {
 
@@ -287,16 +290,8 @@ public class Player extends MovingDamageable implements Ally {
         Bullet b = new Bullet(wg, wg.randomSearchFloor(), direc); // set to a random floor;
         b.move(des); // try to attack and move to the place next to Player;
     }
-
-    public void restoreHealth() {
-        setHealth(default_health);
-    }
-    public void setHealth(int value) {
-        health = value;
-    }
-
-    public void enterDoor() {
-        inDoor = true;
+    public void enterEntrance() {
+        inEntrance = true;
         place.remove(this);
     }
 

@@ -19,7 +19,7 @@ public class Game {
     Input inputCollector;
     boolean cheatMode = false;
 
-    public static final int miniInterval = 15;
+    public static final int miniInterval = 24;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.

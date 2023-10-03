@@ -23,11 +23,6 @@ public class Bullet extends Attacker implements Ally {
     public TETile avatar() {
         return default_avatar;
     }
-
-    @Override
-    public boolean isObstacle() {
-        return false;
-    }
     @Override
     public int isLuminator() {
         return 1;

@@ -17,8 +17,6 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
         vanished = false;
     }
 
-    public abstract boolean isTarget(Thing thing);
-
     /**
      * Make an attacker die;
      * Notice this does not call `remove`,

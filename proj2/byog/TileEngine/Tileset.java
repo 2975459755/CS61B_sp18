@@ -34,17 +34,31 @@ public class Tileset {
     public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain");
     public static final TETile TREE = new TETile('♠', Color.green, Color.black, "tree");
 
+
     public static final TETile LAMP_LIT = new TETile('ψ', Color.orange, Color.black, "lit lamp");
     public static final TETile LAMP_UNLIT = new TETile('ψ', Color.white, Color.black, "unlit lamp");
-    public static final TETile WALL_BREAKABLE = new TETile('#', new Color(255, 168, 82), Color.darkGray,
+
+    public static final TETile WALL_BREAKABLE = new TETile('#', new Color(255, 168, 60), Color.darkGray,
             "breakable wall");
-    public static final TETile WALL_DAMAGED = new TETile('#', new Color(255, 168, 82), Color.orange,
+    public static final TETile WALL_DAMAGED = new TETile('#', Color.gray, Color.orange,
             "breakable wall");
-    public static final TETile DAMAGED_ROMO = new TETile('▲', Color.magenta, Color.black, "mountain");
+
+    public static final TETile ROMO_UP = new TETile('▲', Color.gray, Color.black, "romo up");
+    public static final TETile ROMO_DOWN = new TETile('▼', Color.gray, Color.black, "romo down");
+    public static final TETile ROMO_LEFT = new TETile('◀', Color.gray, Color.black, "romo left");
+    public static final TETile ROMO_RIGHT = new TETile('▶', Color.gray, Color.black, "romo right");
+    public static final TETile ROMO_UP_DAMAGED = new TETile('▲', Color.magenta, Color.black, "romo up damaged");
+    public static final TETile ROMO_DOWN_DAMAGED = new TETile('▼', Color.magenta, Color.black, "romo down damaged");
+    public static final TETile ROMO_LEFT_DAMAGED = new TETile('◀', Color.magenta, Color.black, "romo left damaged");
+    public static final TETile ROMO_RIGHT_DAMAGED = new TETile('▶', Color.magenta, Color.black, "romo right damaged");
+
     public static final TETile PLAYER_RED = new TETile('@', Color.red, Color.black, "player");
-    public static final TETile BULLET = new TETile('⚪', Color.white, Color.black, "bullet");
-    public static final TETile KEY = new TETile('☆', Color.yellow, Color.pink, "key");
     public static final TETile PLAYER_GHOSTED = new TETile('@', Color.gray, Color.gray, "player");
+
+    public static final TETile BULLET = new TETile('⚪', Color.white, Color.black, "bullet");
+
+    public static final TETile KEY = new TETile('☆', Color.yellow, Color.pink, "key");
+    public static final TETile HEART = new TETile('♥', Color.red, Color.black, "heart");
 }
 
 

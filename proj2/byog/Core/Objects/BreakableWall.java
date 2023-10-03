@@ -4,20 +4,23 @@ import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
 import byog.Core.Objects.Headers.Interfaces.Ally;
 import byog.Core.Objects.Headers.Interfaces.Damager;
+import byog.Core.Objects.Headers.Interfaces.Dropper;
+import byog.Core.Objects.Headers.Interfaces.Obstacle;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class BreakableWall extends ImmobileDamageable {
+public class BreakableWall extends ImmobileDamageable implements Dropper, Obstacle {
     public static TETile default_avatar = Tileset.WALL_BREAKABLE;
     public static TETile damaged_avatar = Tileset.WALL_DAMAGED;
     public static int default_health = 3;
 
     public BreakableWall() {}
+
     @Override
-    public boolean isObstacle() {
-        return true;
+    public int maxHealth() {
+        return default_health;
     }
 
     @Override
@@ -25,11 +28,6 @@ public class BreakableWall extends ImmobileDamageable {
         if ((thing instanceof Ally) && (thing instanceof Damager d)) {
             d.doDamage(this);
         }
-    }
-
-    @Override
-    public int getHealth() {
-        return health;
     }
 
     @Override
@@ -51,5 +49,23 @@ public class BreakableWall extends ImmobileDamageable {
         this.ins = new Interval[] {damaged};
 
         updateArrays();
+    }
+
+    @Override
+    public void drop(Thing thing, int direction) {
+        Place des;
+        if (direction < 0 || direction > 7) {
+            des = place;
+        } else {
+            des = place.next(direction);
+        }
+        des.addNew(thing);
+    }
+    @Override
+    public int remove() {
+        updateArrays();
+        place.remove(this);
+        drop(new Heart(wg, place), -1);
+        return 1;
     }
 }

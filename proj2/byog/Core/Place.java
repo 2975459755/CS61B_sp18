@@ -66,7 +66,7 @@ public class Place extends Pos implements Serializable {
         return Nothing.avatar;
     }
     public boolean collectable() {
-        return getPresent().collectable();
+        return getPresent().isCollectable();
     }
 
     /**
@@ -128,18 +128,18 @@ public class Place extends Pos implements Serializable {
         return p;
     }
     public boolean hasNextNothing(int sides) {
-        return hasNext(sides, new Nothing());
+        return hasNext(sides, new Nothing()) >= 0;
     }
     public boolean hasNextFloor(int sides) {
-        return hasNext(sides, new Floor());
+        return hasNext(sides, new Floor()) >= 0;
     }
-    public boolean hasNext(int sides, Thing thing) {
-        for (int i = 0; i < 8; i ++) {
-            if (hasDirec(i % sides, thing)) {
-                return true;
+    public int hasNext(int sides, Thing thing) {
+        for (int i = 0; i < sides; i ++) {
+            if (hasDirec(i, thing)) {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
     public boolean hasDirec(int direc, Thing thing) {
         Place next = next(direc);

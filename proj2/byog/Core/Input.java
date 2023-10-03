@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Input implements Serializable {
+public class Input extends InputSolicitor {
     static final int inComboInterval = Individual.inComboInterval;
     boolean twoPlayers;
     Individual in1; // player 1's input collector;
@@ -63,8 +63,12 @@ public class Input implements Serializable {
     }
 
     void distributeKeys() {
-        char key;
+        char key = '❤'; // just to check if it's the first key;
+        boolean firstKey = true;
         while (true) {
+            if (key != '❤') {
+                firstKey = false;
+            }
             key = oneKey();
             if (key == '0') {
                 // no more inputs;
@@ -78,7 +82,7 @@ public class Input implements Serializable {
                     break;
                 }
             }
-            if (!validKey) {
+            if (!validKey && firstKey) {
                 for (Individual in: all) {
                     in.interval.renew(0);
                 }
@@ -103,119 +107,10 @@ public class Input implements Serializable {
             StdDraw.nextKeyTyped();
         }
     }
-
-    //////////////////////////////////////////////////////
-
-    static int solicitNumPlayers() {
-        StdDraw.clear(Color.BLACK);
-        StdDraw.text(320, 320, "Enter number of players (1 or 2). Press S to end.");
-        StdDraw.show();
-
-        char key;
-        int num = 0;
-        while (true) {
-            StdDraw.pause(30);
-            if (StdDraw.hasNextKeyTyped()) {
-                key = solicitNumberOrS();
-
-                if (key == 's') {
-                    break;
-                }
-                if (key < '0' || key > '2') {
-                    continue;
-                }
-                // player entered 1 or 2;
-                StdDraw.clear(Color.BLACK);
-                StdDraw.text(320, 320, "Enter number of players (1 or 2).");
-                StdDraw.text(320, 300, "Player(s): " + key);
-                StdDraw.show();
-
-                if (key == '1') {
-                    num = 1;
-                } else {
-                    num = 2;
-                }
-            }
-        }
-
-        if (num == 0) {
-            num = 1;
-        }
-        return num;
-    }
-    static long solicitSeed() {
-        /*
-         * Some code I CVed from GitHub;
-         */
-        StdDraw.clear(Color.BLACK);
-        StdDraw.text(320, 320, "Enter seed. Press S to end.");
-        StdDraw.show();
-
-        StringBuilder builder = new StringBuilder();
-        while (true) {
-            if (StdDraw.hasNextKeyTyped()) {
-//                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                char key = solicitNumberOrS(); // this line I wrote myself;
-
-                if (key == 's') {
-                    break;
-                }
-
-                builder.append(key);
-                StdDraw.clear(Color.BLACK);
-                StdDraw.text(320, 320, "Enter seed. Press S to end.");
-                StdDraw.text(320, 300, "Your input: " + builder);
-                StdDraw.show();
-            }
-        }
-
-        if (builder.toString().equals("")) { // This line I added myself;
-            return -1; // no input seed
-        }
-        return Long.parseLong(builder.toString());
-    }
-
-    /**
-     * Valid input char for seed should be either a number or 's';
-     */
-    static char solicitNumberOrS() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                int key = (int) Character.toLowerCase(StdDraw.nextKeyTyped());
-                if (key >= 48 && key <= 57 || key == 115) {
-                    return (char) key;
-                }
-            }
-        }
-    }
-
-    /**
-     * The initial input should be 'n' or 'l' or 'q';
-     */
-    static char solicitInitialInput() {
-        while(true) {
-            char key = solicitInputChar();
-            if (key == 'n' || key == 'l' || key == 'q') {
-                return key;
-            }
-        }
-    }
-    /**
-     * Never ends until the first input;
-     */
-    static char solicitInputChar() {
-        while(true) {
-            if (StdDraw.hasNextKeyTyped()) {
-                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
-                return key;
-            }
-        }
-    }
 }
 
 class Individual implements Serializable {
     static final int inComboInterval = 120;
-    static final int comboLength = 2;
     static final int miniInterval = Game.miniInterval;
     static final ArrayList<Character> validInputs_1 = new ArrayList<>(Arrays.asList(
             'w', 'a', 's', 'd', 'j', 'k', 'o', 'q'));
@@ -401,6 +296,117 @@ class Individual implements Serializable {
                 interval.renew(inComboInterval);
             }
             waitList.add(key);
+        }
+    }
+}
+
+/**
+ * For special input soliciting (like during game initialization);
+ */
+class InputSolicitor implements Serializable {
+    static int solicitNumPlayers() {
+        StdDraw.clear(Color.BLACK);
+        StdDraw.text(320, 320, "Enter number of players (1 or 2). Press S to end.");
+        StdDraw.show();
+
+        char key;
+        int num = 0;
+        while (true) {
+            StdDraw.pause(30);
+            if (StdDraw.hasNextKeyTyped()) {
+                key = solicitNumberOrS();
+
+                if (key == 's') {
+                    break;
+                }
+                if (key < '0' || key > '2') {
+                    continue;
+                }
+                // player entered 1 or 2;
+                StdDraw.clear(Color.BLACK);
+                StdDraw.text(320, 320, "Enter number of players (1 or 2). Press S to end.");
+                StdDraw.text(320, 300, "Player(s): " + key);
+                StdDraw.show();
+
+                if (key == '1') {
+                    num = 1;
+                } else {
+                    num = 2;
+                }
+            }
+        }
+
+        if (num == 0) {
+            num = 1;
+        }
+        return num;
+    }
+    static long solicitSeed() {
+        /*
+         * Some code I CVed from GitHub;
+         */
+        StdDraw.clear(Color.BLACK);
+        StdDraw.text(320, 320, "Enter seed. Press S to end.");
+        StdDraw.show();
+
+        StringBuilder builder = new StringBuilder();
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+//                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+                char key = solicitNumberOrS(); // this line I wrote myself;
+
+                if (key == 's') {
+                    break;
+                }
+
+                builder.append(key);
+                StdDraw.clear(Color.BLACK);
+                StdDraw.text(320, 320, "Enter seed. Press S to end.");
+                StdDraw.text(320, 300, "Your input: " + builder);
+                StdDraw.show();
+            }
+        }
+
+        if (builder.toString().equals("")) { // This line I added myself;
+            return -1; // no input seed
+        }
+        return Long.parseLong(builder.toString());
+    }
+
+    /**
+     * Valid input char for seed should be either a number or 's';
+     */
+    static char solicitNumberOrS() {
+        while(true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                int key = (int) Character.toLowerCase(StdDraw.nextKeyTyped());
+                if (key >= 48 && key <= 57 || key == 115) {
+                    return (char) key;
+                }
+            }
+        }
+    }
+
+    /**
+     * The initial input should be 'n' or 'l' or 'q';
+     */
+    static char solicitInitialInput() {
+        while(true) {
+            char key = solicitInputChar();
+            if (key == 'n' || key == 'l' || key == 'q') {
+                return key;
+            }
+        }
+    }
+    /**
+     * Never ends until the first input;
+     */
+    static char solicitInputChar() {
+        while(true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char key = Character.toLowerCase(StdDraw.nextKeyTyped());
+                return key;
+            }
         }
     }
 }

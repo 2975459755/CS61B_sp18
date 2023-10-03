@@ -22,11 +22,6 @@ public class Floor extends FixedThing {
     }
 
     @Override
-    public boolean isObstacle() {
-        return false;
-    }
-
-    @Override
     public void touchedBy(Thing thing) {
 
     }

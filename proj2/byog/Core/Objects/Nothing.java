@@ -1,12 +1,13 @@
 package byog.Core.Objects;
 
 import byog.Core.Objects.Headers.FixedThing;
+import byog.Core.Objects.Headers.Interfaces.Obstacle;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Nothing extends FixedThing {
+public class Nothing extends FixedThing implements Obstacle {
     public static TETile avatar = Tileset.NOTHING;
     public static boolean isObstacle = true;
     public Nothing() {}
@@ -25,11 +26,6 @@ public class Nothing extends FixedThing {
     @Override
     public TETile avatar() {
         return avatar;
-    }
-
-    @Override
-    public boolean isObstacle() {
-        return true;
     }
 
     @Override

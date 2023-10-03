@@ -29,17 +29,24 @@ public class WG extends Generator {
         int xStart = Math.floorDiv(WIDTH, 2);
         int yStart = Math.floorDiv(HEIGHT, 2); // start point is at the center
 
+        if (f) {
+            clearEdges(Math.floorDiv(Game.HEIGHT, 5));
+        }
         fillWithFloor(places[xStart][yStart]); // First step: Randomly fill with FLOOR tiles;
-        addWALL();
-        door = addDOOR();
-        key = addKEY();
-        addPLAYER(f, numPlayers);
+        if (f) {
+            restoreEdges(Math.floorDiv(Game.HEIGHT, 5));
+        }
+
+        addWall();
+        door = addDoor();
+        key = addKey();
+        addPlayer(f, numPlayers);
 
         /*
         Generate a random number of lamps;
          */
         for (int i = 0; i < rand.nextInt(minLamps, maxLamps + 1); i++) {
-            addLAMP();
+            addLamp();
         }
 
         for (int i = 0; i < rand.nextInt(3, maxRoMos + 1); i++) {
@@ -233,15 +240,15 @@ class World implements Serializable {
     public static int HEIGHT = Game.HEIGHT;
     public static int startWIDTH = 0;
     public static int startHEIGHT = 0;
-    protected static final double keyDoorDis = (WIDTH + HEIGHT) / 4;
-    protected static final double lampDis = (WIDTH + HEIGHT) / 10;
+    protected static double keyDoorDis = (WIDTH + HEIGHT) / 4;
+    protected static double lampDis = (WIDTH + HEIGHT) / 10;
 
     // number of things:
-    protected static final double minFLOORCount = WIDTH * HEIGHT / 2.5;
-    protected static final int maxRoMos = 12;
+    protected static double minFLOORCount = WIDTH * HEIGHT / 2.5;
+    protected static int maxRoMos = 6;
     protected static final int minLamps = 1;
-    protected static final int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
-    protected static final int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
+    protected static int maxLamps = Math.max(Math.floorDiv(WIDTH * HEIGHT, 450), minLamps);
+    protected static int numBreakableWalls = Math.floorDiv(WIDTH * HEIGHT, 400);
 
 }
 
@@ -255,6 +262,8 @@ class Generator extends World {
     public static Place[][] places = new Place[WIDTH][HEIGHT];
     protected Place[][] Splaces;
     protected TETile[][] visibleWorld;
+
+    protected int numFloors = 0;
 
     /*
     What we keep track of:
@@ -291,7 +300,7 @@ class Generator extends World {
         /*
         Renew arrays:
          */
-        keepTrackOf = new ArrayList <Thing> ();
+        keepTrackOf = new ArrayList <> ();
         keepTrackOf.addAll(players);
     }
 
@@ -300,7 +309,7 @@ class Generator extends World {
      * Number of FLOOR must be above minFLOORCount;
      */
     protected void fillWithFloor(Place place) {
-        fillWithFloor(place, 0);
+        fillWithFloor(place, numFloors);
     }
     protected void fillWithFloor(Place place, int n) {
         /*
@@ -308,7 +317,14 @@ class Generator extends World {
         because the FLOOR must not be in the edges
         for aesthetic reasons;
          */
-        clearEdges();
+        clearEdges(1);
+
+        keyDoorDis = (WIDTH - startWIDTH + 1 + HEIGHT - startHEIGHT + 1) / 4;
+        lampDis = (WIDTH - startWIDTH + 1 + HEIGHT - startHEIGHT + 1) / 10;
+        minFLOORCount = (WIDTH - startWIDTH + 1) *  (HEIGHT - startHEIGHT + 1) / 2.5;
+        maxLamps = Math.max(Math.floorDiv((WIDTH - startWIDTH + 1) *  (HEIGHT - startHEIGHT + 1), 450), minLamps);
+        numBreakableWalls = Math.floorDiv((WIDTH - startWIDTH + 1) *  (HEIGHT - startHEIGHT + 1), 400);
+
         /*
         fill with FLOORs;
          */
@@ -316,7 +332,7 @@ class Generator extends World {
         /*
         restore the size of the world;
          */
-        restoreEdges();
+        restoreEdges(1);
     }
     protected void fillWithFloorHelper(Place place, int n) {
         // n: store the number of filled tiles;
@@ -335,22 +351,23 @@ class Generator extends World {
             }
             fillWithFloorHelper(place, n); // this is what `n` is for;
         }
+        numFloors = n;
     }
 
     /**
      * Clear the four edges by narrowing the boundaries;
      */
-    protected void clearEdges() {
-        startWIDTH ++;
-        WIDTH --;
-        startHEIGHT ++;
-        HEIGHT --;
+    protected void clearEdges(int n) {
+        startWIDTH += n;
+        WIDTH -= n;
+        startHEIGHT += n;
+        HEIGHT -= n;
     }
-    protected void restoreEdges() {
-        startWIDTH --;
-        WIDTH ++;
-        startHEIGHT --;
-        HEIGHT ++;
+    protected void restoreEdges(int n) {
+        startWIDTH -= n;
+        WIDTH += n;
+        startHEIGHT -= n;
+        HEIGHT += n;
     }
     /**
      * Replace every `original` in `world` with `tile`;
@@ -381,18 +398,24 @@ class Generator extends World {
     /**
      * Surround the FLOORs with WALLs (in 8 directions);
      */
-    protected void addWALL() {
-        addWALL(8);
+    protected void addWall() {
+        addWall(8);
     }
-    protected void addWALL(int sides) {
+    protected void addWall(int sides) {
         Place place;
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
 
                 place = places[x][y];
                 if (place.isFloor()) {
-                    while (place.hasNextNothing(sides)) {
-                        place.randomSearchNextNothing(rand, sides).fill(new Wall());
+                    int direc;
+                    while (true) {
+                        direc = place.hasNext(sides, new Nothing());
+                        if (direc < 0) {
+                            break;
+                        } else {
+                            place.next(direc).fill(new Wall());
+                        }
                     }
                 }
 
@@ -407,13 +430,13 @@ class Generator extends World {
      * A Door also must be near to a FLOOR;
      * @return Position object of the DOOR;
      */
-    protected Door addDOOR() {
+    protected Door addDoor() {
         Place place;
         do {
             place = places[rand.nextInt(WIDTH)][rand.nextInt(HEIGHT)];
         } while (! (place.nowIs(new Wall())
                 && place.hasNextFloor(4)
-                && place.hasNext(4, new Wall())));
+                && place.hasNext(4, new Wall()) >= 0));
 
         Door d = new Door((WG)this, place);
         place.fill(d);
@@ -425,20 +448,20 @@ class Generator extends World {
      * Use after the Door is added;
      * @return Position object of the KEY;
      */
-    protected Key addKEY() {
+    protected Key addKey() {
         Place place;
         do {
             place = randomSearchFloor();
-        } while (! validKEY(place));
+        } while (! validKey(place));
 
         Key k = new Key((WG)this, place);
         place.addNew(k);
         return k;
     }
-    protected boolean validKEY(Place pos) {
+    protected boolean validKey(Place pos) {
         return pos.distance(door.place) >= keyDoorDis;
     }
-    protected Player addPLAYER(boolean f, int number) {
+    protected Player addPlayer(boolean f, int number) {
         Player p;
         Place place;
         if (f) {
@@ -457,7 +480,7 @@ class Generator extends World {
 
                 p2 = p;
             }
-        } else { // use the existing player instances; update place status;
+        } else { // use the existing player instances; update status;
             for (Player player: players) {
                 player.newWorld();
             }
@@ -466,7 +489,7 @@ class Generator extends World {
 
         return p;
     }
-    protected Lamp addLAMP() {
+    protected Lamp addLamp() {
         Place place;
         do {
             place = randomSearchFloor();
@@ -500,11 +523,11 @@ class Generator extends World {
     protected void addBreakableWall(int num) {
         assert num > 0;
 
-        clearEdges(); // Breakable should not be in the edges;
+        clearEdges(1); // Breakable should not be in the edges;
 
         addBreakableHelper(num);
 
-        restoreEdges();
+        restoreEdges(1);
 
     }
     protected void addBreakableHelper(int num) {
@@ -512,8 +535,8 @@ class Generator extends World {
         do {
             place = randomSearchThing(new Wall());
         } while (!
-                (place.hasNext(4, new Wall()) && !place.hasNext(4, new Nothing()) &&
-                        (place.hasNext(4, new Floor()) || place.hasNext(4, new BreakableWall()))
+                (place.hasNext(4, new Wall()) >= 0 && !place.hasNextNothing(4) &&
+                        (place.hasNextFloor(4) || place.hasNext(4, new BreakableWall()) >= 0)
                 )
         ); // should be next to a Wall, not next to Nothing, and should be next to a Floor or another Breakable;
         BreakableWall bw = new BreakableWall((WG)this, place);

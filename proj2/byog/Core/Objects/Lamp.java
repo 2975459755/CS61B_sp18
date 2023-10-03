@@ -2,6 +2,8 @@ package byog.Core.Objects;
 
 import byog.Core.Objects.Headers.ImmobileThing;
 import byog.Core.Objects.Headers.Interfaces.Collectable;
+import byog.Core.Objects.Headers.Interfaces.Interactable;
+import byog.Core.Objects.Headers.Interfaces.Obstacle;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
@@ -16,7 +18,7 @@ and if interacted again, it's removed (because it could be in the way);
 When a player becomes a ghost (but not dead),
 the other player will have to lit up all lamps to reflesh the ghost;
  */
-public class Lamp extends ImmobileThing {
+public class Lamp extends ImmobileThing implements Interactable, Obstacle {
     public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
     public static TETile avatar_lit = Tileset.LAMP_LIT;
     public static int lumiRange = 6;
@@ -48,10 +50,6 @@ public class Lamp extends ImmobileThing {
             return -1;
         }
     }
-    @Override
-    public boolean collectable() {
-        return true;
-    }
 
     @Override
     public void touchedBy(Thing thing) {
@@ -79,5 +77,12 @@ public class Lamp extends ImmobileThing {
 
     public boolean isLitUp() {
         return litUp;
+    }
+
+    @Override
+    public void interactedBy(Thing thing) {
+        if (thing instanceof Player p) {
+            lightUp();
+        }
     }
 }

@@ -165,8 +165,8 @@ public class Game {
         }
     }
     void cheat() {
-        for (int x = 0; x < WG.WIDTH; x ++) {
-            for (int y = 0; y < WG.HEIGHT; y ++) {
+        for (int x = 0; x < wg.WIDTH; x ++) {
+            for (int y = 0; y < wg.HEIGHT; y ++) {
                 WG.places[x][y].visible = true;
             }
         }

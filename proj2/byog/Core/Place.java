@@ -13,9 +13,9 @@ import java.util.Random;
 import static jdk.dynalink.linker.support.Guards.isInstance;
 
 
-public class Place extends Pos implements Serializable {
+public class Place extends Pos {
     public boolean visible;
-    private ArrayList<Thing> layers;
+    protected ArrayList<Thing> layers;
 
     public Place(int xCoor, int yCoor, Thing thing) {
         x = xCoor;
@@ -34,8 +34,9 @@ public class Place extends Pos implements Serializable {
      * Make the place originalWas some Thing;
      */
     public void fill(Thing thing) {
-        layers = new ArrayList<Thing> ();
+        layers = new ArrayList<> ();
         layers.add(thing);
+        layers.trimToSize();
     }
     /**
      * Make the place nowIs some Thing;
@@ -186,4 +187,28 @@ public class Place extends Pos implements Serializable {
     public Thing getIntrinsic() {
         return layers.get(0);
     }
+}
+class Pos implements Serializable {
+    protected int x;
+    protected int y;
+    public Pos() {}
+    public Pos(int xC, int yC) {
+        this.x = xC;
+        this.y = yC;
+    }
+    public boolean inMap() {
+        return x >= WG.startWIDTH && x < WG.WIDTH
+                && y >= WG.startHEIGHT && y < WG.HEIGHT;
+    }
+    public double distance(Place des) {
+        return Math.sqrt(Math.pow(this.x - des.x, 2)
+                + Math.pow(this.y - des.y, 2));
+    }
+    /**
+     * L-shaped distance;
+     */
+    public int LDistance(Place des) {
+        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
+    }
+
 }

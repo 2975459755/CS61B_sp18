@@ -46,7 +46,7 @@ public class Door extends Enterable {
 
         this.open = false;
 
-        updateArrays();
+        addToArrays();
     }
 
 }

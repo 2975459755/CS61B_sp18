@@ -15,7 +15,12 @@ public class Key extends ImmobileThing implements Collectable {
     public Key() {}
 
     @Override
-    public void updateArrays() {
+    public void addToArrays() {
+
+    }
+
+    @Override
+    public void removeFromArrays() {
 
     }
 
@@ -41,7 +46,7 @@ public class Key extends ImmobileThing implements Collectable {
         this.wg = wg;
         this.place = place;
 
-        updateArrays();
+        addToArrays();
     }
 
 }

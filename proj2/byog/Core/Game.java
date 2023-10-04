@@ -18,8 +18,10 @@ public class Game {
     WG wg = null;
     Input inputCollector;
     boolean cheatMode = false;
+    Interval frameIn;
+    public static final int frameInterval = 40; // AT LEAST 1000/40 = 25 frames per sec;
 
-    public static final int miniInterval = 24;
+    public static final int miniInterval = 12;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -101,6 +103,13 @@ public class Game {
         renderer.initialize(WIDTH, HEIGHT);
         renderer.renderFrame(wg.getVisible());
 
+        /*
+         Prevent too long interval between frame refreshment;
+         Without this, a damaged thing may not switch back to its original appearance
+         if nothing else has changed in the game;
+         */
+        frameIn = new Interval(frameInterval);
+
         inputCollector = new Input(this, wg.numPlayers);
 
         boolean f; // whether something has changed during a miniInterval
@@ -135,13 +144,18 @@ public class Game {
             }
 
             /*
-            Get the appearance of the world, and render frame;
+            If something changed in the game,
+            or the previous frame refreshment is too long ago,
+            get the appearance of the world, and render frame;
              */
-            if (f) {
+            if (f || frameIn.ended()) {
                 if (!cheatMode) {
                     wg.luminateAll();
                 }
                 renderer.renderFrame(wg.getVisible());
+                frameIn.renew(frameInterval);
+            } else {
+                frameIn.update();
             }
 
             /*

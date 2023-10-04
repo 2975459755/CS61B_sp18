@@ -11,7 +11,7 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     protected Interval survival;
     protected int direction;
     protected int atk;
-    protected boolean vanished; // prevent from repeating updateArray;
+    protected boolean vanished;
 
     public Attacker() {
         vanished = false;
@@ -21,17 +21,19 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
      * Make an attacker die;
      * Notice this does not call `remove`,
      * instead, `randomAction` will take care of it;
+     * because when it dies, it remains on the screen for a moment,
+     * (only showed on the screen, does not do anything else);
      */
-    private void vanish() {
+    protected void vanish() {
         if (!vanished) {
-            survival.renew(0); // dies;
-//            remove();
+            survival.renew(150); // dies, but keeps on the screen for a moment;
+            actIn.renew(9999); // but should not move again;
             vanished = true;
         }
     }
 
     /**
-     * When a target walks to this, perform attack;
+     * When a target walks into this, perform attack;
      * Otherwise when an obstacle enters, should vanish;
      */
     @Override
@@ -58,8 +60,8 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     }
     @Override
     public int getHealth() {
-        if (survival.ended() || atk == 0) {
-            // when move to max distance, or atk expires, it dies;
+        if (survival.ended()) {
+            // when move to max distance, it dies;
             return 0;
         } else {
             return 1;
@@ -67,10 +69,14 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     }
     @Override
     public void damagedBy(Thing thing) {
+        if (vanished) {
+            return;
+        }
         if (thing instanceof Attacker) { // collide with hostile attacker;
             vanish();
         }
     }
+
     @Override
     public void damagedBy(int atk) {
 
@@ -87,6 +93,10 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
      */
     @Override
     public void doDamage(Mortal m) {
+        if (vanished) {
+            return;
+        }
+
         vanish();
 
         m.damagedBy(this); // collide with hostile attacker;
@@ -96,6 +106,9 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     public int goAt(Place des) {
         des.touchedBy(this);
 
+        if (isTarget(des.getPresent())) {
+            return 1; // so that it covers the attacked target for a moment;
+        }
         if (!des.canEnter()) {
             // hits hard thing, vanishes;
             vanish();

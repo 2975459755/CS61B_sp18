@@ -12,8 +12,15 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
 
     public MovingThing() {}
     @Override
-    public void updateArrays() {
-        wg.updTrack(this);
+    public void addToArrays() {
+        if (wg.keepTrackOf.contains(this)) {
+            return;
+        }
+        wg.keepTrackOf.add(this);
+    }
+    @Override
+    public void removeFromArrays() {
+        wg.keepTrackOf.remove(this);
     }
     public void move(int direc) {
         move(place.next(direc));

@@ -15,7 +15,7 @@ public abstract class RemovableThing extends Thing {
      * For Mortals: use after dead() !
      */
     public int remove() {
-        updateArrays();
+        removeFromArrays();
         place.remove(this);
         return 1;
     }

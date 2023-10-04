@@ -16,10 +16,16 @@ public abstract class Enterable extends FixedThing implements Changeable, Obstac
         insidePlayers = new ArrayList<> ();
     }
     @Override
-    public void updateArrays() {
-        wg.updTrack(this);
+    public void addToArrays() {
+        if (wg.keepTrackOf.contains(this)) {
+            return;
+        }
+        wg.keepTrackOf.add(this);
     }
-
+    @Override
+    public void removeFromArrays() {
+        wg.keepTrackOf.remove(this);
+    }
     @Override
     public void touchedBy(Thing thing) {
         if (open && (thing instanceof Player p)) {

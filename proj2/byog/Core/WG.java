@@ -134,16 +134,13 @@ public class WG extends Generator {
         }
     }
 
-    public void updTrack(Thing thing) {
-        updArray(keepTrackOf, thing);
-    }
-
     /**
      * When item not in array, add it, return 1;
      * When item is in array, remove it, return -1;
      * param currentCount We declare array size larger than we actually need,
      *                     this will prevent null-pointer exception;
      */
+    @Deprecated
     public <T> void updArray(ArrayList <T> arr, T item) {
         if (arr.contains(item)) {
             arr.remove(item);
@@ -173,6 +170,7 @@ public class WG extends Generator {
         return false;
     }
 
+    @Deprecated
     void playerAct(String input) {
         Player[] a = players.toArray(new Player[players.size()]);
         for (Player p: a) {
@@ -219,6 +217,7 @@ public class WG extends Generator {
         boolean f = false;
         for (Player p: players) {
             if (!p.ghosted()) {
+                // at least one player is not a ghost;
                 f = true;
                 break;
             }

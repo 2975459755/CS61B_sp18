@@ -11,8 +11,14 @@ public class Floor extends FixedThing {
 
     public Floor() {}
 
+
     @Override
-    public void updateArrays() {
+    public void addToArrays() {
+
+    }
+
+    @Override
+    public void removeFromArrays() {
 
     }
 
@@ -29,6 +35,6 @@ public class Floor extends FixedThing {
     public Floor(WG wg) {
         this.wg = wg;
 
-        updateArrays();
+        addToArrays();
     }
 }

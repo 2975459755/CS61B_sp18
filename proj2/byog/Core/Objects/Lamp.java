@@ -27,8 +27,15 @@ public class Lamp extends ImmobileThing implements Interactable, Obstacle {
     public Lamp() {}
 
     @Override
-    public void updateArrays() {
-        wg.updTrack(this);
+    public void addToArrays() {
+        if (wg.keepTrackOf.contains(this)) {
+            return;
+        }
+        wg.keepTrackOf.add(this);
+    }
+    @Override
+    public void removeFromArrays() {
+        wg.keepTrackOf.remove(this);
     }
     @Override
     public TETile avatar() {
@@ -61,7 +68,7 @@ public class Lamp extends ImmobileThing implements Interactable, Obstacle {
 
         litUp = false;
 
-        updateArrays();
+        addToArrays();
     }
 
     public void lightUp() {

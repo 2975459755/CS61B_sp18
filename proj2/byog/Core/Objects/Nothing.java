@@ -9,18 +9,23 @@ import byog.TileEngine.Tileset;
 
 public class Nothing extends FixedThing implements Obstacle {
     public static TETile avatar = Tileset.NOTHING;
-    public static boolean isObstacle = true;
     public Nothing() {}
 
-    @Override
-    public void updateArrays() {
-
-    }
 
     public Nothing(WG wg) {
         this.wg = wg;
 
-        updateArrays();
+        addToArrays();
+    }
+
+    @Override
+    public void addToArrays() {
+
+    }
+
+    @Override
+    public void removeFromArrays() {
+
     }
 
     @Override

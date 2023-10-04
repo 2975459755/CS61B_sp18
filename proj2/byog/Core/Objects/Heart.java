@@ -14,8 +14,14 @@ public class Heart extends ImmobileThing implements Collectable {
         this.wg = wg;
         this.place = place;
     }
+
     @Override
-    public void updateArrays() {
+    public void addToArrays() {
+
+    }
+
+    @Override
+    public void removeFromArrays() {
 
     }
 

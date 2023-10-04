@@ -38,7 +38,7 @@ public class RockMonster extends MovingDamageable implements Damager, Enemy, Mon
         this.health = default_health;
         this.direction = 2;
 
-        updateArrays();
+        addToArrays();
     }
 
     @Override

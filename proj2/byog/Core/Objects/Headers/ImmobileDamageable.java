@@ -9,8 +9,15 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
     protected int health;
     public ImmobileDamageable() {}
     @Override
-    public void updateArrays() {
-        wg.updTrack(this);
+    public void addToArrays() {
+        if (wg.keepTrackOf.contains(this)) {
+            return;
+        }
+        wg.keepTrackOf.add(this);
+    }
+    @Override
+    public void removeFromArrays() {
+        wg.keepTrackOf.remove(this);
     }
     public abstract int maxHealth();
     public void restoreFullHealth() {

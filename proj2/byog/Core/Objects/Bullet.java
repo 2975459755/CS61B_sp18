@@ -27,6 +27,13 @@ public class Bullet extends Attacker implements Ally {
     public int isLuminator() {
         return 1;
     }
+    @Override
+    protected void vanish() {
+        if (!vanished) {
+            survival.renew(0); // unlike the others, bullets disappear instantly;
+            vanished = true;
+        }
+    }
 
     public Bullet (WG wg, Place place, int direction) {
         this.wg = wg;
@@ -39,6 +46,6 @@ public class Bullet extends Attacker implements Ally {
 
         this.atk = 1;
 
-        updateArrays();
+        addToArrays();
     }
 }

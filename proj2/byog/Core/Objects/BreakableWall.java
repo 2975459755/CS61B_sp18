@@ -48,7 +48,7 @@ public class BreakableWall extends ImmobileDamageable implements Dropper, Obstac
         this.damaged = new Interval(0);
         this.ins = new Interval[] {damaged};
 
-        updateArrays();
+        addToArrays();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BreakableWall extends ImmobileDamageable implements Dropper, Obstac
     }
     @Override
     public int remove() {
-        updateArrays();
+        removeFromArrays();
         place.remove(this);
         drop(new Heart(wg, place), -1);
         return 1;

@@ -12,7 +12,12 @@ public class Wall extends FixedThing implements Obstacle {
     public Wall() {}
 
     @Override
-    public void updateArrays() {
+    public void addToArrays() {
+
+    }
+
+    @Override
+    public void removeFromArrays() {
 
     }
 
@@ -29,6 +34,6 @@ public class Wall extends FixedThing implements Obstacle {
     public Wall(WG wg) {
         this.wg= wg;
 
-        updateArrays();
+        addToArrays();
     }
 }

@@ -52,9 +52,21 @@ public class Player extends MovingDamageable implements Ally {
 
 
     @Override
-    public void updateArrays() {
-        wg.updTrack(this);
-        wg.updArray(wg.players, this);
+    public void addToArrays() {
+        if (!wg.keepTrackOf.contains(this)) {
+            wg.keepTrackOf.add(this);
+        }
+        if (!wg.players.contains(this)) {
+            wg.players.add(this);
+            wg.players.trimToSize();
+        }
+    }
+
+    /**
+     * Don't remove from wg.players or wg.keepTrackOf;
+     */
+    @Override
+    public void removeFromArrays() {
     }
 
     /**
@@ -62,7 +74,8 @@ public class Player extends MovingDamageable implements Ally {
      */
     @Override
     public int remove() {
-        // don't remove from wg.players;
+        // don't remove from wg.players or wg.keepTrackOf;
+        removeFromArrays();
         place.remove(this);
         ghosted = true;
         return 1;
@@ -116,7 +129,7 @@ public class Player extends MovingDamageable implements Ally {
         this.damaged = new Interval(0);
         this.ins = new Interval[]{actIn, attackIn, damaged};
 
-        updateArrays();
+        addToArrays();
     }
 
     @Override

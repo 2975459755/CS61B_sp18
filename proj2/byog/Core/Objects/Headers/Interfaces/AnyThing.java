@@ -10,7 +10,8 @@ public interface AnyThing extends Serializable {
      * When this is constructed or removed,
      * the array tracking them should be updated;
      */
-    public void updateArrays();
+    public void addToArrays();
+    public void removeFromArrays();
     /**
      * @return the TETile representation of the instance;
      */

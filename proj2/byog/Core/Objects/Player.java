@@ -26,6 +26,7 @@ Also, the ghost doesn't need to enter the door in order to get to the next world
 public class Player extends MovingDamageable implements Ally {
     public static final int actionInterval = 200;
     public static final int attackInterval = 400;
+    public static final int interactInterval = 5000;
 
     public static final TETile default_avatar = Tileset.PLAYER;
     public static final TETile damaged_avatar = Tileset.PLAYER_RED;
@@ -38,6 +39,7 @@ public class Player extends MovingDamageable implements Ally {
     protected int lumiRange;
     protected TETile avatar;
     protected Interval attackIn;
+    protected Interval interactIn;
     protected boolean ghosted; // when there is another player alive, don't remove thoroughly;
     protected boolean inEntrance;
 
@@ -126,8 +128,10 @@ public class Player extends MovingDamageable implements Ally {
 
         this.actIn = new Interval(0);
         this.attackIn = new Interval(0);
+        this.interactIn = new Interval(0);
         this.damaged = new Interval(0);
-        this.ins = new Interval[]{actIn, attackIn, damaged};
+        this.ins = new Interval[] {actIn, attackIn, interactIn, damaged};
+        this.direction = 0;
 
         addToArrays();
     }
@@ -176,7 +180,7 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public boolean canAct() {
-        return !inEntrance() && !dead() && (canMove() || canAttack());
+        return !inEntrance() && !dead() && (canMove() || canAttack() || canInteract());
     }
     public boolean canMove() {
         return actIn.ended();
@@ -185,7 +189,7 @@ public class Player extends MovingDamageable implements Ally {
         return !ghosted && attackIn.ended();
     }
     public boolean canInteract() {
-        return !ghosted && actIn.ended();
+        return !ghosted && interactIn.ended();
     }
     public boolean canSufferDamage() {
         return damaged.ended() && !ghosted();
@@ -224,10 +228,10 @@ public class Player extends MovingDamageable implements Ally {
         switch (command) {
 
             // four-direction movements
-            case "d", "right", "h" -> move(0);
-            case "a", "left", "f" -> move(1);
-            case "w", "up", "t" -> move(2);
-            case "s", "down", "g" -> move(3);
+            case "d", "right", "h" -> {direction = 0; move(direction);}
+            case "a", "left", "f" -> {direction = 1; move(direction);}
+            case "w", "up", "t" -> {direction = 2; move(direction);}
+            case "s", "down", "g" -> {direction = 3; move(direction);}
 
             // eight-direction movements
             case "up-right" -> move(4);
@@ -236,16 +240,18 @@ public class Player extends MovingDamageable implements Ally {
             case "up-left" -> move(7);
 
             // interact
-            case "dk", "kd", "h'", "'h" -> interact(0);
-            case "ak", "ka", "f'", "'f" -> interact(1);
-            case "wk", "kw", "t'", "'t" -> interact(2);
-            case "sk", "ks", "g'", "'g" -> interact(3);
+            case "k", "'" -> interact(direction);
+            case "dk", "kd", "h'", "'h" -> {direction = 0; interact(direction);}
+            case "ak", "ka", "f'", "'f" -> {direction = 1; interact(direction);}
+            case "wk", "kw", "t'", "'t" -> {direction = 2; interact(direction);}
+            case "sk", "ks", "g'", "'g" -> {direction = 3; interact(direction);}
 
             // attack
-            case "dj", "jd", "h;", ";h" -> attack(0);
-            case "aj", "ja", "f;", ";f" -> attack(1);
-            case "wj", "jw", "t;", ";t" -> attack(2);
-            case "sj", "js", "g;", ";g" -> attack(3);
+            case "j", ";" -> attack(direction);
+            case "dj", "jd", "h;", ";h" -> {direction = 0; attack(direction);}
+            case "aj", "ja", "f;", ";f" -> {direction = 1; attack(direction);}
+            case "wj", "jw", "t;", ";t" -> {direction = 2; attack(direction);}
+            case "sj", "js", "g;", ";g" -> {direction = 3; attack(direction);}
         }
 
     }
@@ -300,10 +306,9 @@ public class Player extends MovingDamageable implements Ally {
             des.collect(this);
         }
 
-        actIn.renew(actionInterval);
+        interactIn.renew(interactInterval);
     }
     public void attack(int direc) {
-
         if (!canAttack()) {
             return;
         }

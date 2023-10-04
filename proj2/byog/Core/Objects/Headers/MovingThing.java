@@ -9,6 +9,7 @@ import byog.Core.Place;
 public abstract class MovingThing extends RemovableThing implements Changeable {
     public Interval actIn;
     public Interval[] ins;
+    protected int direction;
 
     public MovingThing() {}
     @Override
@@ -23,6 +24,7 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
         wg.keepTrackOf.remove(this);
     }
     public void move(int direc) {
+        direction = direc;
         move(place.next(direc));
     }
     public void move(Place des) {

@@ -23,8 +23,8 @@ public class Interval implements Serializable {
         this.start = start;
         this.end = end;
     }
-    public int getCurrent() {
-        return start;
+    public int getRest() {
+        return Math.max(end - start, 0);
     }
 
     /**
@@ -39,6 +39,9 @@ public class Interval implements Serializable {
     public void renew(int start, int end) {
         this.start = start;
         this.end = end;
+    }
+    public void delay(int time) {
+        this.end += time;
     }
     /**
      * When player performs an action,

@@ -289,7 +289,7 @@ class Generator extends World {
         }
     }
     /**
-     * Method for renewing a WG world;
+     * Method for renewing a world;
      */
     protected void renew(boolean f) {
         emptyWorld();
@@ -304,8 +304,8 @@ class Generator extends World {
     }
 
     /**
-     * Randomly fill with FLOOR tiles;
-     * Number of FLOOR must be above minFLOORCount;
+     * Randomly fill with Floors;
+     * Number of Floor must be above minFLOORCount;
      */
     protected void fillWithFloor(Place place) {
         fillWithFloor(place, numFloors);
@@ -357,7 +357,7 @@ class Generator extends World {
      * Clear the four edges by narrowing the boundaries;
      */
     protected void clearEdges(int n) {
-        startWIDTH += n;
+        startWIDTH += n; // TODO
         WIDTH -= n;
         startHEIGHT += n;
         HEIGHT -= n;
@@ -369,15 +369,14 @@ class Generator extends World {
         HEIGHT += n;
     }
     /**
-     * Replace every `original` in `world` with `tile`;
-     * @param original: tile to be replaced;
+     * Replace every `original` in `with `replacer`;
      */
     protected void replaceAll(Thing original, Thing replacer) {
         for (int x = 0; x < WIDTH; x ++) {
             for (int y = 0; y < HEIGHT; y ++) {
 
                 if (places[x][y].nowIs(original)) {
-                    places[x][y].fill(replacer);
+                    places[x][y].fill(replacer);  // TODO
                 }
 
             }
@@ -427,7 +426,6 @@ class Generator extends World {
      * A Door must have at least one surrounding WALL (4-directioned)
      * for aesthetic purpose;
      * A Door also must be near to a FLOOR;
-     * @return Position object of the DOOR;
      */
     protected Door addDoor() {
         Place place;
@@ -443,9 +441,7 @@ class Generator extends World {
         return d;
     }
     /**
-     * Replace a random FLOOR with KEY;
      * Use after the Door is added;
-     * @return Position object of the KEY;
      */
     protected Key addKey() {
         Place place;

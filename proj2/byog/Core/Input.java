@@ -17,9 +17,10 @@ public class Input extends InputSolicitor {
     Game game;
 
     /**
-     * Input collector serves as a pub,
-     * that distributes input keys to the right input collector,
-     * and make each collector process its allocated inputs;
+     * Input instance serves as a pub,
+     * that distributes input keys to the right input collector instance,
+     * and make each collector process its allocated inputs,
+     * which then make players move;
      */
     Input(Game g, int numPlayers) {
         assert numPlayers == 1 || numPlayers == 2;
@@ -72,7 +73,7 @@ public class Input extends InputSolicitor {
             key = oneKey();
             if (key == '0') {
                 // no more inputs;
-                break;
+                return;
             }
 
             boolean validKey = false;
@@ -82,10 +83,13 @@ public class Input extends InputSolicitor {
                     break;
                 }
             }
-            if (!validKey && firstKey) {
-                for (Collector in: all) {
-                    in.interval.renew(0);
+            if (!validKey) {
+                if (firstKey) {
+                    for (Collector in: all) {
+                        in.interval.renew(0);
+                    }
                 }
+                return;
             }
         }
     }

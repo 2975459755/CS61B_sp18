@@ -17,7 +17,9 @@ import java.awt.Color;
  */
 
 public class Tileset {
-    public static final TETile PLAYER = new TETile('@', Color.white, Color.black, "player");
+    public static final String s = "☣⚔﷽";
+    public static final TETile PLAYER =
+      new TETile('⚔', Color.white, Color.black, "player");
     public static final TETile WALL = new TETile('#', new Color(216, 128, 128), Color.darkGray,
             "wall");
     public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black,
@@ -52,8 +54,8 @@ public class Tileset {
     public static final TETile ROMO_LEFT_DAMAGED = new TETile('◀', Color.magenta, Color.black, "romo left damaged");
     public static final TETile ROMO_RIGHT_DAMAGED = new TETile('▶', Color.magenta, Color.black, "romo right damaged");
 
-    public static final TETile PLAYER_RED = new TETile('@', Color.red, Color.black, "player");
-    public static final TETile PLAYER_GHOSTED = new TETile('@', Color.gray, Color.gray, "player");
+    public static final TETile PLAYER_RED = new TETile('⚔', Color.red, Color.black, "player");
+    public static final TETile PLAYER_GHOSTED = new TETile('⚔', Color.gray, Color.gray, "player");
 
     public static final TETile BULLET = new TETile('⚪', Color.white, Color.black, "bullet");
 

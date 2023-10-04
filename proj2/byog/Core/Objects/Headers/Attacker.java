@@ -9,7 +9,6 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     protected int actionInterval = 240;
     protected int moveDistance = 5;
     protected Interval survival;
-    protected int direction;
     protected int atk;
     protected boolean vanished;
 

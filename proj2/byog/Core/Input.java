@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Input extends InputSolicitor {
-    static final int inComboInterval = Individual.inComboInterval;
+    static final int inComboInterval = Collector.inComboInterval;
     boolean twoPlayers;
-    Individual in1; // player 1's input collector;
-    Individual in2; // player 2's input collector;
-    ArrayList<Individual> all; // all input collectors
+    Collector in1; // player 1's input collector;
+    Collector in2; // player 2's input collector;
+    ArrayList<Collector> all; // all input collectors
     Game game;
 
     /**
@@ -26,21 +26,21 @@ public class Input extends InputSolicitor {
         twoPlayers = numPlayers > 1;
         game = g;
 
-        in1 = new Individual(1, game.wg.p1);
+        in1 = new Collector(1, game.wg.p1);
         all = new ArrayList<> ();
         all.add(in1);
 
         if (twoPlayers) {
-            in2 = new Individual(2, game.wg.p2);
+            in2 = new Collector(2, game.wg.p2);
             all.add(in2);
         }
     }
 
     int oneTurn() {
-        Individual[] a = all.toArray(new Individual[all.size()]);
+        Collector[] a = all.toArray(new Collector[all.size()]);
 
         // update time;
-        for (Individual in: a) {
+        for (Collector in: a) {
             in.updateTime();
         }
 
@@ -50,12 +50,12 @@ public class Input extends InputSolicitor {
         // all collectors process inputs;
         int c = 0;
         if (game.wg.canPlayerAct()) {
-            for (Individual in: a) {
+            for (Collector in: a) {
                 c += in.playerAct();
             }
         }
 
-        // distribution ends at the first invalid input,
+        // distribution ends at the first && invalid input,
         // so make sure to clear the rest;
         clearKeyStack();
 
@@ -76,14 +76,14 @@ public class Input extends InputSolicitor {
             }
 
             boolean validKey = false;
-            for (Individual in: all) {
+            for (Collector in: all) {
                 if (in.retrieveOneKey(key)) {
                     validKey = true;
                     break;
                 }
             }
             if (!validKey && firstKey) {
-                for (Individual in: all) {
+                for (Collector in: all) {
                     in.interval.renew(0);
                 }
             }
@@ -109,7 +109,7 @@ public class Input extends InputSolicitor {
     }
 }
 
-class Individual implements Serializable {
+class Collector implements Serializable {
     static final int inComboInterval = 120;
     static final int miniInterval = Game.miniInterval;
     static final ArrayList<Character> validInputs_1 = new ArrayList<>(Arrays.asList(
@@ -131,7 +131,7 @@ class Individual implements Serializable {
     ArrayList<String> combos;
     Player player;
 
-    Individual(int p, Player player) {
+    Collector(int p, Player player) {
         waitList = new ArrayList<>();
         interval = new Interval(0);
 

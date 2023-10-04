@@ -187,6 +187,9 @@ public class Player extends MovingDamageable implements Ally {
     public boolean canInteract() {
         return !ghosted && actIn.ended();
     }
+    public boolean canSufferDamage() {
+        return damaged.ended() && !ghosted();
+    }
 
     /////////////////////////////////////////////////////////////
 
@@ -200,6 +203,17 @@ public class Player extends MovingDamageable implements Ally {
     public void touchedBy(Thing thing) {
         if (!(thing instanceof Friendly) && (thing instanceof Damager d)) {
             d.doDamage(this);
+        }
+    }
+    @Override
+    public void damagedBy(int atk) {
+        if (!canSufferDamage()) {
+            return;
+        }
+        int actualDamage = Math.max(atk - getArmor(), 0);
+        if (actualDamage > 0) {
+            health -= actualDamage;
+            damaged.renew(damageTime());
         }
     }
 

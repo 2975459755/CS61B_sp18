@@ -2,10 +2,7 @@ package byog.Core.Objects;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
-import byog.Core.Objects.Headers.Interfaces.Ally;
-import byog.Core.Objects.Headers.Interfaces.Damager;
-import byog.Core.Objects.Headers.Interfaces.Friendly;
-import byog.Core.Objects.Headers.Interfaces.Interactable;
+import byog.Core.Objects.Headers.Interfaces.*;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
@@ -23,17 +20,17 @@ but is not an obstacle, and can't but move;
 
 Also, the ghost doesn't need to enter the door in order to get to the next world;
  */
-public class Player extends MovingDamageable implements Ally {
-    public static final int actionInterval = 200;
+public class Player extends MovingDamageable implements Ally, Shooter {
+    public static final int moveInterval = 200;
     public static final int attackInterval = 400;
     public static final int interactInterval = 5000;
 
-    public static final TETile default_avatar = Tileset.PLAYER;
-    public static final TETile damaged_avatar = Tileset.PLAYER_RED;
-    public static final TETile ghosted_avatar = Tileset.PLAYER_GHOSTED;
-    public static final int default_lumiRange = 3;
-    public static final int default_health = 5;
-    public static final int default_damageTime = 1000;
+    protected static final TETile default_avatar = Tileset.PLAYER;
+    protected static final TETile damaged_avatar = Tileset.PLAYER_RED;
+    protected static final TETile ghosted_avatar = Tileset.PLAYER_GHOSTED;
+    protected static final int default_lumiRange = 3;
+    protected static final int default_health = 5;
+    protected static final int default_damageTime = 1000;
 
     protected boolean isObstacle = true;
     protected int lumiRange;
@@ -90,7 +87,9 @@ public class Player extends MovingDamageable implements Ally {
      */
     @Override
     public int change() {
-        wg.checkGameOver();
+        if (ghosted()) {
+            wg.checkGameOver();
+        }
         return randomAction();
     }
 
@@ -126,11 +125,11 @@ public class Player extends MovingDamageable implements Ally {
         this.lumiRange = default_lumiRange;
         this.health = default_health;
 
-        this.actIn = new Interval(0);
+        this.moveIn = new Interval(0);
         this.attackIn = new Interval(0);
         this.interactIn = new Interval(0);
         this.damaged = new Interval(0);
-        this.ins = new Interval[] {actIn, attackIn, interactIn, damaged};
+        this.ins = new Interval[] {moveIn, attackIn, interactIn, damaged};
         this.direction = 0;
 
         addToArrays();
@@ -178,12 +177,12 @@ public class Player extends MovingDamageable implements Ally {
         return lumiRange;
     }
 
-    @Override
     public boolean canAct() {
         return !inEntrance() && !dead() && (canMove() || canAttack() || canInteract());
     }
+    @Override
     public boolean canMove() {
-        return actIn.ended();
+        return moveIn.ended();
     }
     public boolean canAttack() {
         return !ghosted && attackIn.ended();
@@ -193,6 +192,10 @@ public class Player extends MovingDamageable implements Ally {
     }
     public boolean canSufferDamage() {
         return damaged.ended() && !ghosted();
+    }
+    @Override
+    public int getAtk() {
+        return 0;
     }
 
     /////////////////////////////////////////////////////////////
@@ -205,7 +208,7 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public void touchedBy(Thing thing) {
-        if (!(thing instanceof Friendly) && (thing instanceof Damager d)) {
+        if (!isAlly(thing) && (thing instanceof Damager d)) {
             d.doDamage(this);
         }
     }
@@ -270,7 +273,7 @@ public class Player extends MovingDamageable implements Ally {
 
     @Override
     public int randomAction() {
-        if (dead()) {
+        if (dead() && !ghosted()) {
             remove(); // ready to become a ghost;
             return 1;
         }
@@ -288,7 +291,7 @@ public class Player extends MovingDamageable implements Ally {
             enter(des);
         }
 
-        actIn.renew(actionInterval);
+        moveIn.renew(moveInterval);
     }
 
     public void interact(int direc) {
@@ -302,9 +305,9 @@ public class Player extends MovingDamageable implements Ally {
         if (des.getPresent() instanceof Interactable i) {
             i.interactedBy(this);
         }
-        if (des.collectable()) { // collectable item
-            des.collect(this);
-        }
+//        if (des.collectable()) { // collectable item
+//            des.collect(this);
+//        }
 
         interactIn.renew(interactInterval);
     }
@@ -316,11 +319,6 @@ public class Player extends MovingDamageable implements Ally {
         shoot(direc);
 
         attackIn.renew(attackInterval);
-    }
-    public void shoot(int direc) {
-        Place des = place.next(direc);
-        Bullet b = new Bullet(wg, wg.randomSearchFloor(), direc); // set to a random floor;
-        b.move(des); // try to attack and move to the place next to Player;
     }
     public void enterEntrance() {
         inEntrance = true;
@@ -334,5 +332,10 @@ public class Player extends MovingDamageable implements Ally {
         ghosted = false;
         lumiRange = default_lumiRange;
         isObstacle = true;
+    }
+
+    @Override
+    public void doDamage(Mortal target) {
+
     }
 }

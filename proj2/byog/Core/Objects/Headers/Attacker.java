@@ -2,15 +2,17 @@ package byog.Core.Objects.Headers;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.Interfaces.Damager;
+import byog.Core.Objects.Headers.Interfaces.HasTarget;
 import byog.Core.Objects.Headers.Interfaces.Mortal;
 import byog.Core.Place;
 
-public abstract class Attacker extends MovingThing implements Mortal, Damager {
-    protected int actionInterval = 240;
+public abstract class Attacker extends MovingThing implements HasTarget, Mortal, Damager {
+    protected int moveInterval = 240;
     protected int moveDistance = 5;
     protected Interval survival;
     protected int atk;
     protected boolean vanished;
+    protected HasTarget owner;
 
     public Attacker() {
         vanished = false;
@@ -26,9 +28,18 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     protected void vanish() {
         if (!vanished) {
             survival.renew(150); // dies, but keeps on the screen for a moment;
-            actIn.renew(9999); // but should not move again;
+            moveIn.renew(9999); // but should not move again;
             vanished = true;
         }
+    }
+
+    @Override
+    public boolean isEnemy(Thing thing) {
+        return owner.isEnemy(thing);
+    }
+    @Override
+    public boolean isAlly(Thing thing) {
+        return owner.isAlly(thing);
     }
 
     /**
@@ -37,7 +48,7 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
      */
     @Override
     public void touchedBy(Thing thing) {
-        if (isTarget(thing)) {
+        if (isEnemy(thing)) {
             // when target walks into this
             doDamage((Mortal) thing);
         } else if (thing.isObstacle()) {
@@ -49,12 +60,12 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
         if (dead()) {
             return remove();
         }
-        if (! canAct()) {
+        if (! canMove()) {
             return 0;
         }
 
         move(direction);
-        actIn.renew(actionInterval);
+        moveIn.renew(moveInterval);
         return 1;
     }
     @Override
@@ -105,7 +116,7 @@ public abstract class Attacker extends MovingThing implements Mortal, Damager {
     public int goAt(Place des) {
         des.touchedBy(this);
 
-        if (isTarget(des.getPresent())) {
+        if (isEnemy(des.getPresent())) {
             return 1; // so that it covers the attacked target for a moment;
         }
         if (!des.canEnter()) {

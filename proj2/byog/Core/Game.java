@@ -19,7 +19,7 @@ public class Game {
     Input inputCollector;
     boolean cheatMode = false;
     Interval frameIn;
-    public static final int frameInterval = 40; // AT LEAST 1000/40 = 25 frames per sec;
+    public static final int frameInterval = 50; // AT LEAST 1000/50 = 20 frames per sec;
 
     public static final int miniInterval = 12;
 

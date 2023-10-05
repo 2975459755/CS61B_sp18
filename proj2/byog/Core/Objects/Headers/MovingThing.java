@@ -7,7 +7,7 @@ import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Place;
 
 public abstract class MovingThing extends RemovableThing implements Changeable {
-    public Interval actIn;
+    public Interval moveIn;
     public Interval[] ins;
     protected int direction;
 
@@ -52,8 +52,8 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
             in.update(t);
         }
     }
-    public boolean canAct() {
-        return actIn.ended();
+    public boolean canMove() {
+        return moveIn.ended();
     }
 
     @Override

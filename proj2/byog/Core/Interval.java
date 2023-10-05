@@ -53,7 +53,7 @@ public class Interval implements Serializable {
     public void renew(String playerInput) {
         int st = playerInput.length() * Input.inComboInterval;
 
-        renew(st, Player.actionInterval);
+        renew(st, Player.moveInterval);
     }
 
     /**

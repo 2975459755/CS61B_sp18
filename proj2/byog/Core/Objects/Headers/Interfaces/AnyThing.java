@@ -1,6 +1,8 @@
 package byog.Core.Objects.Headers.Interfaces;
 
 import byog.Core.Objects.Headers.Thing;
+import byog.Core.Place;
+import byog.Core.WG;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;
@@ -12,6 +14,8 @@ public interface AnyThing extends Serializable {
      */
     public void addToArrays();
     public void removeFromArrays();
+    public WG getWorld();
+    public Place getPlace();
     /**
      * @return the TETile representation of the instance;
      */

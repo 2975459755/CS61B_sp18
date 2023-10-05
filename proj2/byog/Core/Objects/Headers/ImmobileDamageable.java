@@ -2,6 +2,7 @@ package byog.Core.Objects.Headers;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.Interfaces.Damageable;
+import byog.Core.Objects.Headers.Interfaces.Damager;
 
 public abstract class ImmobileDamageable extends ImmobileThing implements Damageable {
     protected Interval[] ins;
@@ -36,6 +37,12 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
     }
     public int getArmor() {
         return 0;
+    }
+    @Override
+    public void touchedBy(Thing thing) {
+        if ((thing instanceof Damager d) && d.isEnemy(this)) {
+            d.doDamage(this);
+        }
     }
     @Override
     public void damagedBy(Thing thing) {

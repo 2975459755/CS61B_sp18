@@ -1,4 +1,14 @@
 package byog.Core.Objects.Headers.Interfaces;
 
-public interface Enemy extends AnyThing{
+import byog.Core.Objects.Headers.Thing;
+
+public interface Enemy extends HasTarget {
+    @Override
+    default boolean isEnemy(Thing thing) {
+        return (thing instanceof Ally) && (thing instanceof Mortal);
+    }
+    @Override
+    default boolean isAlly(Thing thing) {
+        return thing instanceof Enemy;
+    }
 }

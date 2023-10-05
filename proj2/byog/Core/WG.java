@@ -128,7 +128,7 @@ public class WG extends Generator {
 
         Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
         for (Thing t: a) {
-            t.place.luminate();
+            t.getPlace().luminate();
         }
 
         updateVisible();
@@ -195,6 +195,7 @@ public class WG extends Generator {
 
     /**
      * All Changeable take change, if they do;
+     * @return 0 if no changes;
      */
     int checkChange() {
         int ret = 0;
@@ -229,17 +230,14 @@ public class WG extends Generator {
      * This method is invoked by player.change() in every game loop;
      */
     public void checkGameOver() {
-        boolean f = false;
         for (Player p: players) {
             if (!p.ghosted()) {
                 // at least one player is not a ghost;
-                f = true;
-                break;
+                return;
             }
         }
-        if (!f) {
-            endGame();
-        }
+
+        endGame();
     }
 
     public void endGame() {
@@ -533,7 +531,7 @@ class Generator extends World {
         return k;
     }
     protected boolean validKey(Place pos) {
-        return pos.LDistance(door.place) >= keyDoorDis;
+        return pos.LDistance(door.getPlace()) >= keyDoorDis;
     }
     protected Player addPlayer(boolean f, int number) {
         Player p;
@@ -581,7 +579,7 @@ class Generator extends World {
         Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
         for (Thing lumi: a) {
             if (lumi instanceof Lamp l) {
-                if (place.LDistance(l.place) < lampDis) {
+                if (place.LDistance(l.getPlace()) < lampDis) {
                     return false;
                 }
             }

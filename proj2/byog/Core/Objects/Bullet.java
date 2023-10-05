@@ -3,21 +3,15 @@ package byog.Core.Objects;
 import byog.Core.*;
 import byog.Core.Objects.Headers.*;
 import byog.Core.Objects.Headers.Interfaces.Ally;
-import byog.Core.Objects.Headers.Interfaces.Friendly;
+import byog.Core.Objects.Headers.Interfaces.HasTarget;
 import byog.Core.Objects.Headers.Interfaces.Mortal;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Bullet extends Attacker implements Ally {
+public class Bullet extends Attacker {
     public static final TETile default_avatar = Tileset.BULLET;
 
     public Bullet() {}
-
-    @Override
-    public boolean isTarget(Thing thing) {
-        return !(thing instanceof Friendly) && (thing instanceof Mortal);
-    }
-
 
     @Override
     public TETile avatar() {
@@ -35,14 +29,15 @@ public class Bullet extends Attacker implements Ally {
         }
     }
 
-    public Bullet (WG wg, Place place, int direction) {
+    public Bullet (WG wg, Place place, HasTarget owner, int direction) {
         this.wg = wg;
         this.place = place;
         this.direction = direction;
+        this.owner = owner;
 
-        this.actIn = new Interval(actionInterval);
-        this.survival = new Interval(actionInterval * moveDistance);
-        this.ins = new Interval[] {actIn, survival};
+        this.moveIn = new Interval(moveInterval);
+        this.survival = new Interval(moveInterval * moveDistance);
+        this.ins = new Interval[] {moveIn, survival};
 
         this.atk = 1;
 

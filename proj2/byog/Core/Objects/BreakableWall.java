@@ -12,22 +12,15 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 public class BreakableWall extends ImmobileDamageable implements Dropper, Obstacle {
-    public static TETile default_avatar = Tileset.WALL_BREAKABLE;
-    public static TETile damaged_avatar = Tileset.WALL_DAMAGED;
-    public static int default_health = 3;
+    protected static TETile default_avatar = Tileset.WALL_BREAKABLE;
+    protected static TETile damaged_avatar = Tileset.WALL_DAMAGED;
+    protected static int default_health = 3;
 
     public BreakableWall() {}
 
     @Override
     public int maxHealth() {
         return default_health;
-    }
-
-    @Override
-    public void touchedBy(Thing thing) {
-        if ((thing instanceof Ally) && (thing instanceof Damager d)) {
-            d.doDamage(this);
-        }
     }
 
     @Override

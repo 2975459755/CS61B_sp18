@@ -19,9 +19,9 @@ When a player becomes a ghost (but not dead),
 the other player will have to lit up all lamps to reflesh the ghost;
  */
 public class Lamp extends ImmobileThing implements Interactable, Obstacle {
-    public static TETile avatar_unlit = Tileset.LAMP_UNLIT;
-    public static TETile avatar_lit = Tileset.LAMP_LIT;
-    public static int lumiRange = 6;
+    protected static TETile avatar_unlit = Tileset.LAMP_UNLIT;
+    protected static TETile avatar_lit = Tileset.LAMP_LIT;
+    protected static int lumiRange = 6;
     protected boolean litUp;
 
     public Lamp() {}

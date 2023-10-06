@@ -1,7 +1,6 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Objects.Headers.ImmobileThing;
-import byog.Core.Objects.Headers.Interfaces.Collectable;
 import byog.Core.Objects.Headers.Interfaces.Interactable;
 import byog.Core.Objects.Headers.Interfaces.Obstacle;
 import byog.Core.Objects.Headers.Thing;
@@ -28,14 +27,14 @@ public class Lamp extends ImmobileThing implements Interactable, Obstacle {
 
     @Override
     public void addToArrays() {
-        if (wg.keepTrackOf.contains(this)) {
+        if (wg.luminators.contains(this)) {
             return;
         }
-        wg.keepTrackOf.add(this);
+        wg.luminators.add(this);
     }
     @Override
     public void removeFromArrays() {
-        wg.keepTrackOf.remove(this);
+        wg.luminators.remove(this);
     }
     @Override
     public TETile avatar() {

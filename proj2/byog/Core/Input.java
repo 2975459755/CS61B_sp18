@@ -1,6 +1,6 @@
 package byog.Core;
 
-import byog.Core.Objects.Player;
+import byog.Core.Objects.SingleBlock.Player;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;

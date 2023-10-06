@@ -1,9 +1,7 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
-import byog.Core.Objects.Headers.Interfaces.Ally;
-import byog.Core.Objects.Headers.Interfaces.Damager;
 import byog.Core.Objects.Headers.Interfaces.Dropper;
 import byog.Core.Objects.Headers.Interfaces.Obstacle;
 import byog.Core.Place;

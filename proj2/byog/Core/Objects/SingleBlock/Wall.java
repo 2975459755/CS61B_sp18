@@ -1,4 +1,4 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Objects.Headers.FixedThing;
 import byog.Core.Objects.Headers.Interfaces.Obstacle;
@@ -7,16 +7,9 @@ import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class Nothing extends FixedThing implements Obstacle {
-    public static TETile avatar = Tileset.NOTHING;
-    public Nothing() {}
-
-
-    public Nothing(WG wg) {
-        this.wg = wg;
-
-        addToArrays();
-    }
+public class Wall extends FixedThing implements Obstacle {
+    public static TETile avatar = Tileset.WALL;
+    public Wall() {}
 
     @Override
     public void addToArrays() {
@@ -30,11 +23,17 @@ public class Nothing extends FixedThing implements Obstacle {
 
     @Override
     public TETile avatar() {
-        return avatar;
+        return Wall.avatar;
     }
 
     @Override
     public void touchedBy(Thing thing) {
 
+    }
+
+    public Wall(WG wg) {
+        this.wg= wg;
+
+        addToArrays();
     }
 }

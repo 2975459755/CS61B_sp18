@@ -1,8 +1,8 @@
 package byog.Core;
 
-import byog.Core.Objects.Floor;
+import byog.Core.Objects.SingleBlock.Floor;
 import byog.Core.Objects.Headers.Interfaces.Collectable;
-import byog.Core.Objects.Nothing;
+import byog.Core.Objects.SingleBlock.Nothing;
 import byog.Core.Objects.Headers.Thing;
 import byog.TileEngine.TETile;
 
@@ -45,6 +45,10 @@ public class Place extends Pos {
         layers.add(thing);
     }
 
+    public boolean contains(Thing thing) {
+        return layers.contains(thing);
+    }
+
     /**
      * Restore the place back to what it originalWas;
      */
@@ -71,6 +75,7 @@ public class Place extends Pos {
     }
 
     /**
+     * Collect all collectables from top to bottom, until the first un-collectable;
      * Use after collectable();
      */
     public void collect(Thing thing) {
@@ -82,13 +87,24 @@ public class Place extends Pos {
             }
         }
     }
+
+    /**
+     * A place is considered canEnter if the top is an obstacle;
+     */
     public boolean canEnter() {
         return !getPresent().isObstacle();
     }
+
+    /**
+     * Touch the top layer Thing;
+     */
     public void touchedBy(Thing thing) {
         getPresent().touchedBy(thing);
     }
 
+    /**
+     * Return the largest lumi-range among all layers;
+     */
     public int isLuminator() {
         int res = -1;
         for (Thing t: layers) {
@@ -98,6 +114,10 @@ public class Place extends Pos {
         }
         return res;
     }
+
+    /**
+     * Luminate all surrounding places within lumi-range;
+     */
     public void luminate() {
         luminate(isLuminator());
     }
@@ -134,6 +154,11 @@ public class Place extends Pos {
     public boolean hasNextFloor(int sides) {
         return hasNext(sides, new Floor()) >= 0;
     }
+
+    /**
+     * If the place is next to a Thing, return the direction;
+     * Otherwise return -1;
+     */
     public int hasNext(int sides, Thing thing) {
         for (int i = 0; i < sides; i ++) {
             if (hasDirec(i, thing)) {
@@ -146,6 +171,11 @@ public class Place extends Pos {
         Place next = next(direc);
         return next != null && next.nowIs(thing);
     }
+
+    /**
+     * @param direct 0: right; 1 : left; 2: up; 3: down;
+     *               4: ↑→; 5: ↓←; 6: ↓→; 7: ↑←;
+     */
     public Place next(int direct) {
         int xC = x;
         int yC = y;

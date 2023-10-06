@@ -1,8 +1,7 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Objects.Headers.ImmobileThing;
 import byog.Core.Objects.Headers.Interfaces.Collectable;
-import byog.Core.Objects.Headers.RemovableThing;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;

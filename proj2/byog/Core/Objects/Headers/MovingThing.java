@@ -1,37 +1,43 @@
 package byog.Core.Objects.Headers;
 
-import byog.Core.Game;
 import byog.Core.Interval;
-import byog.Core.Objects.Floor;
 import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Place;
 
 public abstract class MovingThing extends RemovableThing implements Changeable {
-    public Interval moveIn;
-    public Interval[] ins;
+    protected Interval moveIn;
+    protected Interval[] ins;
     protected int direction;
 
     public MovingThing() {}
     @Override
     public void addToArrays() {
-        if (wg.keepTrackOf.contains(this)) {
-            return;
+        if (!wg.keepTrackOf.contains(this)) {
+            wg.keepTrackOf.add(this);
         }
-        wg.keepTrackOf.add(this);
     }
     @Override
     public void removeFromArrays() {
         wg.keepTrackOf.remove(this);
     }
-    public void move(int direc) {
+    public void setDirection(int direc) {
         direction = direc;
+    }
+    public void move(int direc) {
+        setDirection(direc);
         move(place.next(direc));
     }
-    public void move(Place des) {
+    /**
+     * This is protected because it does not set direction;
+     */
+    protected void move(Place des) {
         int c = goAt(des);
         if (c == 1) { // destination is available for entering;
             enter(des);
         }
+    }
+    public int goAt(int direc) {
+        return goAt(place.next(direc));
     }
     /**
      * Try to enter some place;

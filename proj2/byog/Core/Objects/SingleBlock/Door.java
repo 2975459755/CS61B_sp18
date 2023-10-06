@@ -1,10 +1,6 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Objects.Headers.Enterable;
-import byog.Core.Objects.Headers.FixedThing;
-import byog.Core.Objects.Headers.Interfaces.Changeable;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
-import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
@@ -16,6 +12,20 @@ public class Door extends Enterable {
     public static int lumiRange = 2;
 
     public Door() {}
+
+    @Override
+    public void addToArrays() {
+        super.addToArrays();
+        if (!wg.luminators.contains(this)) {
+            wg.luminators.add(this);
+        }
+    }
+
+    @Override
+    public void removeFromArrays() {
+        super.removeFromArrays();
+        wg.luminators.remove(this);
+    }
 
     @Override
     public TETile avatar() {

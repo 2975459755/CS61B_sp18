@@ -1,4 +1,4 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.*;
 import byog.Core.Objects.Headers.*;
@@ -12,6 +12,20 @@ public class Bullet extends Attacker {
     public static final TETile default_avatar = Tileset.BULLET;
 
     public Bullet() {}
+
+    @Override
+    public void addToArrays() {
+        super.addToArrays();
+        if (!wg.luminators.contains(this)) {
+            wg.luminators.add(this);
+        }
+    }
+
+    @Override
+    public void removeFromArrays() {
+        super.removeFromArrays();
+        wg.luminators.remove(this);
+    }
 
     @Override
     public TETile avatar() {

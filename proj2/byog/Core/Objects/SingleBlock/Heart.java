@@ -1,4 +1,4 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Objects.Headers.ImmobileThing;
 import byog.Core.Objects.Headers.Interfaces.Collectable;

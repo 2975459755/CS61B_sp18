@@ -2,8 +2,7 @@ package byog.Core.Objects.Headers;
 
 import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Objects.Headers.Interfaces.Obstacle;
-import byog.Core.Objects.Player;
-import byog.TileEngine.TETile;
+import byog.Core.Objects.SingleBlock.Player;
 
 import java.util.ArrayList;
 
@@ -17,10 +16,9 @@ public abstract class Enterable extends FixedThing implements Changeable, Obstac
     }
     @Override
     public void addToArrays() {
-        if (wg.keepTrackOf.contains(this)) {
-            return;
+        if (!wg.keepTrackOf.contains(this)) {
+            wg.keepTrackOf.add(this);
         }
-        wg.keepTrackOf.add(this);
     }
     @Override
     public void removeFromArrays() {
@@ -63,7 +61,7 @@ public abstract class Enterable extends FixedThing implements Changeable, Obstac
             // there are more than one entrance, one player entered another,
             // the other player died later, but this is checked first;
             Enterable en = this; // the right entrance must not be this, but initialization is forced;
-            for (Thing t: wg.keepTrackOf) {
+            for (Changeable t: wg.keepTrackOf) {
                 if ((t instanceof Enterable e) && (e.isEntered())) {
                     en = e;
                     break; // prevent from possible? iteration Exception;

@@ -1,4 +1,4 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;

@@ -1,4 +1,4 @@
-package byog.Core.Objects;
+package byog.Core.Objects.SingleBlock;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.*;
@@ -58,6 +58,9 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         if (!wg.players.contains(this)) {
             wg.players.add(this);
             wg.players.trimToSize();
+        }
+        if (!wg.luminators.contains(this)) {
+            wg.luminators.add(this);
         }
     }
 
@@ -281,7 +284,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
     }
 
     @Override
-    public void move(Place des) {
+    protected void move(Place des) {
         if (!canMove()) {
             return;
         }
@@ -295,13 +298,17 @@ public class Player extends MovingDamageable implements Ally, Shooter {
     }
 
     public void interact(int direc) {
-        interact(place.next(direc));
-    }
-    public void interact(Place des) {
         if (!canInteract()) {
             return;
         }
+        setDirection(direc);
+        interact(place.next(direc));
+    }
 
+    /**
+     * This is protected because it does not set direction;
+     */
+    protected void interact(Place des) {
         if (des.getPresent() instanceof Interactable i) {
             i.interactedBy(this);
         }
@@ -315,7 +322,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         if (!canAttack()) {
             return;
         }
-
+        setDirection(direc);
         shoot(direc);
 
         attackIn.renew(attackInterval);

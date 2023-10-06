@@ -1,8 +1,10 @@
 package byog.Core;
 
-import byog.Core.Objects.*;
 import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.MultiBlock.Rectangle;
+import byog.Core.Objects.MultiBlock.TwinRoMo;
+import byog.Core.Objects.SingleBlock.*;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;
@@ -53,6 +55,8 @@ public class WG extends Generator {
         addRoMo(numRoMos);
 
         addBreakableWall(numBreakableWalls);
+
+        addTwinRoMo(); // TODO
 
         // reset the world size;
         if (firstWorld) {
@@ -126,7 +130,7 @@ public class WG extends Generator {
             }
         }
 
-        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
+        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
         for (Thing t: a) {
             t.getPlace().luminate();
         }
@@ -213,7 +217,7 @@ public class WG extends Generator {
      * If so, reflesh the ghost;
      */
     public void checkAllLamps() {
-        for (Thing t: keepTrackOf) {
+        for (Thing t: luminators) {
             if ((t instanceof Lamp l) && (!l.isLitUp())) {
                 return;
             }
@@ -345,7 +349,8 @@ class Generator extends World {
     public Player p2;
     public int numPlayers;
     public ArrayList <Player> players = new ArrayList <> ();
-    public ArrayList <Thing> keepTrackOf = new ArrayList <> (); // All Changeable, luminators;
+    public ArrayList <Changeable> keepTrackOf = new ArrayList <> (); // All Changeables;
+    public ArrayList <Thing> luminators = new ArrayList<> ();
 
     /**
      * Generate places;
@@ -623,6 +628,22 @@ class Generator extends World {
         if (num > 1) {
             addBreakableWall(num - 1); // recursion, base case: num == 1;
         }
+    }
+
+    protected void addTwinRoMo() {
+        Place start;
+        Rectangle rect;
+        do {
+            start = randomSearchFloor();
+            rect = new Rectangle(start, 2, 1);
+        } while (!rect.valid());
+
+        for (Place[] p: rect.rectangle) {
+            for (Place place: p) {
+                place.fill(new Floor());
+            }
+        }
+        new TwinRoMo((WG) this, rect);
     }
 }
 

@@ -126,4 +126,15 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
         }
         return 1;
     }
+    @Override
+    public void move(int direc) {
+        move(place.next(direc));
+    }
+    @Override
+    public void move(Place des) {
+        int c = goAt(des);
+        if (c == 1) { // destination is available for entering;
+            enter(des);
+        }
+    }
 }

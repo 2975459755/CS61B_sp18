@@ -135,6 +135,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         this.ins = new Interval[] {moveIn, attackIn, interactIn, damaged};
         this.direction = 0;
 
+        place.addNew(this);
         addToArrays();
     }
 
@@ -323,7 +324,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
             return;
         }
         setDirection(direc);
-        shoot(direc);
+        shoot(direc, place.next(direc));
 
         attackIn.renew(attackInterval);
     }

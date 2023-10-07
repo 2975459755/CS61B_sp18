@@ -16,7 +16,7 @@ public class Game {
     public static final int HEIGHT = 40;
 
     WG wg = null;
-    Input inputCollector;
+    Input inputParser;
     boolean cheatMode = false;
     Interval frameIn;
     public static final int frameInterval = 50; // AT LEAST 1000/50 = 20 frames per sec;
@@ -49,55 +49,6 @@ public class Game {
 
         playGame();
     }
-
-//    @Deprecated
-//    void playGame(boolean flag) {
-//        TERenderer renderer = new TERenderer();
-//        renderer.initialize(WIDTH, HEIGHT);
-//        renderer.renderFrame(wg.getVisible());
-//
-//        String input;
-//        boolean f; // whether something has changed during a miniInterval
-//        while (true) {
-//            StdDraw.pause(miniInterval);
-//            f = false;
-//
-//            /*
-//            Process keyboard input:
-//             */
-//            boolean canPlayerAct = wg.canPlayerAct();
-//            input = Input.tryValidCombo(Input.comboLength, canPlayerAct);
-//            if (canPlayerAct && !input.equals("")) { // valid input, and player can act
-//
-//                if (input.equals("o")) {
-//                    cheat();
-//                } else if (input.equals("q")) {
-//                    save();
-//                } else {
-//                    wg.playerAct(input);
-//                    cheatMode = false;
-//                }
-//
-//                wg.update(input); // update all MTs for the time Input spent soliciting combo input;
-//                f = true;
-//            }
-//            Input.clearKeyQueue();
-//
-//            /*
-//            Move all MovingThing;
-//             */
-//            if (wg.checkChange() > 0) {
-//                f = true;
-//            }
-//
-//            if (!cheatMode) {
-//                wg.luminateAll();
-//            }
-//            renderer.renderFrame(wg.getVisible());
-//
-//            wg.update();
-//        }
-//    }
     void playGame() {
         TERenderer renderer = new TERenderer();
         renderer.initialize(WIDTH, HEIGHT);
@@ -110,7 +61,7 @@ public class Game {
          */
         frameIn = new Interval(frameInterval);
 
-        inputCollector = new Input(this, wg.numPlayers);
+        inputParser = new Input(this, wg.numPlayers);
 
         boolean f; // whether something has changed during a miniInterval
         while (true) {
@@ -120,7 +71,7 @@ public class Game {
             /*
             Process keyboard input:
              */
-            int input  = inputCollector.oneTurn();
+            int input  = inputParser.oneTurn();
             if (input != 0) {
                 // something happened
                 f = true;

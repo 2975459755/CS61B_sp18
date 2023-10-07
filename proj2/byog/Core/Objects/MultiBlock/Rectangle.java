@@ -8,16 +8,23 @@ import java.util.ArrayList;
 
 public class Rectangle implements Serializable {
     public Place[][] rectangle;
-    public Place start;
+    public Place start; // the left bottom place;
     public int width;
     public int height;
     protected boolean valid = true;
     public Rectangle(Place start, int w, int h) {
-        rectangle = new Place[w][h];
         this.start = start;
         width = w;
         height = h;
 
+        expandIntoRect(w, h);
+    }
+
+    /**
+     * Reset rectangle based on existing start point and given w and h;
+     */
+    protected void expandIntoRect(int w, int h) {
+        rectangle = new Place[w][h];
         rectangle[0][0] = start;
         for (int y = 0; y < h; y ++) {
             if (y != 0) {
@@ -34,6 +41,14 @@ public class Rectangle implements Serializable {
     }
     public boolean valid() {
         return valid;
+    }
+
+    public void fillWith(Thing thing) {
+        for (Place[] p: rectangle) {
+            for (Place place: p) {
+                place.fill(thing);
+            }
+        }
     }
     public int countObstacles(ArrayList<Thing> blocks) {
         int count = 0;
@@ -99,7 +114,7 @@ public class Rectangle implements Serializable {
         }
         return ret;
     }
-    public ArrayList<Thing> upSide(ArrayList<Thing> blocks) {
+    public ArrayList<Thing> upSide(ArrayList blocks) {
         ArrayList<Thing> ret = new ArrayList<> ();
         for (int x = 0; x < width; x ++) {
             for (int y = height - 1; y >= 0; y --) {
@@ -116,17 +131,55 @@ public class Rectangle implements Serializable {
         return new Rectangle(start.next(direc), width, height);
     }
 
-    public void rotate(boolean f) {
-        if (f) {
-            rotateClockwise();
+    public boolean canRotate(ArrayList blocks) {
+        return countObstacles(blocks) == 0;
+    }
+
+    /**
+     * Rotate(mutate) rectangle field in a Rectangle instance,
+     * and change blocks' places accordingly;
+     */
+    public void rotate(boolean clockwise, ArrayList blocks) {
+        if (clockwise) {
+            rotateClockwise(blocks);
         } else {
-            rotateCounter();
+            rotateCounter(blocks);
         }
     }
-    protected void rotateClockwise() {
-        Place[][] newRect = new Place[height][width];
+    protected void rotateClockwise(ArrayList blocks) {
+        /*
+        Reset rectangle:
+         */
+        int t = width;
+        width = height;
+        height = t;
+        expandIntoRect(width, height);
+        /*
+        Rotate the blocks:
+         */
+        for (Block block: (ArrayList<Block>) blocks) {
+            Place p = block.getPlace();
+            int x = p.x() - start.x();
+            int y = p.y() - start.y();
+            block.enter(rectangle[y][height - 1 - x]);
+        }
     }
-    protected void rotateCounter() {
-
+    protected void rotateCounter(ArrayList blocks) {
+        /*
+        Reset rectangle:
+         */
+        int t = width;
+        width = height;
+        height = t;
+        expandIntoRect(width, height);
+        /*
+        Rotate the blocks:
+         */
+        for (Block block: (ArrayList<Block>) blocks) {
+            Place p = block.getPlace();
+            int x = p.x() - start.x();
+            int y = p.y() - start.y();
+            block.enter(rectangle[width - 1 - y][x]);
+        }
     }
 }

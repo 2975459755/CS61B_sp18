@@ -30,14 +30,9 @@ public class RockMonster extends MovingDamageable implements Damager, Monster, O
         this.wg = wg;
         this.place = place;
 
-        this.moveIn = new Interval(0);
-
-        this.damaged = new Interval(0);
-
-        this.ins = new Interval[] {moveIn, damaged};
         this.health = default_health;
-        this.direction = 2;
 
+        place.addNew(this);
         addToArrays();
     }
 
@@ -49,14 +44,6 @@ public class RockMonster extends MovingDamageable implements Damager, Monster, O
     @Override
     public TETile damagedAvatar() {
         return damaged_avatar[direction];
-    }
-
-    @Override
-    public TETile avatar() {
-        if (duringDamage()) {
-            return damagedAvatar();
-        }
-        return defaultAvatar();
     }
 
     @Override

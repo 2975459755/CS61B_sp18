@@ -43,6 +43,8 @@ public class WG extends Generator {
 
         fillWithFloor(places[xStart][yStart]); // First step: Randomly fill with FLOOR tiles;
 
+        addTwinRoMo(); // TODO
+
         addWall();
         door = addDoor();
         key = addKey();
@@ -55,8 +57,6 @@ public class WG extends Generator {
         addRoMo(numRoMos);
 
         addBreakableWall(numBreakableWalls);
-
-        addTwinRoMo(); // TODO
 
         // reset the world size;
         if (firstWorld) {
@@ -378,6 +378,8 @@ class Generator extends World {
          */
         keepTrackOf = new ArrayList <> ();
         keepTrackOf.addAll(players);
+        luminators = new ArrayList<> ();
+        luminators.addAll(players);
     }
 
     /**
@@ -487,7 +489,8 @@ class Generator extends World {
             for (int y = startHEIGHT; y < HEIGHT; y ++) {
 
                 place = places[x][y];
-                if (place.isFloor()) {
+                // Use originalWas: because tile might be covered with something;
+                if (place.originalWas(new Floor())) {
                     int direc;
                     while (true) {
                         direc = place.hasNext(sides, new Nothing());
@@ -517,10 +520,7 @@ class Generator extends World {
                 && place.hasNextFloor(4)
                 && place.hasNext(4, new Wall()) >= 0));
 
-        Door d = new Door((WG)this, place);
-        place.fill(d);
-
-        return d;
+        return new Door((WG)this, place);
     }
     /**
      * Use after the Door is added;
@@ -531,9 +531,7 @@ class Generator extends World {
             place = randomSearchFloor();
         } while (! validKey(place));
 
-        Key k = new Key((WG)this, place);
-        place.addNew(k);
-        return k;
+        return new Key((WG)this, place);
     }
     protected boolean validKey(Place pos) {
         return pos.LDistance(door.getPlace()) >= keyDoorDis;
@@ -545,17 +543,13 @@ class Generator extends World {
             players = new ArrayList<> ();
             // add first player;
             place = randomSearchFloor();
-            p = new Player((WG)this, place);
-            place.addNew(p);
+            p1 = new Player((WG)this, place);
+            p = p1;
 
-            p1 = p;
             if (number > 1) {
                 // add second player;
                 place = randomSearchFloor();
-                p = new Player((WG)this, place);
-                place.addNew(p);
-
-                p2 = p;
+                p2 = new Player((WG)this, place);
             }
         } else { // use the existing player instances; update status;
             for (Player player: players) {
@@ -572,8 +566,7 @@ class Generator extends World {
             place = randomSearchFloor();
         } while (! validLamp(place));
 
-        Lamp l = new Lamp((WG)this, place);
-        place.addNew(l);
+        new Lamp((WG)this, place);
 
         if (n > 1) {
             addLamp(n - 1);
@@ -581,7 +574,7 @@ class Generator extends World {
     }
     protected boolean validLamp(Place place) {
         // lamps should not be too close to each other
-        Thing[] a = keepTrackOf.toArray(new Thing[keepTrackOf.size()]);
+        Thing[] a = luminators.toArray(new Thing[luminators.size()]);
         for (Thing lumi: a) {
             if (lumi instanceof Lamp l) {
                 if (place.LDistance(l.getPlace()) < lampDis) {
@@ -593,8 +586,7 @@ class Generator extends World {
     }
     protected void addRoMo(int n) {
         Place place = randomSearchFloor();
-        RockMonster rm = new RockMonster((WG)this, place);
-        place.addNew(rm);
+        new RockMonster((WG)this, place);
 
         if (n > 1) {
             addRoMo(n - 1);
@@ -620,10 +612,9 @@ class Generator extends World {
                         (place.hasNextFloor(4) || place.hasNext(4, new BreakableWall()) >= 0)
                 )
         ); // should be next to a Wall, not next to Nothing, and should be next to a Floor or another Breakable;
-        BreakableWall bw = new BreakableWall((WG)this, place);
 
         place.fill(new Floor()); // when it's broken, it should be Floor, not Wall;
-        place.addNew(bw);
+        new BreakableWall((WG)this, place);
 
         if (num > 1) {
             addBreakableWall(num - 1); // recursion, base case: num == 1;
@@ -638,11 +629,7 @@ class Generator extends World {
             rect = new Rectangle(start, 2, 1);
         } while (!rect.valid());
 
-        for (Place[] p: rect.rectangle) {
-            for (Place place: p) {
-                place.fill(new Floor());
-            }
-        }
+        rect.fillWith(new Floor());
         new TwinRoMo((WG) this, rect);
     }
 }

@@ -67,6 +67,7 @@ public class Lamp extends ImmobileThing implements Interactable, Obstacle {
 
         litUp = false;
 
+        place.addNew(this);
         addToArrays();
     }
 

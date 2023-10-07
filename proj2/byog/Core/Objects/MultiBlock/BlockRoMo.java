@@ -1,14 +1,14 @@
 package byog.Core.Objects.MultiBlock;
 
 import byog.Core.Interval;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
+import byog.Core.Objects.Headers.Interfaces.*;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-public class BlockRoMo extends Block implements Obstacle {
+public class BlockRoMo extends Block implements Damager, Monster, Obstacle {
     protected static final int moveInterval = 1000;
 
     protected static final TETile[] default_avatar = {
@@ -18,29 +18,30 @@ public class BlockRoMo extends Block implements Obstacle {
             Tileset.ROMO_UP_DAMAGED, Tileset.ROMO_DOWN_DAMAGED};
     protected static int default_health = 3;
 
+
     public BlockRoMo(WG wg, Place place, MultiBlock m) {
         this.wg = wg;
         this.place = place;
         this.mother = m;
 
-        this.moveIn = new Interval(0);
-
-        this.ins = new Interval[] {moveIn};
-
+        place.addNew(this);
         addToArrays();
     }
+
     @Override
-    public TETile avatar() {
+    public void move(int direc) {
+        move(place.next(direc));
+    }
+
+    @Override
+    public TETile defaultAvatar() {
         return default_avatar[direction];
     }
 
     @Override
-    public void touchedBy(Thing thing) {
-        mother.touchedBy(thing);
+    public TETile damagedAvatar() {
+        return damaged_avatar[direction];
     }
 
-    @Override
-    public int randomAction() {
-        return 0;
-    }
+
 }

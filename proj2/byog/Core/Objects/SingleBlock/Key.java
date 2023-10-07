@@ -45,6 +45,7 @@ public class Key extends ImmobileThing implements Collectable {
         this.wg = wg;
         this.place = place;
 
+        place.addNew(this);
         addToArrays();
     }
 

@@ -9,7 +9,11 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
     protected Interval[] ins;
     protected int direction;
 
-    public MovingThing() {}
+    public MovingThing() {
+        this.moveIn = new Interval (0);
+        this.ins = new Interval[] {moveIn};
+        this.direction = 2;
+    }
     @Override
     public void addToArrays() {
         if (!wg.keepTrackOf.contains(this)) {

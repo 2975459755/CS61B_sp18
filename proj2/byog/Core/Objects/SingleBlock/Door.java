@@ -56,6 +56,7 @@ public class Door extends Enterable {
 
         this.open = false;
 
+        place.fill(this);
         addToArrays();
     }
 

@@ -3,6 +3,7 @@ package byog.Core.Objects.MultiBlock;
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.Interfaces.Changeable;
 import byog.Core.Objects.Headers.Interfaces.Damageable;
+import byog.Core.Objects.Headers.Interfaces.Damager;
 import byog.Core.Objects.Headers.Interfaces.HasTarget;
 import byog.Core.Objects.Headers.MovingDamageable;
 import byog.Core.Objects.Headers.MovingThing;
@@ -13,20 +14,30 @@ import byog.TileEngine.TETile;
 
 import java.util.ArrayList;
 
-public abstract class MultiBlock extends MovingThing implements Damageable {
-    protected ArrayList<MovingThing> blocks;
-    protected int size;
+public abstract class MultiBlock extends MovingDamageable implements HasTarget, Damager {
+    protected ArrayList<Block> blocks;
     protected Rectangle rectangle;
-    protected Interval moveIn;
-    protected Interval[] ins;
     protected int direction;
 
     public MultiBlock() {
         this.blocks = new ArrayList<> ();
+        blocks.trimToSize();
     }
 
     @Override
-    public abstract int damageTime();
+    public void damagedBy(int atk) {
+        int actualDamage = Math.max(atk - getArmor(), 0);
+        if (actualDamage > 0) {
+            health -= actualDamage;
+            damaged.renew(damageTime());
+            setAllDamaged(); // change appearance of every block;
+        }
+    }
+    protected void setAllDamaged() {
+        for (Block block: blocks) {
+            block.setDamaged();
+        }
+    }
 
     @Override
     public TETile defaultAvatar() {
@@ -53,14 +64,6 @@ public abstract class MultiBlock extends MovingThing implements Damageable {
         return false;
     }
 
-    public abstract int maxHealth();
-
-    @Override
-    public int change() {
-        return randomAction();
-    }
-
-    public abstract int randomAction();
     @Override
     public int remove() {
         removeFromArrays();
@@ -83,12 +86,15 @@ public abstract class MultiBlock extends MovingThing implements Damageable {
     public void enter(Place des) {
 
     }
+    @Override
     public void move(int direc) {
         direction = direc;
         ArrayList<MovingThing> frontSide = rectangle.sides(blocks, direc);
+        // Reset direction of every block;
         for (MovingThing block: blocks) {
             block.setDirection(direc);
         }
+        // Count number of obstacles in front of the frontSide;
         int c = 0;
         for (int i = 0; i < frontSide.size(); i ++) {
             c += frontSide.get(i).goAt(direc);
@@ -96,21 +102,35 @@ public abstract class MultiBlock extends MovingThing implements Damageable {
         if (c != frontSide.size()) {
             return; // some block hits obstacle;
         } else {
+            // Move every block, and move the rectangle;
             rectangle = rectangle.moveTowards(direc);
             for (MovingThing block: blocks) {
                 block.move(direc);
             }
         }
     }
-    /**
-     * Try to enter some place;
-     * @return 1: Destination is available for entering;
-     * 0: Can't go to destination;
-     * -1: something special happens;
-     */
+    @Override
     public abstract int goAt(Place des);
+    @Override
     public boolean canMove() {
         return moveIn.ended();
     }
+    public boolean canRotate() {
+        return rectangle.canRotate(blocks);
+    }
+    public void rotate(boolean clockwise) {
+        if (canRotate()) {
+            rectangle.rotate(clockwise, blocks);
+        }
+    }
 
+    @Override
+    public <T> void update(T t) {
+        for (Interval in: ins) {
+            in.update(t);
+        }
+        for (Block block: blocks) {
+            block.update(t);
+        }
+    }
 }

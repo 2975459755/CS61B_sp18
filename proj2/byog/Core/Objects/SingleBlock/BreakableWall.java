@@ -36,9 +36,8 @@ public class BreakableWall extends ImmobileDamageable implements Dropper, Obstac
         this.place = place;
 
         this.health = default_health;
-        this.damaged = new Interval(0);
-        this.ins = new Interval[] {damaged};
 
+        place.addNew(this);
         addToArrays();
     }
 

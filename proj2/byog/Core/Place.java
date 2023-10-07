@@ -136,8 +136,6 @@ public class Place extends Pos {
         }
     }
 
-
-
     public Place randomSearchNextNothing(Random rand, int sides) {
         return randomSearchNext(rand, sides, new Nothing());
     }
@@ -167,6 +165,10 @@ public class Place extends Pos {
         }
         return -1;
     }
+
+    /**
+     * Whether a place has something next to it in the specified direction;
+     */
     public boolean hasDirec(int direc, Thing thing) {
         Place next = next(direc);
         return next != null && next.nowIs(thing);
@@ -175,6 +177,7 @@ public class Place extends Pos {
     /**
      * @param direct 0: right; 1 : left; 2: up; 3: down;
      *               4: ↑→; 5: ↓←; 6: ↓→; 7: ↑←;
+     * @return null if coordinate is out of bounds;
      */
     public Place next(int direct) {
         int xC = x;
@@ -195,12 +198,23 @@ public class Place extends Pos {
         }
         return null;
     }
+    /**
+     * Determine whether the top layer is a Floor;
+     */
     public boolean isFloor() {
         return nowIs(new Floor(null));
     }
+
+    /**
+     * Determine whether the bottom layer is a subtype instance of the specified thing;
+     */
     public boolean originalWas(Thing thing) {
         return thing.getClass().isInstance(getIntrinsic());
     }
+
+    /**
+     * Determine whether the top layer is a subtype instance of the specified thing;
+     */
     public boolean nowIs(Thing thing) {
         if (layers != null) {
             return thing.getClass().isInstance(getPresent());
@@ -214,10 +228,20 @@ public class Place extends Pos {
     public Thing getPresent() {
         return layers.get(layers.size() - 1);
     }
+
+    /**
+     *
+     * @return the bottom of the layers;
+     */
     public Thing getIntrinsic() {
         return layers.get(0);
     }
 }
+
+/**
+ * A position object has only the two coordinates as its field,
+ * access them via x() and y();
+ */
 class Pos implements Serializable {
     protected int x;
     protected int y;
@@ -226,10 +250,25 @@ class Pos implements Serializable {
         this.x = xC;
         this.y = yC;
     }
+    public int x() {
+        return x;
+    }
+    public int y() {
+        return y;
+    }
+
+    /**
+     * Determine whether a point(x, y) is in the map;
+     * notice this uses startWIDTH/startHEIGHT and WIDTH/HEIGHT in WG class;
+     */
     public boolean inMap() {
         return x >= WG.startWIDTH && x < WG.WIDTH
                 && y >= WG.startHEIGHT && y < WG.HEIGHT;
     }
+
+    /**
+     * Straight distance;
+     */
     public double distance(Place des) {
         return Math.sqrt(Math.pow(this.x - des.x, 2)
                 + Math.pow(this.y - des.y, 2));
@@ -238,7 +277,20 @@ class Pos implements Serializable {
      * L-shaped distance;
      */
     public int LDistance(Place des) {
-        return Math.abs(this.x - des.x) + Math.abs(this.y - des.y);
+        return xDistance(des) + yDistance(des);
+    }
+
+    /**
+     * The difference of y coordinate with the other point (absolute value);
+     */
+    public int yDistance(Place des) {
+        return Math.abs(this.y - des.y);
+    }
+    /**
+     * The difference of x coordinate with the other point (absolute value);
+     */
+    public int xDistance(Place des) {
+        return Math.abs(this.x - des.x);
     }
 
 }

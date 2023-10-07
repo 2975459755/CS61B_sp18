@@ -4,17 +4,17 @@ import byog.Core.Objects.SingleBlock.Player;
 
 import java.io.Serializable;
 
+/**
+ * An interval serves as a time tracker,
+ * and it should be updated after each game loop;
+ * The outside can access whether it's ended;
+ */
 public class Interval implements Serializable {
     static final int miniInterval = Game.miniInterval;
 
     private int start;
     private int end;
 
-    /**
-     * An interval serves as a time tracker,
-     * and it should be updated after each game loop;
-     * The outside can access whether it's ended;
-     */
     public Interval(int end) {
         this.start = 0;
         this.end = end;

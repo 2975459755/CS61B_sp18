@@ -2,68 +2,85 @@ package byog.Core.Objects.MultiBlock;
 
 import byog.Core.Interval;
 import byog.Core.Objects.Headers.Attacker;
-import byog.Core.Objects.Headers.Interfaces.Damager;
-import byog.Core.Objects.Headers.Interfaces.Monster;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
+import byog.Core.Objects.Headers.Interfaces.*;
+import byog.Core.Objects.Headers.MovingThing;
 import byog.Core.Objects.Headers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 
-public class TwinRoMo extends MultiBlock {
+import java.util.ArrayList;
+
+public class TwinRoMo extends MultiBlock implements Monster {
     protected static final int moveInterval = 1000;
+    protected static int atk = 1;
+    protected static int default_health = 3;
     public TwinRoMo(WG wg, Rectangle rect) {
         this.wg = wg;
         this.rectangle = rect;
 
-        this.moveIn = new Interval(0);
-
-        this.ins = new Interval[] {moveIn};
-        this.direction = 2;
+        this.health = default_health;
 
         for (int x = 0; x < rect.width; x ++) {
+            if (blocks.size() == 2) {
+                break;
+            }
             for (int y = 0; y < rect.height; y ++) {
                 Place place = rect.rectangle[x][y];
                 BlockRoMo block = new BlockRoMo(wg, place, this);
                 blocks.add(block);
-                place.addNew(block);
+                break;
             }
         }
 
+        direction = 0; // initial state: left-right oriented;
+        setOrientation();
+
         addToArrays();
+    }
+    protected void setOrientation() {
+        if (direction < 2) {
+            // left-right;
+            setLeftRight();
+        } else {
+            // up-down;
+            setUpDown();
+        }
+    }
+    protected void setLeftRight() {
+        ArrayList<Block> side = rectangle.sides(blocks, 0);
+        for (Block block: side) {
+            block.setDirection(0);
+        }
+        side = rectangle.sides(blocks, 1);
+        for(Block block: side) {
+            block.setDirection(1);
+        }
+    }
+    protected void setUpDown() {
+        ArrayList<Block> side = rectangle.sides(blocks, 2);
+        for (Block block: side) {
+            block.setDirection(2);
+        }
+        side = rectangle.sides(blocks, 3);
+        for(Block block: side) {
+            block.setDirection(3);
+        }
     }
     @Override
     public void touchedBy(Thing thing) {
-
-    }
-
-    @Override
-    public boolean duringDamage() {
-        return false;
-    }
-
-    @Override
-    public int getHealth() {
-        return 1;
-    }
-
-    @Override
-    public void damagedBy(Thing thing) {
-
-    }
-
-    @Override
-    public void damagedBy(int atk) {
-
-    }
-
-    @Override
-    public int damageTime() {
-        return 0;
+        if ((thing instanceof Damager d) && d.isEnemy(this)) {
+            // None Enemy Damager;
+            d.doDamage(this);
+        }
+        if (isEnemy(thing)) {
+            // Mortal Friendly;
+            doDamage((Damageable) thing);
+        }
     }
 
     @Override
     public int maxHealth() {
-        return 1;
+        return default_health;
     }
 
     @Override
@@ -77,14 +94,66 @@ public class TwinRoMo extends MultiBlock {
         return wander();
     }
     public int wander() {
-        direction = wg.rand.nextInt(4);
-        move(direction);
+        int direc = wg.rand.nextInt(4);
+        int diff = direction - direc;
+        if (Math.abs(diff) <= 1 && direction > 1 == direc > 1) {
+            direction = direc;
+            move(direction);
+        } else {
+            if ((diff == 2 && direction == 0 || direction == 1)
+                || (diff == -1 && direction == 2)
+                || (diff == -3 && direction == 3)) {
+                direction = direc;
+                rotate(false);
+            } else {
+                direction = direc;
+                rotate(true);
+            }
+        }
         moveIn.renew(moveInterval);
         return 1;
     }
 
     @Override
+    public void move(int direc) {
+        direction = direc;
+        ArrayList<MovingThing> frontSide = rectangle.sides(blocks, direc);
+        // Don't reset direction of every block;
+        // Count number of obstacles in front of the frontSide;
+        int c = 0;
+        for (int i = 0; i < frontSide.size(); i ++) {
+            c += frontSide.get(i).goAt(direc);
+        }
+        if (c != frontSide.size()) {
+            return; // some block hits obstacle;
+        } else {
+            // Move every block, and move the rectangle;
+            rectangle = rectangle.moveTowards(direc);
+            for (MovingThing block: blocks) {
+                block.move(direc);
+            }
+        }
+    }
+    @Override
+    public void rotate(boolean clockwise) {
+        if (rectangle.canRotate(blocks)) {
+            rectangle.rotate(clockwise, blocks);
+            setOrientation();
+        }
+    }
+
+    @Override
     public int goAt(Place des) {
         return 0;
+    }
+
+    @Override
+    public int getAtk() {
+        return atk;
+    }
+
+    @Override
+    public void doDamage(Mortal target) {
+        target.damagedBy(getAtk());
     }
 }

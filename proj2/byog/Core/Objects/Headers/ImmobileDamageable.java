@@ -8,7 +8,10 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
     protected Interval[] ins;
     protected Interval damaged;
     protected int health;
-    public ImmobileDamageable() {}
+    public ImmobileDamageable() {
+        this.damaged = new Interval(0);
+        this.ins = new Interval[] {damaged};
+    }
     @Override
     public void addToArrays() {
         if (wg.keepTrackOf.contains(this)) {
@@ -53,8 +56,12 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
         int actualDamage = Math.max(atk - getArmor(), 0);
         if (actualDamage > 0) {
             health -= actualDamage;
-            damaged.renew(damageTime());
+            setDamaged();
         }
+    }
+    @Override
+    public void setDamaged() {
+        damaged.renew(damageTime());
     }
     @Override
     public boolean duringDamage() {

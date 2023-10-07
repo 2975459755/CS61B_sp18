@@ -15,7 +15,7 @@ import java.util.Arrays;
  * which then make players move;
  */
 public class Input extends InputSolicitor {
-    public static final int inComboInterval = 120;
+    public static final int inComboInterval = 100;
     protected boolean twoPlayers;
     protected Collector in1; // player 1's input collector;
     protected Collector in2; // player 2's input collector;

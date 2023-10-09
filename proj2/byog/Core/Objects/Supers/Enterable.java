@@ -1,7 +1,7 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
-import byog.Core.Objects.Headers.Interfaces.Changeable;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
+import byog.Core.Objects.Supers.Interfaces.Changeable;
+import byog.Core.Objects.Supers.Interfaces.Obstacle;
 import byog.Core.Objects.SingleBlock.Player;
 
 import java.util.ArrayList;

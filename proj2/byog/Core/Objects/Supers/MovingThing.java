@@ -1,7 +1,7 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
 import byog.Core.Interval;
-import byog.Core.Objects.Headers.Interfaces.Changeable;
+import byog.Core.Objects.Supers.Interfaces.Changeable;
 import byog.Core.Place;
 
 public abstract class MovingThing extends RemovableThing implements Changeable {

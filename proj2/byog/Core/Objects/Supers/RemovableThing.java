@@ -1,4 +1,4 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
 import byog.Core.Place;
 

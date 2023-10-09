@@ -1,8 +1,8 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
 import byog.Core.Interval;
-import byog.Core.Objects.Headers.Interfaces.Damageable;
-import byog.Core.Objects.Headers.Interfaces.Damager;
+import byog.Core.Objects.Supers.Interfaces.Damageable;
+import byog.Core.Objects.Supers.Interfaces.Damager;
 
 public abstract class MovingDamageable extends MovingThing implements Damageable {
     protected Interval damaged;

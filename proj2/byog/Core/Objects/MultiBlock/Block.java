@@ -1,14 +1,11 @@
 package byog.Core.Objects.MultiBlock;
 
-import byog.Core.Interval;
-import byog.Core.Objects.Headers.Interfaces.Damager;
-import byog.Core.Objects.Headers.Interfaces.HasTarget;
-import byog.Core.Objects.Headers.Interfaces.Mortal;
-import byog.Core.Objects.Headers.MovingDamageable;
-import byog.Core.Objects.Headers.MovingThing;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Interfaces.Damager;
+import byog.Core.Objects.Supers.Interfaces.HasTarget;
+import byog.Core.Objects.Supers.Interfaces.Mortal;
+import byog.Core.Objects.Supers.MovingDamageable;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
-import byog.TileEngine.TETile;
 
 public abstract class Block extends MovingDamageable implements Damager, HasTarget {
     public MultiBlock mother;
@@ -40,7 +37,7 @@ public abstract class Block extends MovingDamageable implements Damager, HasTarg
     }
     @Override
     public int goAt(Place des) {
-        des.touchedBy(this);
+        des.touchedBy(this); // TODO
         if (des.canEnter() || mother.blocks.contains(des.getPresent())) {
             return 1;
         }

@@ -1,9 +1,9 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
 import byog.Core.Interval;
-import byog.Core.Objects.Headers.Interfaces.Damager;
-import byog.Core.Objects.Headers.Interfaces.HasTarget;
-import byog.Core.Objects.Headers.Interfaces.Mortal;
+import byog.Core.Objects.Supers.Interfaces.Damager;
+import byog.Core.Objects.Supers.Interfaces.HasTarget;
+import byog.Core.Objects.Supers.Interfaces.Mortal;
 import byog.Core.Place;
 
 public abstract class Attacker extends MovingThing implements HasTarget, Mortal, Damager {

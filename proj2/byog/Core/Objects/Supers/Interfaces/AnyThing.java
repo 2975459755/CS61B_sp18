@@ -1,6 +1,6 @@
-package byog.Core.Objects.Headers.Interfaces;
+package byog.Core.Objects.Supers.Interfaces;
 
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;

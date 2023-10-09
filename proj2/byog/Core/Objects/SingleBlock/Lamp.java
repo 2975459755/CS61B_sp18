@@ -1,9 +1,9 @@
 package byog.Core.Objects.SingleBlock;
 
-import byog.Core.Objects.Headers.ImmobileThing;
-import byog.Core.Objects.Headers.Interfaces.Interactable;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.ImmobileThing;
+import byog.Core.Objects.Supers.Interfaces.Interactable;
+import byog.Core.Objects.Supers.Interfaces.Obstacle;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;

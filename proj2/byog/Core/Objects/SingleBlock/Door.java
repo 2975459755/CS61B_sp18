@@ -1,6 +1,6 @@
 package byog.Core.Objects.SingleBlock;
 
-import byog.Core.Objects.Headers.Enterable;
+import byog.Core.Objects.Supers.Enterable;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;

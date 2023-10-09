@@ -1,4 +1,4 @@
-package byog.Core.Objects.Headers.Interfaces;
+package byog.Core.Objects.Supers.Interfaces;
 
 import byog.Core.Objects.SingleBlock.Bullet;
 import byog.Core.Place;

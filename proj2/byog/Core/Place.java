@@ -1,9 +1,9 @@
 package byog.Core;
 
 import byog.Core.Objects.SingleBlock.Floor;
-import byog.Core.Objects.Headers.Interfaces.Collectable;
+import byog.Core.Objects.Supers.Interfaces.Collectable;
 import byog.Core.Objects.SingleBlock.Nothing;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Thing;
 import byog.TileEngine.TETile;
 
 import java.io.Serializable;

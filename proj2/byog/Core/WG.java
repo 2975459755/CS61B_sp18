@@ -1,7 +1,7 @@
 package byog.Core;
 
-import byog.Core.Objects.Headers.Interfaces.Changeable;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Interfaces.Changeable;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Objects.MultiBlock.Rectangle;
 import byog.Core.Objects.MultiBlock.TwinRoMo;
 import byog.Core.Objects.SingleBlock.*;

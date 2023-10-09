@@ -1,9 +1,8 @@
 package byog.Core.Objects.SingleBlock;
 
-import byog.Core.Interval;
-import byog.Core.Objects.Headers.*;
-import byog.Core.Objects.Headers.Interfaces.Dropper;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
+import byog.Core.Objects.Supers.*;
+import byog.Core.Objects.Supers.Interfaces.Dropper;
+import byog.Core.Objects.Supers.Interfaces.Obstacle;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;

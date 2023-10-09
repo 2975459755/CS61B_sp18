@@ -1,6 +1,6 @@
-package byog.Core.Objects.Headers;
+package byog.Core.Objects.Supers;
 
-import byog.Core.Objects.Headers.Interfaces.AnyThing;
+import byog.Core.Objects.Supers.Interfaces.AnyThing;
 import byog.Core.Place;
 import byog.Core.WG;
 

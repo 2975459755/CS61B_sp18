@@ -1,4 +1,4 @@
-package byog.Core.Objects.Headers.Interfaces;
+package byog.Core.Objects.Supers.Interfaces;
 
 public interface Obstacle extends AnyThing {
 

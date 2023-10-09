@@ -1,8 +1,6 @@
-package byog.Core.Objects.Headers.Interfaces;
+package byog.Core.Objects.Supers.Interfaces;
 
-import byog.Core.Objects.Headers.Thing;
-
-import java.io.Serializable;
+import byog.Core.Objects.Supers.Thing;
 
 public interface Collectable extends AnyThing {
 

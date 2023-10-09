@@ -1,6 +1,6 @@
 package byog.Core.Objects.MultiBlock;
 
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 
 import java.io.Serializable;
@@ -26,6 +26,8 @@ public class Rectangle implements Serializable {
     protected void expandIntoRect(int w, int h) {
         rectangle = new Place[w][h];
         rectangle[0][0] = start;
+
+        label:
         for (int y = 0; y < h; y ++) {
             if (y != 0) {
                 rectangle[0][y] = rectangle[0][y - 1].next(2);
@@ -35,6 +37,7 @@ public class Rectangle implements Serializable {
                 if (rectangle[x][y] == null) {
                     // invalid rectangle: out of bounds of map;
                     valid = false;
+                    break label;
                 }
             }
         }

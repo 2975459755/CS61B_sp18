@@ -1,8 +1,8 @@
 package byog.Core.Objects.SingleBlock;
 
-import byog.Core.Objects.Headers.FixedThing;
-import byog.Core.Objects.Headers.Interfaces.Obstacle;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.FixedThing;
+import byog.Core.Objects.Supers.Interfaces.Obstacle;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;

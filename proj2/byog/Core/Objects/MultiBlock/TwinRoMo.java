@@ -1,10 +1,8 @@
 package byog.Core.Objects.MultiBlock;
 
-import byog.Core.Interval;
-import byog.Core.Objects.Headers.Attacker;
-import byog.Core.Objects.Headers.Interfaces.*;
-import byog.Core.Objects.Headers.MovingThing;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.Interfaces.*;
+import byog.Core.Objects.Supers.MovingThing;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 

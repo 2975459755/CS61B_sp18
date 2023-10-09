@@ -1,10 +1,8 @@
 package byog.Core.Objects.SingleBlock;
 
 import byog.Core.*;
-import byog.Core.Objects.Headers.*;
-import byog.Core.Objects.Headers.Interfaces.Ally;
-import byog.Core.Objects.Headers.Interfaces.HasTarget;
-import byog.Core.Objects.Headers.Interfaces.Mortal;
+import byog.Core.Objects.Supers.*;
+import byog.Core.Objects.Supers.Interfaces.HasTarget;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 

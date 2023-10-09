@@ -1,8 +1,8 @@
 package byog.Core.Objects.SingleBlock;
 
-import byog.Core.Objects.Headers.ImmobileThing;
-import byog.Core.Objects.Headers.Interfaces.Collectable;
-import byog.Core.Objects.Headers.Thing;
+import byog.Core.Objects.Supers.ImmobileThing;
+import byog.Core.Objects.Supers.Interfaces.Collectable;
+import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 import byog.Core.WG;
 import byog.TileEngine.TETile;

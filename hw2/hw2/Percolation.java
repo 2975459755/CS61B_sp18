@@ -8,7 +8,9 @@ import java.util.HashSet;
 public class Percolation {
     private int n;
     private HashSet<Integer> opened;
+    @Deprecated
     private HashSet<Integer> firstRowOpened; // store which of the first row are open;
+    @Deprecated
     private HashSet<Integer> filledSet; // store the set number that's filled; should be updated dynamically;
     WeightedQuickUnionUF djs;
 
@@ -20,10 +22,12 @@ public class Percolation {
             throw new IllegalArgumentException("N must be greater than 0");
         }
         n = N;
-        firstRowOpened = new HashSet<>();
         opened = new HashSet<>();
-        filledSet = new HashSet<>();
-        djs = new WeightedQuickUnionUF(N * N);
+        djs = new WeightedQuickUnionUF(N * N); // the last one is for "source of water";
+        /* connect the top layer with the "source of water"; */
+        for (int i = 0; i < n; i ++) {
+            djs.union(i, n * n + 1);
+        }
     }
 
     /**
@@ -37,12 +41,7 @@ public class Percolation {
         }
 
         int curr = indexOf(row, col);
-        boolean f = false; // whether the filled sites will be changed;
         opened.add(curr);
-        if (curr < n) {
-            firstRowOpened.add(curr);
-            f = true;
-        }
 
         for (int i = 0; i < 4; i ++) {
             int next = next(row, col, i);
@@ -51,13 +50,8 @@ public class Percolation {
                 continue;
             }
             if (isOpen(next)) {
-                f = true;
                 djs.union(curr, next);
             }
-        }
-
-        if (f) {
-            updateFilled();
         }
     }
 
@@ -88,7 +82,7 @@ public class Percolation {
         }
 
         int curr = indexOf(row, col);
-        return filledSet.contains(djs.find(curr));
+        return djs.find(curr) == djs.find(n * n);
     }
 
     public int numberOfOpenSites() {
@@ -138,17 +132,13 @@ public class Percolation {
     }
 
     /**
-     * Takes O(logN);
+     * Takes O(NlogN);
      */
+    @Deprecated
     private void updateFilled() {
         filledSet = new HashSet<> ();
         for (int i: firstRowOpened) {
             filledSet.add(djs.find(i));
         }
-    }
-
-    public static void main(String[] args) {
-        Percolation p = new Percolation(1);
-        p.open(0, 0);
     }
 }

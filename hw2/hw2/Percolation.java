@@ -108,12 +108,14 @@ public class Percolation {
      * Takes O(1);
      */
     private int next(int row, int col, int direction) {
-        return switch(direction) {
-            case 0 -> indexOf(row - 1, col);
-            case 1 -> indexOf(row + 1, col);
-            case 2 -> indexOf(row, col - 1);
-            default -> indexOf(row, col + 1);
+        int ret;
+        switch(direction) {
+            case 0: ret = indexOf(row - 1, col); break;
+            case 1: ret = indexOf(row + 1, col); break;
+            case 2: ret = indexOf(row, col - 1); break;
+            default: ret = indexOf(row, col + 1);
         };
+        return ret;
     }
     /**
      * Takes O(1);

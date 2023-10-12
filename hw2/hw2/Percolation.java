@@ -23,10 +23,10 @@ public class Percolation {
         }
         n = N;
         opened = new HashSet<>();
-        djs = new WeightedQuickUnionUF(N * N); // the last one is for "source of water";
+        djs = new WeightedQuickUnionUF(n * n + 1); // the last one is for "source of water";
         /* connect the top layer with the "source of water"; */
         for (int i = 0; i < n; i ++) {
-            djs.union(i, n * n + 1);
+            djs.union(i, n * n);
         }
     }
 

@@ -124,7 +124,7 @@ public class Percolation {
         if (!inBounds(row, col)) {
             return -1;
         }
-        return row * n + col + 1;
+        return row * n + col;
     }
 
     /**

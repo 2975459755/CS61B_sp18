@@ -12,10 +12,12 @@ public class Percolation {
     private HashSet<Integer> firstRowOpened; // store which of the first row are open;
     @Deprecated
     private HashSet<Integer> filledSet; // store the set number that's filled; should be updated dynamically;
-    WeightedQuickUnionUF djs;
+    private WeightedQuickUnionUF djs;
+    private WeightedQuickUnionUF djs_2;
 
     /**
-     * Constructor is O(N^2);
+     * Constructor is O(N^2) from the constructor of disjointSet;
+     * The rest of the constructor takes O(NlogN); logN from union();
      */
     public Percolation(int N) throws IllegalArgumentException {
         if (N <= 0) {
@@ -23,15 +25,31 @@ public class Percolation {
         }
         n = N;
         opened = new HashSet<>();
-        djs = new WeightedQuickUnionUF(n * n + 1); // the last one is for "source of water";
+        /* The last one is for "source of water"; */
+        djs = new WeightedQuickUnionUF(n * n + 1);
+        /*
+        A copy of `djs` with an extra component;
+        The last one is for "bottom of the shape";
+        Because you can't just connect with this last one with the "source",
+        this will cause every site at the bottom to be filled,
+        even if they are not;
+        This will double the runtime of constructor and open(...),
+        so I hope I would find another implementation that's both fast and not ugly;
+        */
+        djs_2 = new WeightedQuickUnionUF(n * n + 2);
         /* connect the top layer with the "source of water"; */
         for (int i = 0; i < n; i ++) {
             djs.union(i, n * n);
+            djs_2.union(i, n * n);
+        }
+        /* connect the bottom layer with the "bottom of the shape"; */
+        for (int i = 0; i < n; i ++) {
+            djs_2.union(indexOf(n - 1, i), n * n + 1);
         }
     }
 
     /**
-     * This implementation is O(logN); (logN from union, and find inside updateFilled())
+     * This implementation is O(logN); (logN from union())
      */
     public void open(int row, int col) throws IndexOutOfBoundsException {
         if (!inBounds(row, col)) {
@@ -51,6 +69,7 @@ public class Percolation {
             }
             if (isOpen(next)) {
                 djs.union(curr, next);
+                djs_2.union(curr, next);
             }
         }
     }
@@ -72,7 +91,7 @@ public class Percolation {
 
     /**
      * This implementation is O(logN),
-     * if contains() of HashSet is not worse than O(logN); (logN from find)
+     * if contains() of HashSet is not worse than O(logN); (logN from connected())
      */
     public boolean isFull(int row, int col) throws IndexOutOfBoundsException {
         if (!inBounds(row, col)) {
@@ -82,7 +101,7 @@ public class Percolation {
         }
 
         int curr = indexOf(row, col);
-        return djs.find(curr) == djs.find(n * n);
+        return djs.connected(curr, n * n);
     }
 
     public int numberOfOpenSites() {
@@ -90,15 +109,10 @@ public class Percolation {
     }
 
     /**
-     * This implementation is O(N) * O_isFull;
+     * This implementation is O(logN); (logN from connected())
      */
     public boolean percolates() {
-        for (int i = 0; i < n; i ++) {
-            if (isFull(n - 1, i)) {
-                return true;
-            }
-        }
-        return false;
+        return djs_2.connected(n * n, n * n + 1);
     }
 
     /**
@@ -140,5 +154,9 @@ public class Percolation {
         for (int i: firstRowOpened) {
             filledSet.add(djs.find(i));
         }
+    }
+
+    public static void main(String[] args) {
+
     }
 }

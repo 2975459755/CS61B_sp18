@@ -7,7 +7,6 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 public class Bullet extends Attacker {
-    public static final TETile default_avatar = Tileset.BULLET;
 
     public Bullet() {}
 
@@ -27,7 +26,7 @@ public class Bullet extends Attacker {
 
     @Override
     public TETile avatar() {
-        return default_avatar;
+        return avatar;
     }
     @Override
     public int isLuminator() {
@@ -41,18 +40,19 @@ public class Bullet extends Attacker {
         }
     }
 
-    public Bullet (WG wg, Place place, HasTarget owner, int direction) {
+    public Bullet (WG wg, Place place, HasTarget owner, int direction, TETile avatar, int atk) {
         this.wg = wg;
         this.place = place;
         this.direction = direction;
         this.owner = owner;
+        this.atk = atk;
+        this.avatar = avatar;
 
         this.moveIn = new Interval(moveInterval);
         this.survival = new Interval(moveInterval * moveDistance);
         this.ins = new Interval[] {moveIn, survival};
 
-        this.atk = 1;
-
         addToArrays();
     }
+
 }

@@ -216,9 +216,16 @@ class Collector implements Serializable {
             return ret;
 
         } else if (waitList.size() == 1) {
-            // Some key is still waiting;
 
-            return "0";
+            if (interval.getRest() < inComboInterval / 2) {
+                // waited for some time, no more input;
+                String ret = String.valueOf(waitList.get(0));
+                waitList.clear();
+                return ret;
+            } else {
+                // still waiting
+                return "0";
+            }
 
         } else {
             // There exists a possible combo;

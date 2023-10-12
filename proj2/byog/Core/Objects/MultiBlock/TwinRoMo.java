@@ -4,6 +4,7 @@ import byog.Core.Objects.Supers.Interfaces.*;
 import byog.Core.Objects.Supers.MovingThing;
 import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
+import byog.Core.Utils;
 import byog.Core.WG;
 
 import java.util.ArrayList;
@@ -83,30 +84,16 @@ public class TwinRoMo extends MultiBlock implements Monster {
 
     @Override
     public int randomAction() {
-        if (dead()) {
-            return remove();
-        }
-        if (!canMove()) {
-            return 0;
-        }
         return wander();
     }
     public int wander() {
         int direc = wg.rand.nextInt(4);
-        int diff = direction - direc;
-        if (Math.abs(diff) <= 1 && direction > 1 == direc > 1) {
+        if (direc == direction || direc == Utils.oppositeDirec(direction)) {
             direction = direc;
             move(direction);
         } else {
-            if ((diff == 2 && direction == 0 || direction == 1)
-                || (diff == -1 && direction == 2)
-                || (diff == -3 && direction == 3)) {
-                direction = direc;
-                rotate(false);
-            } else {
-                direction = direc;
-                rotate(true);
-            }
+            rotate(Utils.clockwise(direction, direc));
+            direction = direc;
         }
         moveIn.renew(moveInterval);
         return 1;
@@ -153,5 +140,10 @@ public class TwinRoMo extends MultiBlock implements Monster {
     @Override
     public void doDamage(Mortal target) {
         target.damagedBy(getAtk());
+    }
+
+    @Override
+    public boolean canAttack() {
+        return true;
     }
 }

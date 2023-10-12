@@ -65,9 +65,14 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
     public boolean canMove() {
         return moveIn.ended();
     }
-
+    public boolean canAct() {
+        return canMove();
+    }
     @Override
     public int change() {
+        if (!canAct()) {
+            return 0;
+        }
         return randomAction();
     }
     /**

@@ -14,10 +14,9 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
     }
     @Override
     public void addToArrays() {
-        if (wg.keepTrackOf.contains(this)) {
-            return;
+        if (!wg.keepTrackOf.contains(this)) {
+            wg.keepTrackOf.add(this);
         }
-        wg.keepTrackOf.add(this);
     }
     @Override
     public void removeFromArrays() {
@@ -73,8 +72,14 @@ public abstract class ImmobileDamageable extends ImmobileThing implements Damage
             remove();
             return 1;
         }
-        return 0;
+        if (!canAct()) {
+            return 0;
+        }
+        return randomAction();
     }
+    public abstract boolean canAct();
+
+    protected abstract int randomAction();
 
     @Override
     public <T> void update(T t) {

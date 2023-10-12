@@ -84,7 +84,6 @@ public abstract class MultiBlock extends MovingDamageable implements HasTarget, 
     }
     @Override
     public void move(int direc) {
-        direction = direc;
         ArrayList<MovingThing> frontSide = rectangle.sides(blocks, direc);
         // Reset direction of every block;
         for (MovingThing block: blocks) {

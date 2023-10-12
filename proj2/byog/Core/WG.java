@@ -1,11 +1,13 @@
 package byog.Core;
 
+import byog.Core.Objects.MultiBlock.MobileFlower;
 import byog.Core.Objects.Supers.Interfaces.Changeable;
 import byog.Core.Objects.Supers.Thing;
 import byog.Core.Objects.MultiBlock.Rectangle;
 import byog.Core.Objects.MultiBlock.TwinRoMo;
 import byog.Core.Objects.SingleBlock.*;
 import byog.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.Serializable;
 import java.util.*;
@@ -44,6 +46,7 @@ public class WG extends Generator {
         fillWithFloor(places[xStart][yStart]); // First step: Randomly fill with FLOOR tiles;
 
         addTwinRoMo(); // TODO
+        addMobileFlower(); // TODO
 
         addWall();
         door = addDoor();
@@ -57,6 +60,8 @@ public class WG extends Generator {
         addRoMo(numRoMos);
 
         addBreakableWall(numBreakableWalls);
+
+        addFlower();
 
         // reset the world size;
         if (firstWorld) {
@@ -245,6 +250,7 @@ public class WG extends Generator {
     }
 
     public void endGame() {
+        StdDraw.pause(1200);
         System.exit(1);
     }
 
@@ -631,6 +637,26 @@ class Generator extends World {
 
         rect.fillWith(new Floor());
         new TwinRoMo((WG) this, rect);
+    }
+
+    protected void addFlower() {
+        Place place;
+        do {
+            place = randomSearchFloor();
+        } while (place.hasNext(4, new Wall()) != -1);
+        new Flower((WG)this, place);
+    }
+
+    protected void addMobileFlower() {
+        Place start;
+        Rectangle rect;
+        do {
+            start = randomSearchFloor();
+            rect = new Rectangle(start, 3, 3);
+        } while (!rect.valid());
+
+        rect.fillWith(new Floor());
+        new MobileFlower((WG) this, rect);
     }
 }
 

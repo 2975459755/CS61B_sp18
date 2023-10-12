@@ -59,12 +59,6 @@ public class RockMonster extends MovingDamageable implements Damager, Monster, O
 
     @Override
     public int randomAction() {
-        if (dead()) {
-            return remove();
-        }
-        if (!canMove()) {
-            return 0;
-        }
         return wander();
     }
 
@@ -96,5 +90,10 @@ public class RockMonster extends MovingDamageable implements Damager, Monster, O
     @Override
     public void doDamage(Mortal target) {
         target.damagedBy(getAtk());
+    }
+
+    @Override
+    public boolean canAttack() {
+        return moveIn.ended();
     }
 }

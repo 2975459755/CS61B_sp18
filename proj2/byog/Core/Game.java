@@ -21,7 +21,7 @@ public class Game {
     Interval frameIn;
     public static final int frameInterval = 50; // AT LEAST 1000/50 = 20 frames per sec;
 
-    public static final int miniInterval = 12;
+    public static final int miniInterval = 30;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.

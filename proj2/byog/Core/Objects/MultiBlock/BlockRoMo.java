@@ -41,5 +41,8 @@ public class BlockRoMo extends Block implements Damager, Monster, Obstacle {
         return damaged_avatar[direction];
     }
 
-
+    @Override
+    public boolean canAttack() {
+        return true;
+    }
 }

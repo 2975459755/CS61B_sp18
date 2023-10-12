@@ -55,4 +55,13 @@ public abstract class MovingDamageable extends MovingThing implements Damageable
     public boolean duringDamage() {
         return !damaged.ended();
     }
+    @Override
+    public int change() {
+        if (dead()) {
+            return remove();
+        } else if (!canAct()) {
+            return 0;
+        }
+        return randomAction();
+    }
 }

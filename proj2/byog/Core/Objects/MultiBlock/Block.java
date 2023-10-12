@@ -80,6 +80,7 @@ public abstract class Block extends MovingDamageable implements Damager, HasTarg
 
     @Override
     public void damagedBy(int atk) {
-        mother.damagedBy(atk);
+        int reducedAtk = Math.max(0, atk - getArmor());
+        mother.damagedBy(reducedAtk);
     }
 }

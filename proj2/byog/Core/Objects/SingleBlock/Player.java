@@ -188,6 +188,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
     public boolean canMove() {
         return moveIn.ended();
     }
+    @Override
     public boolean canAttack() {
         return !ghosted && attackIn.ended();
     }
@@ -199,7 +200,16 @@ public class Player extends MovingDamageable implements Ally, Shooter {
     }
     @Override
     public int getAtk() {
-        return 0;
+        return 1;
+    }
+    @Override
+    public TETile bulletAvatar() {
+        return Tileset.BULLET;
+    }
+
+    @Override
+    public int bulletAtk() {
+        return getAtk();
     }
 
     /////////////////////////////////////////////////////////////
@@ -324,7 +334,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
             return;
         }
         setDirection(direc);
-        shoot(direc, place.next(direc));
+        shoot(direc, place);
 
         attackIn.renew(attackInterval);
     }

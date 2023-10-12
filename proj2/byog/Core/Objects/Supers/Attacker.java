@@ -5,6 +5,7 @@ import byog.Core.Objects.Supers.Interfaces.Damager;
 import byog.Core.Objects.Supers.Interfaces.HasTarget;
 import byog.Core.Objects.Supers.Interfaces.Mortal;
 import byog.Core.Place;
+import byog.TileEngine.TETile;
 
 public abstract class Attacker extends MovingThing implements HasTarget, Mortal, Damager {
     protected int moveInterval = 240;
@@ -12,7 +13,8 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
     protected Interval survival;
     protected int atk;
     protected boolean vanished;
-    protected HasTarget owner;
+    public HasTarget owner;
+    protected TETile avatar;
 
     public Attacker() {
         vanished = false;
@@ -49,9 +51,13 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
     @Override
     public void touchedBy(Thing thing) {
         if (isEnemy(thing)) {
-            // when target walks into this
+            // when target walks into this;
             doDamage((Mortal) thing);
+        } else if ((thing instanceof Attacker d) && (owner.isEnemy((Thing)d.owner))) {
+            // when enemy attacker walks into this, should both vanish;
+            doDamage(d);
         } else if (thing.isObstacle()) {
+            // hits an obstacle;
             vanish();
         }
     }
@@ -94,6 +100,14 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
     @Override
     public int getAtk() {
         return atk;
+    }
+
+    /**
+     * This means nothing to Attackers;
+     */
+    @Override
+    public boolean canAttack() {
+        return true;
     }
 
     /**

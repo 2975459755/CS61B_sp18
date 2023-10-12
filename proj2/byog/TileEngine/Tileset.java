@@ -58,9 +58,15 @@ public class Tileset {
     public static final TETile PLAYER_GHOSTED = new TETile('⚔', Color.gray, Color.gray, "player");
 
     public static final TETile BULLET = new TETile('⚪', Color.white, Color.black, "bullet");
+    public static final TETile BULLET_FLOWER = new TETile('☣', Color.green, Color.black, "flower bullet");
 
     public static final TETile KEY = new TETile('☆', Color.yellow, Color.pink, "key");
     public static final TETile HEART = new TETile('♥', Color.red, Color.black, "heart");
+    public static final TETile FLOWER_DEFAULT = new TETile('❀', Color.magenta, Color.black, "flower");
+    public static final TETile FLOWER_DAMAGED = new TETile('❀', Color.magenta, Color.pink, "flower");
+    public static final TETile STONE = new TETile('▢', Color.gray, Color.black, "stone");
+    public static final TETile STONE_DAMAGED = new TETile('▢', Color.yellow, Color.black, "stone");
+
 }
 
 

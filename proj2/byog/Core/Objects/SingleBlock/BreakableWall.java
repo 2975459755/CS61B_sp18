@@ -21,6 +21,16 @@ public class BreakableWall extends ImmobileDamageable implements Dropper, Obstac
     }
 
     @Override
+    public boolean canAct() {
+        return false;
+    }
+
+    @Override
+    protected int randomAction() {
+        return 0;
+    }
+
+    @Override
     public TETile defaultAvatar() {
         return default_avatar;
     }

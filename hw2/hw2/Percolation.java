@@ -6,21 +6,23 @@ import java.util.ArrayList;
 
 public class Percolation {
     private int n;
-    private int opened; // store the number of opened sites;
+    private int countOpened; // store the number of opened sites;
+    private boolean[] opened;
     private ArrayList<Integer> firstRowOpened; // store which of the first row are open;
     private ArrayList<Integer> filledSet; // store the set number that's filled; should be updated dynamically;
     WeightedQuickUnionUF djs;
 
     /**
-     * Constructor is O(N); (N from construction of djs)
+     * Constructor is O(N^2);
      */
     public Percolation(int N) throws IllegalArgumentException {
         if (N <= 0) {
             throw new IllegalArgumentException("N must be greater than 0");
         }
         n = N;
-        opened = 0;
+        countOpened = 0;
         firstRowOpened = new ArrayList<>();
+        opened = new boolean[N * N];
         filledSet = new ArrayList<>();
         djs = new WeightedQuickUnionUF(N * N);
     }
@@ -35,8 +37,9 @@ public class Percolation {
             return;
         }
 
-        opened ++;
         int curr = row * n + col + 1;
+        opened[curr] = true;
+        countOpened ++;
         if (curr <= n) {
             firstRowOpened.add(curr);
         }
@@ -60,18 +63,18 @@ public class Percolation {
     }
 
     /**
-     * This implementation is O(logN); (logN from find)
+     * This implementation is O(1);
      */
     public boolean isOpen(int row, int col) throws IndexOutOfBoundsException {
         if (!inBounds(row, col)) {
             throw new IndexOutOfBoundsException();
         }
         int curr = indexOf(row, col);
-        return filledSet.contains(curr) || djs.find(curr) != curr ;
+        return opened[curr];
     }
 
     private boolean isOpen(int index) {
-        return filledSet.contains(index) || djs.find(index) != index;
+        return opened[index];
     }
 
     /**
@@ -89,7 +92,7 @@ public class Percolation {
     }
 
     public int numberOfOpenSites() {
-        return opened;
+        return countOpened;
     }
 
     /**

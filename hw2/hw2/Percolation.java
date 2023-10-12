@@ -37,12 +37,13 @@ public class Percolation {
         }
 
         int curr = indexOf(row, col);
+        boolean f = false; // whether the filled sites will be changed;
         opened.add(curr);
         if (curr < n) {
             firstRowOpened.add(curr);
+            f = true;
         }
 
-        boolean f = false;
         for (int i = 0; i < 4; i ++) {
             int next = next(row, col, i);
             if (next == -1) {
@@ -144,5 +145,10 @@ public class Percolation {
         for (int i: firstRowOpened) {
             filledSet.add(djs.find(i));
         }
+    }
+
+    public static void main(String[] args) {
+        Percolation p = new Percolation(1);
+        p.open(0, 0);
     }
 }

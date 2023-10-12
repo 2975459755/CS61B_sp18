@@ -3,13 +3,13 @@ package hw2;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Percolation {
     private int n;
-    private int countOpened; // store the number of opened sites;
-    private boolean[] opened;
-    private ArrayList<Integer> firstRowOpened; // store which of the first row are open;
-    private ArrayList<Integer> filledSet; // store the set number that's filled; should be updated dynamically;
+    private HashSet<Integer> opened;
+    private HashSet<Integer> firstRowOpened; // store which of the first row are open;
+    private HashSet<Integer> filledSet; // store the set number that's filled; should be updated dynamically;
     WeightedQuickUnionUF djs;
 
     /**
@@ -20,10 +20,9 @@ public class Percolation {
             throw new IllegalArgumentException("N must be greater than 0");
         }
         n = N;
-        countOpened = 0;
-        firstRowOpened = new ArrayList<>();
-        opened = new boolean[N * N];
-        filledSet = new ArrayList<>();
+        firstRowOpened = new HashSet<>();
+        opened = new HashSet<>();
+        filledSet = new HashSet<>();
         djs = new WeightedQuickUnionUF(N * N);
     }
 
@@ -37,9 +36,8 @@ public class Percolation {
             return;
         }
 
-        int curr = row * n + col + 1;
-        opened[curr] = true;
-        countOpened ++;
+        int curr = indexOf(row, col);
+        opened.add(curr);
         if (curr <= n) {
             firstRowOpened.add(curr);
         }
@@ -63,22 +61,23 @@ public class Percolation {
     }
 
     /**
-     * This implementation is O(1);
+     * This implementation is O(1), if contains() of HashSet is O(1);
      */
     public boolean isOpen(int row, int col) throws IndexOutOfBoundsException {
         if (!inBounds(row, col)) {
             throw new IndexOutOfBoundsException();
         }
         int curr = indexOf(row, col);
-        return opened[curr];
+        return opened.contains(curr);
     }
 
     private boolean isOpen(int index) {
-        return opened[index];
+        return opened.contains(index);
     }
 
     /**
-     * This implementation is O(logN); (logN from find)
+     * This implementation is O(logN),
+     * if contains() of HashSet is not worse than O(logN); (logN from find)
      */
     public boolean isFull(int row, int col) throws IndexOutOfBoundsException {
         if (!inBounds(row, col)) {
@@ -92,11 +91,11 @@ public class Percolation {
     }
 
     public int numberOfOpenSites() {
-        return countOpened;
+        return opened.size();
     }
 
     /**
-     * This implementation is O(N);
+     * This implementation is O(N), if contains() of HashSet is O(1);
      */
     public boolean percolates() {
         for (int i = 0; i < n; i ++) {
@@ -141,7 +140,7 @@ public class Percolation {
      * Takes O(logN);
      */
     private void updateFilled() {
-        filledSet = new ArrayList<> ();
+        filledSet = new HashSet<> ();
         for (int i: firstRowOpened) {
             filledSet.add(djs.find(i));
         }

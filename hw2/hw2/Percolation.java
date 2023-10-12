@@ -38,7 +38,7 @@ public class Percolation {
 
         int curr = indexOf(row, col);
         opened.add(curr);
-        if (curr <= n) {
+        if (curr < n) {
             firstRowOpened.add(curr);
         }
 
@@ -95,11 +95,11 @@ public class Percolation {
     }
 
     /**
-     * This implementation is O(N), if contains() of HashSet is O(1);
+     * This implementation is O(N) * O_isFull;
      */
     public boolean percolates() {
         for (int i = 0; i < n; i ++) {
-            if (filledSet.contains(indexOf(n - 1, i))) {
+            if (isFull(n - 1, i)) {
                 return true;
             }
         }

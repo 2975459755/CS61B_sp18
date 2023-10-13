@@ -44,7 +44,7 @@ public class PercolationStats {
 
         statistics.add(c);
 
-        if (T > 0) {
+        if (T > 1) {
             simulate(N, T - 1);
         } else {
             // convert arrayList to array;

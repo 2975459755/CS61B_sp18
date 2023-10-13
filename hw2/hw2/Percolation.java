@@ -25,8 +25,10 @@ public class Percolation {
         }
         n = N;
         opened = new HashSet<>();
+
         /* The last one is for "source of water"; */
         djs = new WeightedQuickUnionUF(n * n + 1);
+
         /*
         A copy of `djs` with an extra component;
         The last one is for "bottom of the shape";
@@ -37,16 +39,19 @@ public class Percolation {
         so I hope I would find another implementation that's both fast and not ugly;
         */
         djs_2 = new WeightedQuickUnionUF(n * n + 2);
-        // corner case: n == 1;
-        if (n > 1) {
-            for (int i = 0; i < n; i ++) {
-                /* connect the top layer with the "source of water"; */
-                djs.union(i, n * n);
-                djs_2.union(i, n * n);
-                /* connect the bottom layer with the "bottom of the shape"; */
+
+        for (int i = 0; i < n; i ++) {
+            /* connect the top layer with the "source of water"; */
+            djs.union(i, n * n);
+            djs_2.union(i, n * n);
+
+            /* connect the bottom layer with the "bottom of the shape"; */
+            // corner case: n == 1; Otherwise percolates at the beginning;
+            if (n > 1) {
                 djs_2.union(indexOf(n - 1, i), n * n + 1);
             }
         }
+
     }
 
     /**
@@ -113,7 +118,7 @@ public class Percolation {
      * This implementation is O(logN); (logN from connected())
      */
     public boolean percolates() {
-        return djs_2.connected(n * n, n * n + 1);
+        return djs_2.connected(n * n, n * n + 1) || (n == 1 && isOpen(0, 0));
     }
 
     /**

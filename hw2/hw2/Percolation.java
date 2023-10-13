@@ -37,14 +37,15 @@ public class Percolation {
         so I hope I would find another implementation that's both fast and not ugly;
         */
         djs_2 = new WeightedQuickUnionUF(n * n + 2);
-        /* connect the top layer with the "source of water"; */
-        for (int i = 0; i < n; i ++) {
-            djs.union(i, n * n);
-            djs_2.union(i, n * n);
-        }
-        /* connect the bottom layer with the "bottom of the shape"; */
-        for (int i = 0; i < n; i ++) {
-            djs_2.union(indexOf(n - 1, i), n * n + 1);
+        // corner case: n == 1;
+        if (n > 1) {
+            for (int i = 0; i < n; i ++) {
+                /* connect the top layer with the "source of water"; */
+                djs.union(i, n * n);
+                djs_2.union(i, n * n);
+                /* connect the bottom layer with the "bottom of the shape"; */
+                djs_2.union(indexOf(n - 1, i), n * n + 1);
+            }
         }
     }
 

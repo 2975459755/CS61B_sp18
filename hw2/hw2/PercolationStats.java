@@ -12,7 +12,7 @@ public class PercolationStats {
     private Random rand;
     private PercolationFactory perc;
     private ArrayList<Integer> statistics;
-    private int[] statsArray;
+    private double[] statsArray;
 
     public PercolationStats(int N, int T, PercolationFactory pf) throws IllegalArgumentException {
         if (T <= 0) {
@@ -24,7 +24,7 @@ public class PercolationStats {
         rand = new Random();
         perc = pf;
         statistics = new ArrayList<> ();
-        statsArray = new int[T];
+        statsArray = new double[T];
 
         simulate(N, T);
     }
@@ -49,7 +49,7 @@ public class PercolationStats {
         } else {
             // convert arrayList to array;
             for (int i = 0; i < times; i ++) {
-                statsArray[i] = statistics.get(i);
+                statsArray[i] = (double) statistics.get(i) / (size * size);
             }
         }
     }

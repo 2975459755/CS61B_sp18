@@ -135,10 +135,13 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             /* Replace p's position with the left-most child in its right; */
             Node successor = leftMost(p.right);
             if (successor != null) {
+                // there is a successor, copy the values:
                 p.key = successor.key;
                 p.value = successor.value;
-                p = removeLeftMost(p.right);
+                // remove that successor from its original position;
+                p.right = removeLeftMost(p.right);
             } else {
+                // no successor, namely the entire right side is empty;
                 p = p.left;
             }
         } else if (key.compareTo(p.key) > 0) {

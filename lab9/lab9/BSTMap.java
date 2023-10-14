@@ -136,7 +136,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             and put its right node into the tree */
             Node right = p.right;
             p = p.left;
-            root = addNode(right, root);
+            p = addNode(right, p);
         } else if (key.compareTo(p.key) > 0) {
             p.right = remove(key, p.right);
         } else {
@@ -177,5 +177,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public Iterator<K> iterator() {
         return keySet().iterator();
+    }
+
+    public static void main(String[] args) {
+        BSTMap<String, Integer> m = new BSTMap<> ();
+        m.put("1", 1);
+        m.put("1" + 1, 1);
+        m.put("1" + 2, 1);
+        m.put("1" + 0, 1);
+        m.remove("1");
     }
 }

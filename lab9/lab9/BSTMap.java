@@ -132,11 +132,15 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (p == null) {
             return null;
         } else if (key.equals(p.key)) {
-            /* Set the deleted node to its left node,
-            and put its right node into the tree */
-            Node right = p.right;
-            p = p.left;
-            p = addNode(right, p);
+            /* Replace p's position with the left-most child in its right; */
+            Node successor = leftMost(p.right);
+            if (successor != null) {
+                p.key = successor.key;
+                p.value = successor.value;
+                p = removeLeftMost(p.right);
+            } else {
+                p = p.left;
+            }
         } else if (key.compareTo(p.key) > 0) {
             p.right = remove(key, p.right);
         } else {
@@ -145,20 +149,32 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return p;
     }
 
-    private Node addNode(Node p, Node to) {
-        if (p == null) {
-            return to;
-        }
-        if (to == null) {
-            return p;
-        } else if (p.key.compareTo(to.key) > 0) {
-            to.right = addNode(p, to.right);
+    /**
+     * Remove the left-most node of p;
+     * if that node has a child (to its right), replace it with that child;
+     */
+    private Node removeLeftMost(Node p) {
+        if (p.left == null) {
+            if (p.right == null) {
+                return null;
+            } else {
+                return p.right;
+            }
         } else {
-            to.left = addNode(p, to.left);
+            p.left = removeLeftMost(p.left);
         }
-        return to;
+        return p;
     }
-
+    /**
+     * Find the left-most node of p;
+     */
+    private Node leftMost(Node p) {
+        if (p == null || p.left == null) {
+            return p;
+        } else {
+            return leftMost(p.left);
+        }
+    }
     /** Removes the key-value entry for the specified key only if it is
      *  currently mapped to the specified value.  Returns the VALUE removed,
      *  null on failed removal.

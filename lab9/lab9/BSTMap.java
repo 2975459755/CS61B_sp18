@@ -1,5 +1,6 @@
 package lab9;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -99,7 +100,18 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     /* Returns a Set view of the keys contained in this map. */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> s = new HashSet<>();
+        keySet(s, root);
+        return s;
+    }
+
+    private void keySet(Set<K> s, Node p) {
+        if (p == null) {
+            return ;
+        }
+        s.add(p.key);
+        keySet(s, p.left);
+        keySet(s, p.right);
     }
 
     /** Removes KEY from the tree if present
@@ -108,7 +120,36 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        V val = get(key);
+        root = remove(key, root);
+        return val;
+    }
+
+    private Node remove(K key, Node p) {
+        if (p == null) {
+            return null;
+        } else if (key.equals(p.key)) {
+            Node right = p.right;
+            p = p.left;
+            size --;
+            root = addNode(right, root);
+        } else if (key.compareTo(p.key) > 0) {
+            p.right = remove(key, p.right);
+        } else {
+            p.left = remove(key, p.left);
+        }
+        return p;
+    }
+
+    private Node addNode(Node p, Node to) {
+        if (to == null) {
+            return p;
+        } else if (p.key.compareTo(to.key) > 0) {
+            to.right = addNode(p, to.right);
+        } else {
+            to.left = addNode(p, to.left);
+        }
+        return to;
     }
 
     /** Removes the key-value entry for the specified key only if it is
@@ -117,7 +158,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      **/
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        V val = get(key);
+        if (val != value) {
+            return null;
+        }
+        root = remove(key, root);
+        return val;
     }
 
     @Override

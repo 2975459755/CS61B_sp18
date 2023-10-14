@@ -121,6 +121,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public V remove(K key) {
         V val = get(key);
+        if (val != null) {
+            size --;
+        }
         root = remove(key, root);
         return val;
     }
@@ -129,9 +132,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (p == null) {
             return null;
         } else if (key.equals(p.key)) {
+            /* Set the deleted node to its left node,
+            and put its right node into the tree */
             Node right = p.right;
             p = p.left;
-            size --;
             root = addNode(right, root);
         } else if (key.compareTo(p.key) > 0) {
             p.right = remove(key, p.right);
@@ -142,6 +146,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     private Node addNode(Node p, Node to) {
+        if (p == null) {
+            return to;
+        }
         if (to == null) {
             return p;
         } else if (p.key.compareTo(to.key) > 0) {
@@ -162,6 +169,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (val != value) {
             return null;
         }
+        size --;
         root = remove(key, root);
         return val;
     }

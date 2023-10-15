@@ -13,8 +13,13 @@ public class ComplexOomage implements Oomage {
     public int hashCode() {
         int total = 0;
         for (int x : params) {
-            total = total * 256;
-            total = total + x;
+            /*
+            So that (0 + 2) = 2 won't collide with ((255 + 2) // 2) * 2 = 256,
+            because (0 + 2) * ((255 + 2) / 2 + 1) = 2 * 129 = 258;
+            And params of higher digits will affect the smallest digit (in binary form);
+             */
+            total = total * ((255 + 2) / 2 + 1);
+            total = total + x + 2;
         }
         return total;
     }

@@ -221,6 +221,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
                 break;
             }
         }
+        // Maintain the structure after changing the priority of one node;
         swim(i);
         sink(i);
     }

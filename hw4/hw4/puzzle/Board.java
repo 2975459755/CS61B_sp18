@@ -148,6 +148,7 @@ public class Board implements WorldState {
         return i >= 0 && i < length && j >= 0 && j < length;
     }
 
+    @Override
     public boolean equals(Object y) {
         if (!(y instanceof Board)) {
             return false;
@@ -164,6 +165,11 @@ public class Board implements WorldState {
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     /** Returns the string representation of the board. 

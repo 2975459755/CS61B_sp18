@@ -7,6 +7,7 @@ public class Board implements WorldState {
     private int length;
     private int[][] tiles;
     private static final int BLANK = 0;
+    private int zero; // the position of zero;
 
     public Board(int[][] tiles) {
         length = 0;
@@ -14,9 +15,13 @@ public class Board implements WorldState {
             length ++;
         }
         this.tiles = new int[length][length];
+        zero = -1;
         for (int i = 0; i < length; i ++) {
             for (int j = 0; j < length; j ++) {
                 this.tiles[i][j] = tiles[i][j];
+                if (zero == -1 && tiles[i][j] == BLANK) {
+                    zero = numOfIndex(i, j);
+                }
             }
         }
     }
@@ -26,42 +31,64 @@ public class Board implements WorldState {
         return manhattan();
     }
 
-    /**
-     * Source: <a href="http://joshh.ug/neighbors.html"> click here </a>;
-     */
     @Override
     public Iterable<WorldState> neighbors() {
         Queue<WorldState> neighbors = new Queue<>();
-        int hug = size();
-        int bug = -1;
-        int zug = -1;
-        for (int rug = 0; rug < hug; rug++) {
-            for (int tug = 0; tug < hug; tug++) {
-                if (tileAt(rug, tug) == BLANK) {
-                    bug = rug;
-                    zug = tug;
-                }
+        // where 0 is located:
+        int i = iIndex(zero);
+        int j = jIndex(zero);
+
+        // make a copy:
+        int[][] newState = new int[length][length];
+        for (int x = 0; x < length; x ++) {
+            for (int y = 0; y < length; y ++) {
+                newState[x][y] = tiles[x][y];
             }
         }
-        int[][] ili1li1 = new int[hug][hug];
-        for (int pug = 0; pug < hug; pug++) {
-            for (int yug = 0; yug < hug; yug++) {
-                ili1li1[pug][yug] = tileAt(pug, yug);
-            }
+
+        if (j > 0) {    // left;
+            j --;
+            neighbors.enqueue(new Board(swap(i, j, newState)));
+            swapBack(i, j, newState);
+            j ++;
         }
-        for (int l11il = 0; l11il < hug; l11il++) {
-            for (int lil1il1 = 0; lil1il1 < hug; lil1il1++) {
-                if (Math.abs(-bug + l11il) + Math.abs(lil1il1 - zug) - 1 == 0) {
-                    ili1li1[bug][zug] = ili1li1[l11il][lil1il1];
-                    ili1li1[l11il][lil1il1] = BLANK;
-                    Board neighbor = new Board(ili1li1);
-                    neighbors.enqueue(neighbor);
-                    ili1li1[l11il][lil1il1] = ili1li1[bug][zug];
-                    ili1li1[bug][zug] = BLANK;
-                }
-            }
+        if (j < length - 1) {   // right;
+            j ++;
+            neighbors.enqueue(new Board(swap(i, j, newState)));
+            swapBack(i, j, newState);
+            j --;
+        }
+        if (i > 0) { // up;
+            i --;
+            neighbors.enqueue(new Board(swap(i, j, newState)));
+            swapBack(i, j, newState);
+            i ++;
+        }
+        if (i < length - 1) { // down
+            i ++;
+            neighbors.enqueue(new Board(swap(i, j, newState)));
+            swapBack(i, j, newState);
+            i --;
         }
         return neighbors;
+    }
+
+    /**
+     * Swap the tile (i, j) with the zero,
+     * return that array;
+     */
+    private int[][] swap(int ii, int jj, int[][] newState) {
+        newState[iIndex(zero)][jIndex(zero)] = newState[ii][jj];
+        newState[ii][jj] = BLANK;
+        return newState;
+    }
+
+    /**
+     * Swap back;
+     */
+    private void swapBack(int ii, int jj, int[][] newState) {
+        newState[ii][jj] = tileAt(ii, jj);
+        newState[iIndex(zero)][jIndex(zero)] = BLANK;
     }
 
     public int tileAt(int i, int j) {

@@ -3,7 +3,7 @@ package hw4.puzzle;
 import edu.princeton.cs.algs4.MinPQ;
 
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.HashSet;
 
 public class Solver {
     private class SearchNode implements Comparable<SearchNode>{
@@ -30,30 +30,34 @@ public class Solver {
 
     private MinPQ<SearchNode> queue;
     private ArrayList<WorldState> soln;
-    private int enqueued;
+    private HashSet<WorldState> calculatedStates;
 
     public Solver(WorldState initial) {
         soln = new ArrayList<>();
         queue = new MinPQ<> ();
         queue.insert(new SearchNode(initial, null));
-        enqueued = 1; // TODO
+
+        calculatedStates = new HashSet<> ();
         solve();
     }
 
     private void solve() {
         SearchNode node = queue.delMin();
-        if (node.ws.isGoal()) {
-            solved(node);
-            return;
-        }
-        for (WorldState next: node.ws.neighbors()) {
-            if (node.prev != null && next.equals(node.prev.ws)) {
-                continue;
+        // Don't use recursion, or this may run into StackOverFlow Error;
+        while(calculatedStates.contains(node.ws) || !node.ws.isGoal()) {
+
+            calculatedStates.add(node.ws);
+            for (WorldState next: node.ws.neighbors()) {
+                if (node.prev != null && next.equals(node.prev.ws)) {
+                    continue;
+                }
+                queue.insert(new SearchNode(next, node));
             }
-            queue.insert(new SearchNode(next, node));
-            enqueued ++; // TODO
+            node = queue.delMin();
+
         }
-        solve();
+
+        solved(node);
     }
 
     private void solved(SearchNode node) {
@@ -62,10 +66,6 @@ public class Solver {
             node = node.prev;
         }
         soln.add(0, node.ws);
-    }
-
-    public int totalEnqueued() {
-        return enqueued;
     }
 
     public int moves() {

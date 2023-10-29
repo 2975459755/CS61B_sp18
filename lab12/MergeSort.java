@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.Stack;
 
 public class MergeSort {
     /**
@@ -36,8 +37,7 @@ public class MergeSort {
             makeSingleItemQueues(Queue<Item> items) {
         // Your code here!
         Queue<Queue<Item>> res = new Queue<>();
-        while (!items.isEmpty()) {
-            Item i = items.dequeue();
+        for (Item i: items) {
             Queue<Item> subQueue = new Queue<> ();
             subQueue.enqueue(i);
             res.enqueue(subQueue);
@@ -89,18 +89,19 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        int n = items.size();
-        if (n <= 1) {
+        if (items.size() <= 1) {
             return items;
         }
-        Queue<Item> half = new Queue<> ();
-        for (int i = 0; i < n / 2; i ++) {
-            half.enqueue(items.dequeue());
+        Queue<Queue<Item>> res = makeSingleItemQueues(items);
+        Stack<Queue<Item>> stack = new Stack<> ();
+
+        while (res.size() > 1) {
+            while (res.size() > 1)      stack.push(mergeSortedQueues(res.dequeue(), res.dequeue()));
+            if (!res.isEmpty())         stack.push(res.dequeue());
+            while (!stack.isEmpty())    res.enqueue(stack.pop());
         }
-        half = mergeSort(half);
-        items = mergeSort(items);
-        items = mergeSortedQueues(half, items);
-        return items;
+
+        return res.dequeue();
     }
     public static void main(String[] args) {
         Queue<String> q1 = new Queue<> ();
@@ -111,5 +112,6 @@ public class MergeSort {
 
         Queue res = mergeSort(q1);
         System.out.println(res);
+        System.out.println(q1);
     }
 }

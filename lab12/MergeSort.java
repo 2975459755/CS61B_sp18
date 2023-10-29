@@ -90,7 +90,7 @@ public class MergeSort {
             Queue<Item> items) {
         // Your code here!
         int n = items.size();
-        if (n == 1) {
+        if (n <= 1) {
             return items;
         }
         Queue<Item> half = new Queue<> ();

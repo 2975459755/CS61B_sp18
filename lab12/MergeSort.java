@@ -89,19 +89,33 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        if (items.size() <= 1) {
-            return items;
-        }
+        /* Recursion: */
+        if (items.size() <= 1) return items;
+
+        Queue<Queue<Item>> res = makeSingleItemQueues(items);
+        helper(res);
+        return res.dequeue();
+
+        /*
+        'Implicit recursion' (i.e. Stack) without use of helper function:
+
+        if (items.size() <= 1) return items;
         Queue<Queue<Item>> res = makeSingleItemQueues(items);
         Stack<Queue<Item>> stack = new Stack<> ();
-
         while (res.size() > 1) {
             while (res.size() > 1)      stack.push(mergeSortedQueues(res.dequeue(), res.dequeue()));
             if (!res.isEmpty())         stack.push(res.dequeue());
             while (!stack.isEmpty())    res.enqueue(stack.pop());
         }
+        return res.dequeue();   */
+    }
 
-        return res.dequeue();
+    private static <Item extends Comparable> void helper(Queue<Queue<Item>> queues) {
+        if (queues.size() <= 1) return;
+        Queue<Item> merged = mergeSortedQueues(queues.dequeue(), queues.dequeue());
+        helper(queues); // after merging, each queue inside grows from size m -> 2m;
+        queues.enqueue(merged); // total number of queues shrink from n -> n/2;
+        helper(queues); // all over again;
     }
     public static void main(String[] args) {
         Queue<String> q1 = new Queue<> ();
@@ -109,6 +123,9 @@ public class MergeSort {
         q1.enqueue("a");
         q1.enqueue("c");
         q1.enqueue("b");
+        q1.enqueue("a");
+        q1.enqueue("z");
+        q1.enqueue("f");
 
         Queue res = mergeSort(q1);
         System.out.println(res);

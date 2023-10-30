@@ -89,16 +89,16 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        /* Recursion:
+        /* Recursion: */
         if (items.size() <= 1) return items;
 
         Queue<Queue<Item>> res = makeSingleItemQueues(items);
         helper(res);
-        return res.dequeue();*/
+        return res.dequeue();
 
         /*
         'Implicit recursion' (i.e. Stack) without use of helper function:
-*/
+
         if (items.size() <= 1) return items;
         Queue<Queue<Item>> res = makeSingleItemQueues(items);
         Stack<Queue<Item>> stack = new Stack<> ();
@@ -107,7 +107,7 @@ public class MergeSort {
             if (!res.isEmpty())         stack.push(res.dequeue());
             while (!stack.isEmpty())    res.enqueue(stack.pop());
         }
-        return res.dequeue();
+        return res.dequeue(); */
     }
 
     private static <Item extends Comparable> void helper(Queue<Queue<Item>> queues) {

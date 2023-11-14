@@ -1,7 +1,7 @@
 import edu.princeton.cs.algs4.MinPQ;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -32,9 +32,8 @@ public class RadixSort {
         // sort;
         String[] sorted = new String[asciis.length]; // non-destructive;
         System.arraycopy(asciis, 0, sorted, 0, asciis.length);
-        for (int i = 1; i <= numDigits; i ++) { // starts from 1;
-            sortHelperLSD(sorted, i);
-        }
+//        for (int i = 1; i <= numDigits; i ++) sortHelperLSD(sorted, i); // LSD;
+        sortHelperMSD(sorted, 0, sorted.length - 1, numDigits); // MSD;
         return sorted;
     }
 
@@ -46,37 +45,54 @@ public class RadixSort {
      */
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
+        sortHelper(asciis, 0, asciis.length - 1, index);
+    }
 
+    /**
+     * Used for both LSD and MSD;
+     * It's destructive;
+     * Uses a _priority queue_ instead of a sized 256 array,
+     *  so that it easily handles more than just ASCII characters;
+     */
+    private static ArrayDeque<Integer> sortHelper(String[] asciis, int start, int end, int index) {
         // Create the Nodes;
         HashMap<Character, Node> map = new HashMap<> ();
-        for (String s: asciis) {
+        for (int i = start; i <= end; i ++) {
+            String s = asciis[i];
             char digit = digitAt(s, index);
             if (map.containsKey(digit)) {
-                map.get(digit).strings.add(s);
+                map.get(digit).add(s); // counting is carried out implicitly;
             } else {
                 Node n = new Node(digit, s);
                 map.put(digit, n);
             }
         }
 
-        // Insert Nodes into PQ;
+        /* Insert Nodes into PQ;
+           This has to be done AFTER finishing creation of the Nodes,
+               because in a PQ you can't access inserted items; */
         MinPQ<Node> pq = new MinPQ<> ();
-        for (char digit: map.keySet()) {
+        for (char digit: map.keySet()) { // iteration of HashMap;
             pq.insert(map.get(digit));
         }
 
-        int i = 0;
+        int i = start;
+        ArrayDeque<Integer> lengths = new ArrayDeque<> (); // this is for MSD;
         while (!pq.isEmpty()) {
             Node n = pq.delMin();
-            for (String s: n.strings) {
+            lengths.add(n.size()); // this is for MSD;
+            for (String s: n.strings) { // the reverse counting part;
                 asciis[i] = s;
                 i ++;
             }
         }
+        return lengths; // this is for MSD;
     }
 
     /**
-     * Since PriorityQueue is not stable, I made this instead;
+     * Since PriorityQueue is not stable,
+     *  you can't simply put the strings into a PQ (use a special comparator, of course);
+     * So I made this instead;
      */
     private static class Node implements Comparable<Node> {
         public char label;
@@ -93,8 +109,18 @@ public class RadixSort {
         public int compareTo(Node o) {
             return label - o.label;
         }
+        public void add(String s) {
+            strings.add(s);
+        }
+        public int size() {
+            return strings.size();
+        }
     }
 
+    /**
+     * index == 1 -> last digit;
+     * index == s.length() -> first digit;
+     */
     private static char digitAt(String s, int index) {
         if (s.length() < index) {
             return 0;
@@ -114,7 +140,14 @@ public class RadixSort {
      **/
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
         // Optional MSD helper method for optional MSD radix sort
-        return;
+        if (start >= end || index < 1) return;
+
+        ArrayDeque<Integer> lengths = sortHelper(asciis, start, end, index);
+        while (!lengths.isEmpty()) {
+            int l = lengths.removeFirst();
+            sortHelperMSD(asciis, start, start + l - 1, index - 1);
+            start += l;
+        }
     }
 
     public static void main(String[] args) {

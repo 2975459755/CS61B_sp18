@@ -32,8 +32,8 @@ public class RadixSort {
         // sort;
         String[] sorted = new String[asciis.length]; // non-destructive;
         System.arraycopy(asciis, 0, sorted, 0, asciis.length);
-//        for (int i = 1; i <= numDigits; i ++) sortHelperLSD(sorted, i); // LSD;
-        sortHelperMSD(sorted, 0, sorted.length - 1, numDigits); // MSD;
+//        for (int i = numDigits - 1; i >= 0; i --) sortHelperLSD(sorted, i); // LSD;
+        sortHelperMSD(sorted, 0, sorted.length - 1, 0, numDigits); // MSD;
         return sorted;
     }
 
@@ -91,7 +91,7 @@ public class RadixSort {
 
     /**
      * Since PriorityQueue is not stable,
-     *  you can't simply put the strings into a PQ (use a special comparator, of course);
+     *  you can't simply put the strings into a PQ (using a special comparator, of course);
      * So I made this instead;
      */
     private static class Node implements Comparable<Node> {
@@ -118,14 +118,14 @@ public class RadixSort {
     }
 
     /**
-     * index == 1 -> last digit;
-     * index == s.length() -> first digit;
+     * index == 0 -> (from left) first digit;
+     * index == s.length() - 1 -> (from left) last digit;
      */
     private static char digitAt(String s, int index) {
-        if (s.length() < index) {
+        if (index > s.length() - 1) {
             return 0;
         }
-        return s.charAt(s.length() - index);
+        return s.charAt(index);
     }
 
     /**
@@ -138,20 +138,20 @@ public class RadixSort {
      * @param index the index of the character the method is currently sorting on
      *
      **/
-    private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
+    private static void sortHelperMSD(String[] asciis, int start, int end, int index, int numDigits) {
         // Optional MSD helper method for optional MSD radix sort
-        if (start >= end || index < 1) return;
+        if (start >= end || index >= numDigits - 1) return;
 
         ArrayDeque<Integer> lengths = sortHelper(asciis, start, end, index);
         while (!lengths.isEmpty()) {
             int l = lengths.removeFirst();
-            sortHelperMSD(asciis, start, start + l - 1, index - 1);
+            sortHelperMSD(asciis, start, start + l - 1, index + 1, numDigits);
             start += l;
         }
     }
 
     public static void main(String[] args) {
-        String[] arr = {"ccc", "aaa", "bbb", "ab","abc", "cba",  "bc"};
+        String[] arr = {"cccac", "cccac", "bbbgn", "ab", "abcd", "cba", "bc"};
         String[] sorted = sort(arr);
         for (String s: sorted) {
             System.out.println(s);

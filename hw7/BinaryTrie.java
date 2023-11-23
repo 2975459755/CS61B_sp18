@@ -1,28 +1,27 @@
 import edu.princeton.cs.algs4.MinPQ;
 
 import java.io.Serializable;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BinaryTrie implements Serializable {
-    Node root;
-    Map<Character, BitSequence> lookUpTable;
-    private class Node implements Comparable<Node> {
-        boolean isEnd;
+    private static Node root;
+    private Map<Character, BitSequence> lookUpTable;
+    private static final String LEFT = "0", RIGHT = "1";
+
+    private static class Node implements Comparable<Node> {
         Node parent = null, left = null, right = null;
         int frequency;
-        char symbol;
-        String edgeTo;
+        char symbol; // only leaf nodes have symbol;
+        String edgeTo; // "l" or "r";
         Node(Node l, Node r) {
             left = l;
             right = r;
 
             l.parent = this;
-            l.edgeTo = "l";
+            l.edgeTo = LEFT;
             r.parent = this;
-            r.edgeTo = "r";
-            isEnd = false;
+            r.edgeTo = RIGHT;
             edgeTo = "";
             frequency = l.frequency + r.frequency;
         }
@@ -30,19 +29,28 @@ public class BinaryTrie implements Serializable {
             symbol = c;
             frequency = f;
 
-            isEnd = true;
             edgeTo = "";
+        }
+        boolean isLeaf() {
+            return left == null && right == null;
+        }
+        boolean isRoot() {
+            return parent == null;
         }
         Node search(int bit) {
             assert bit == 0 || bit == 1;
             return bit == 0 ? left : right;
         }
-        String getSequence() {
-            if (parent != null) {
-                return parent.getSequence() + edgeTo;
-            } else {
+
+        /**
+         * The path consisting of left/right directions
+         *  to traverse from root to this;
+         */
+        String getPath() {
+            if (!isRoot())
+                return parent.getPath() + edgeTo;
+            else
                 return edgeTo;
-            }
         }
         @Override
         public int compareTo(Node o) {
@@ -66,16 +74,15 @@ public class BinaryTrie implements Serializable {
         lookUpTable = null;
     }
     public Match longestPrefixMatch(BitSequence querySequence) {
-        BitSequence bs = new BitSequence();
         Node node = root;
         for (int i = 0; i < querySequence.length(); i ++) {
             int bit = querySequence.bitAt(i);
-            bs = bs.appended(bit);
             node = node.search(bit);
 
-            if (node.isEnd) break;
+            if (node.isLeaf()) break;
         }
-        return new Match(bs, node.symbol);
+        return new Match(new BitSequence(node.getPath()),
+                        node.symbol);
     }
     public Map<Character, BitSequence> buildLookupTable() {
         if (lookUpTable == null) {
@@ -86,13 +93,13 @@ public class BinaryTrie implements Serializable {
     }
 
     /**
-     * Traverse through the trie to the leaves;
+     * Traverse through the trie til the leaves;
      */
     private void buildTableHelper(Node n) {
         if (n == null) return;
-        if (n.isEnd) {
+        if (n.isLeaf()) {
             lookUpTable.put(n.symbol,
-                    strToBS(n.getSequence()));
+                    new BitSequence(n.getPath()));
         } else {
           buildTableHelper(n.left);
           buildTableHelper(n.right);
@@ -103,6 +110,7 @@ public class BinaryTrie implements Serializable {
      * Convert an 'edgeTo' sequence to BitSequence;
      * e.g. "lrlrr" -> 01011;
      */
+    @Deprecated
     private static BitSequence strToBS(String seq) {
         BitSequence bs = new BitSequence();
         for (int i = 0; i < seq.length(); i ++) {

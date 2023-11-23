@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BinaryTrie implements Serializable {
-    private static Node root;
+    private Node root;
     private Map<Character, BitSequence> lookUpTable;
-    private static final String LEFT = "0", RIGHT = "1";
+    private final String LEFT = "0", RIGHT = "1";
 
-    private static class Node implements Comparable<Node> {
+    private class Node implements Comparable<Node>, Serializable {
         Node parent = null, left = null, right = null;
         int frequency;
         char symbol; // only leaf nodes have symbol;

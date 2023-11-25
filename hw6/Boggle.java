@@ -9,7 +9,6 @@ public class Boggle {
     static String dictPath = "words.txt";
 
     private static int n, m;
-    private static boolean solved = false;
     /**
      * Solves a Boggle puzzle.
      * 
@@ -32,11 +31,13 @@ public class Boggle {
         m = table.size(); // # rows
         // Find solution;
         MinPQ<String> sol = findSol(allWords, table);
-        HashSet<String> ret = new HashSet<>();
+        List<String> ret = new ArrayList<>();
         while (ret.size() < k) {
+            String s = sol.delMin();
+            if (ret.contains(s)) continue;
             ret.add(sol.delMin());
         }
-        return new ArrayList<>(ret);
+        return ret;
     }
     private static MinPQ<String> findSol(Trie t, List<ArrayList<CH>> table) {
         MinPQ<String> sol = new MinPQ<>(new StrCmp());

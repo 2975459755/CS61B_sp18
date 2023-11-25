@@ -32,7 +32,7 @@ public class Boggle {
         // Find solution;
         MinPQ<String> sol = findSol(allWords, table);
         List<String> ret = new ArrayList<>();
-        while (ret.size() < k) {
+        while (ret.size() < k && !sol.isEmpty()) {
             String s = sol.delMin();
             if (ret.contains(s)) continue;
             ret.add(s);

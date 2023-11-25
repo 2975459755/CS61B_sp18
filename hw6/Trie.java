@@ -5,13 +5,6 @@ public class Trie {
         Map<Character, Node> children;
         char value;
         boolean isEnd;
-        Node(Node parent, char val, boolean end) {
-            parent.children.put(val, this);
-            value = val;
-            isEnd = end;
-
-            children = new HashMap<>();
-        }
         Node(char val, boolean end) {
             value = val;
             isEnd = end;
@@ -39,8 +32,8 @@ public class Trie {
     public Trie(String dictPath) {
         root = new Node();
         In in = new In(dictPath);
-        while (!in.isEmpty()) {
-            put(in.readString());
+        while (in.hasNextLine()) {
+            put(in.readLine());
         }
     }
     public void put(String word) {

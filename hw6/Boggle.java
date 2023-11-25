@@ -35,7 +35,7 @@ public class Boggle {
         while (ret.size() < k) {
             String s = sol.delMin();
             if (ret.contains(s)) continue;
-            ret.add(sol.delMin());
+            ret.add(s);
         }
         return ret;
     }
@@ -43,7 +43,7 @@ public class Boggle {
         MinPQ<String> sol = new MinPQ<>(new StrCmp());
         for (int i = 0; i < m; i ++) {
             for (int j = 0; j < n; j ++) {
-                // For each point, find the solution;
+                // For each point, traverse the table;
                 searchBoggle(sol, t.root, table, i, j, new ArrayList<>());
             }
         }
@@ -61,8 +61,8 @@ public class Boggle {
         Trie.Node thisNode = prevNode.getChild(thisChar);
         if (thisNode == null) return; // no such word;
         if (thisNode.isEnd) { // finds a word;
-            if (copyOfSearched.size() >= 3) { // word should be sized >= 3;
-                sol.insert(toStr(copyOfSearched));
+            if (copyOfSearched.size() >= 3) { // a word should be sized >= 3;
+                sol.insert(toStr(copyOfSearched)); // add the word to solutions;
             }
         }
         searchBoggle(sol, thisNode, table, i - 1, j - 1, copyOfSearched);

@@ -60,7 +60,7 @@ public class Input extends InputSolicitor {
 
         // distribution ends at the first && invalid input,
         // so make sure to clear the rest;
-        clearKeyStack();
+        clearKeyQueue();
 
         return c;
     }
@@ -109,7 +109,7 @@ public class Input extends InputSolicitor {
         }
     }
 
-    protected static void clearKeyStack() {
+    protected static void clearKeyQueue() {
         while (StdDraw.hasNextKeyTyped()) {
             StdDraw.nextKeyTyped();
         }

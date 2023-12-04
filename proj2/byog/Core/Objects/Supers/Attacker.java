@@ -7,6 +7,8 @@ import byog.Core.Objects.Supers.Interfaces.Mortal;
 import byog.Core.Place;
 import byog.TileEngine.TETile;
 
+import static byog.Core.Utils.*;
+
 public abstract class Attacker extends MovingThing implements HasTarget, Mortal, Damager {
     protected int moveInterval = 240;
     protected int moveDistance = 5;
@@ -131,14 +133,14 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
         des.touchedBy(this);
 
         if (isEnemy(des.getPresent())) {
-            return 1; // so that it covers the attacked target for a moment;
+            return Available; // so that it covers the attacked target for a moment;
         }
         if (!des.canEnter()) {
             // hits hard thing, vanishes;
             vanish();
-            return 0;
+            return Unavailable;
         }
-        return 1;
+        return Available;
     }
     @Override
     public void move(int direc) {
@@ -147,7 +149,7 @@ public abstract class Attacker extends MovingThing implements HasTarget, Mortal,
     @Override
     public void move(Place des) {
         int c = goAt(des);
-        if (c == 1) { // destination is available for entering;
+        if (c == Available) { // destination is available for entering;
             enter(des);
         }
     }

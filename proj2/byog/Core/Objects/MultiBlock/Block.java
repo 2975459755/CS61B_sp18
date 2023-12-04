@@ -7,6 +7,8 @@ import byog.Core.Objects.Supers.MovingDamageable;
 import byog.Core.Objects.Supers.Thing;
 import byog.Core.Place;
 
+import static byog.Core.Utils.*;
+
 public abstract class Block extends MovingDamageable implements Damager, HasTarget {
     public MultiBlock mother;
 
@@ -39,9 +41,9 @@ public abstract class Block extends MovingDamageable implements Damager, HasTarg
     public int goAt(Place des) {
         des.touchedBy(this); // TODO
         if (des.canEnter() || mother.blocks.contains(des.getPresent())) {
-            return 1;
+            return Available;
         }
-        return 0;
+        return Unavailable;
     }
     @Override
     public void touchedBy(Thing thing) {

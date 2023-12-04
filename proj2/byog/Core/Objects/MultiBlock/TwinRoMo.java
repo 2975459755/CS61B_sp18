@@ -8,6 +8,7 @@ import byog.Core.Utils;
 import byog.Core.WG;
 
 import java.util.ArrayList;
+import static byog.Core.Utils.*;
 
 public class TwinRoMo extends MultiBlock implements Monster {
     protected static final int moveInterval = 1000;
@@ -129,7 +130,7 @@ public class TwinRoMo extends MultiBlock implements Monster {
 
     @Override
     public int goAt(Place des) {
-        return 0;
+        return Unavailable;
     }
 
     @Override

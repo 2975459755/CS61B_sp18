@@ -10,6 +10,8 @@ import byog.Core.Place;
 import byog.Core.Utils;
 import byog.Core.WG;
 
+import static byog.Core.Utils.*;
+
 public class MobileFlower extends MultiBlock implements Monster {
     protected final int moveInterval = 1200;
     protected final int attackInterval = 1500;
@@ -39,12 +41,12 @@ public class MobileFlower extends MultiBlock implements Monster {
                     BlockFlower f = new BlockFlower(wg, place, this);
                     blocks.add(f);
                     flower = f;
-                    f.setDirection(2);
+                    f.setDirection(Up);
                 }
             }
         }
 
-        this.direction = 2;
+        this.direction = Up;
         addToArrays();
     }
 
@@ -61,7 +63,7 @@ public class MobileFlower extends MultiBlock implements Monster {
     }
     @Override
     public int goAt(Place des) {
-        return 0;
+        return Unavailable;
     }
 
     @Override

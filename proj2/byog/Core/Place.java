@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import static jdk.dynalink.linker.support.Guards.isInstance;
+import static byog.Core.Utils.*;
 
 
 public class Place extends Pos {
+
     public boolean visible;
     protected ArrayList<Thing> layers;
 
@@ -183,14 +185,14 @@ public class Place extends Pos {
         int xC = x;
         int yC = y;
         switch (direct) {
-            case 0: xC ++; break; // right
-            case 1: xC --; break; // left
-            case 2: yC ++; break; // up
-            case 3: yC --; break; // down
-            case 4: xC ++; yC ++; break; // up right
-            case 5: xC --; yC --; break; // down left
-            case 6: xC ++; yC --; break; // down right
-            case 7: xC --; yC ++; break; // up left
+            case Right: xC ++; break; // right
+            case Left: xC --; break; // left
+            case Up: yC ++; break; // up
+            case Down: yC --; break; // down
+            case UpRight: xC ++; yC ++; break; // up right
+            case DownLeft: xC --; yC --; break; // down left
+            case DownRight: xC ++; yC --; break; // down right
+            case UpLeft: xC --; yC ++; break; // up left
         }
 
         if (new Place(xC, yC).inMap()) {

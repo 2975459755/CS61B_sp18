@@ -4,6 +4,8 @@ import byog.Core.Interval;
 import byog.Core.Objects.Supers.Interfaces.Changeable;
 import byog.Core.Place;
 
+import static byog.Core.Utils.*;
+
 public abstract class MovingThing extends RemovableThing implements Changeable {
     protected Interval moveIn;
     protected Interval[] ins;
@@ -12,7 +14,7 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
     public MovingThing() {
         this.moveIn = new Interval (0);
         this.ins = new Interval[] {moveIn};
-        this.direction = 2;
+        this.direction = Up;
     }
     @Override
     public void addToArrays() {
@@ -36,7 +38,7 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
      */
     protected void move(Place des) {
         int c = goAt(des);
-        if (c == 1) { // destination is available for entering;
+        if (c == Available) { // destination is available for entering;
             enter(des);
         }
     }
@@ -52,9 +54,9 @@ public abstract class MovingThing extends RemovableThing implements Changeable {
     public int goAt(Place des) {
         des.touchedBy(this);
         if (des.canEnter()) {
-            return 1;
+            return Available;
         }
-        return 0;
+        return Unavailable;
     }
     @Override
     public <T> void update(T t) {

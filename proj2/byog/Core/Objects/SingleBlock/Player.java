@@ -8,6 +8,8 @@ import byog.Core.WG;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+import static byog.Core.Utils.*;
+
 /*
 When a player dies, and the other is still alive,
 we set ghosted to true, remove from its place;
@@ -133,7 +135,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         this.interactIn = new Interval(0);
         this.damaged = new Interval(0);
         this.ins = new Interval[] {moveIn, attackIn, interactIn, damaged};
-        this.direction = 0;
+        this.direction = Right;
 
         place.addNew(this);
         addToArrays();
@@ -245,30 +247,30 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         switch (command) {
 
             // four-direction movements
-            case "d", "right", "h" -> {direction = 0; move(direction);}
-            case "a", "left", "f" -> {direction = 1; move(direction);}
-            case "w", "up", "t" -> {direction = 2; move(direction);}
-            case "s", "down", "g" -> {direction = 3; move(direction);}
+            case "d", "right", "h" -> {direction = Right; move(direction);}
+            case "a", "left", "f" -> {direction = Left; move(direction);}
+            case "w", "up", "t" -> {direction = Up; move(direction);}
+            case "s", "down", "g" -> {direction = Down; move(direction);}
 
             // eight-direction movements
-            case "up-right" -> move(4);
-            case "down-right" -> move(5);
-            case "down-left" -> move(6);
-            case "up-left" -> move(7);
+            case "up-right" -> move(UpRight);
+            case "down-right" -> move(DownRight);
+            case "down-left" -> move(DownLeft);
+            case "up-left" -> move(UpLeft);
 
             // interact
             case "k", "'" -> interact(direction);
-            case "dk", "kd", "h'", "'h" -> {direction = 0; interact(direction);}
-            case "ak", "ka", "f'", "'f" -> {direction = 1; interact(direction);}
-            case "wk", "kw", "t'", "'t" -> {direction = 2; interact(direction);}
-            case "sk", "ks", "g'", "'g" -> {direction = 3; interact(direction);}
+            case "dk", "kd", "h'", "'h" -> {direction = Right; interact(direction);}
+            case "ak", "ka", "f'", "'f" -> {direction = Left; interact(direction);}
+            case "wk", "kw", "t'", "'t" -> {direction = Up; interact(direction);}
+            case "sk", "ks", "g'", "'g" -> {direction = Down; interact(direction);}
 
             // attack
             case "j", ";" -> attack(direction);
-            case "dj", "jd", "h;", ";h" -> {direction = 0; attack(direction);}
-            case "aj", "ja", "f;", ";f" -> {direction = 1; attack(direction);}
-            case "wj", "jw", "t;", ";t" -> {direction = 2; attack(direction);}
-            case "sj", "js", "g;", ";g" -> {direction = 3; attack(direction);}
+            case "dj", "jd", "h;", ";h" -> {direction = Right; attack(direction);}
+            case "aj", "ja", "f;", ";f" -> {direction = Left; attack(direction);}
+            case "wj", "jw", "t;", ";t" -> {direction = Up; attack(direction);}
+            case "sj", "js", "g;", ";g" -> {direction = Down; attack(direction);}
         }
 
     }
@@ -280,9 +282,9 @@ public class Player extends MovingDamageable implements Ally, Shooter {
             if (des.collectable()) {
                 des.collect(this);
             }
-            return 1;
+            return Available;
         }
-        return 0;
+        return Unavailable;
     }
 
     @Override
@@ -301,7 +303,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         }
 
         int c = goAt(des);
-        if (c == 1) { // destination is available for entering;
+        if (c == Available) { // destination is available for entering;
             enter(des);
         }
 

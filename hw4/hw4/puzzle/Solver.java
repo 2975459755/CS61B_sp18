@@ -54,7 +54,6 @@ public class Solver {
                 queue.insert(new SearchNode(next, node));
             }
             node = queue.delMin();
-
         }
 
         solved(node);

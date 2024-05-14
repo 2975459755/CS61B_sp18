@@ -66,7 +66,7 @@ public class Place extends Pos {
         layers.remove(thing);
     }
 
-    TETile getVisible() {
+    public TETile getVisible() {
         if (visible) {
             return getPresent().avatar(); // get the top of layers, return the avatar;
         }
@@ -80,7 +80,7 @@ public class Place extends Pos {
      * Collect all collectables from top to bottom, until the first un-collectable;
      * Use after collectable();
      */
-    public void collect(Thing thing) {
+    public void collectBy(Thing thing) {
         while (layers.size() > 1) {
             if (getPresent() instanceof Collectable c) {
                 c.collectedBy(thing);
@@ -130,7 +130,7 @@ public class Place extends Pos {
         for (int i = x - radius; i <= x + radius; i ++) {
             for (int j = y - radius; j <= y + radius; j ++) {
 
-                if (new Place(i, j).inMap()) {
+                if (new Pos(i, j).inMap()) {
                     WG.places[i][j].visible = true;
                 }
 

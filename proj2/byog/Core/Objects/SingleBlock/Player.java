@@ -280,7 +280,7 @@ public class Player extends MovingDamageable implements Ally, Shooter {
         des.touchedBy(this);
         if (des.canEnter()) {
             if (des.collectable()) {
-                des.collect(this);
+                des.collectBy(this);
             }
             return Available;
         }

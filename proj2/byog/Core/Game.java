@@ -17,7 +17,6 @@ public class Game {
 
     WG wg = null;
     Input inputParser;
-    boolean cheatMode = false;
     Interval frameIn;
     public static final int frameInterval = 50; // AT LEAST 1000/50 = 20 frames per sec;
 
@@ -75,15 +74,12 @@ public class Game {
             if (input != 0) {
                 // something happened
                 f = true;
-                if (input > 10) {
-                    // cheat mode;
-                    cheat();
-                } else if (input < 0) {
-                    // quit and save;
+                if (input > 10) { // cheat mode;
+                    wg.cheat();
+                } else if (input < 0) { // quit and save;
                     save();
-                } else {
-                    // player made a usual action;
-                    cheatMode = false;
+                } else { // player made an usual action;
+
                 }
             }
 
@@ -100,9 +96,6 @@ public class Game {
             get the appearance of the world, and render frame;
              */
             if (f || frameIn.ended()) {
-                if (!cheatMode) {
-                    wg.luminateAll();
-                }
                 renderer.renderFrame(wg.getVisible());
                 frameIn.renew(frameInterval);
             } else {
@@ -114,15 +107,6 @@ public class Game {
              */
             wg.update();
         }
-    }
-    void cheat() {
-        for (int x = 0; x < wg.WIDTH; x ++) {
-            for (int y = 0; y < wg.HEIGHT; y ++) {
-                WG.places[x][y].visible = true;
-            }
-        }
-        wg.updateVisible();
-        cheatMode = true;
     }
 
     /**
@@ -154,7 +138,7 @@ public class Game {
         } else {
             throw new RuntimeException("Type 'N' or 'L' to start !");
         }
-        world.updateVisible();
+        //world.updateVisible();
         finalWorldFrame = world.getVisible();
         return finalWorldFrame;
     }

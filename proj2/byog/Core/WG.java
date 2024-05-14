@@ -20,6 +20,7 @@ import java.util.*;
  */
 public class WG extends Generator {
 
+    private boolean cheatMode = false;
     void randomWorld() {
         randomWorld(true);
     }
@@ -71,7 +72,7 @@ public class WG extends Generator {
 
         replaceAll(new Nothing(), new Nothing());
 
-        luminateAll();
+        // luminateAll();
     }
     public WG(long seed, int players) {
         rand = new Random(seed);
@@ -86,7 +87,7 @@ public class WG extends Generator {
         randomWorld();
     }
 
-    void save() {
+    public void save() {
         placesForSave = places;
 
         WIDTH_FOR_SAVE = WIDTH;
@@ -94,7 +95,7 @@ public class WG extends Generator {
         startWIDTH_FOR_SAVE = startWIDTH;
         startHEIGHT_FOR_SAVE = startHEIGHT;
     }
-    void load() {
+    public void load() {
         places = placesForSave;
 
         WIDTH = WIDTH_FOR_SAVE;
@@ -103,7 +104,21 @@ public class WG extends Generator {
         startHEIGHT = startHEIGHT_FOR_SAVE;
     }
 
-    TETile[][] getVisible() {
+    public void cheat() {
+        cheatMode = !cheatMode;
+
+        if (cheatMode) {
+            for (int x = startWIDTH; x < WIDTH; x ++) {
+                for (int y = startHEIGHT; y < HEIGHT; y ++) {
+                    WG.places[x][y].visible = true;
+                }
+            }
+        }
+    }
+
+    public TETile[][] getVisible() {
+        if (!cheatMode) luminateAll();
+        updateVisible();
         return visibleWorld;
     }
 
@@ -111,7 +126,7 @@ public class WG extends Generator {
      * Given that visible is properly updated,
      * update visible world in accordance to that;
      */
-    void updateVisible() {
+    private void updateVisible() {
         visibleWorld = new TETile[WIDTH][HEIGHT];
         for (int i = 0; i < WIDTH; i ++) {
             for (int j = 0; j < HEIGHT; j++) {
@@ -126,7 +141,7 @@ public class WG extends Generator {
      * Iterate through all luminators in the world,
      * and luminate;
      */
-    void luminateAll() {
+    private void luminateAll() {
         for (int i = 0; i < WIDTH; i ++) {
             for (int j = 0; j < HEIGHT; j++) { // reset visible to all false;
 
@@ -140,7 +155,7 @@ public class WG extends Generator {
             t.getPlace().luminate();
         }
 
-        updateVisible();
+        // updateVisible();
     }
 
     /**
@@ -351,8 +366,7 @@ class Generator extends World {
      */
     public Door door;
     public Key key;
-    public Player p1;
-    public Player p2;
+    public Player p1, p2;
     public int numPlayers;
     public ArrayList <Player> players = new ArrayList <> ();
     public ArrayList <Changeable> keepTrackOf = new ArrayList <> (); // All Changeables;

@@ -66,7 +66,7 @@ public class Input extends InputSolicitor {
     }
 
     protected void distributeKeys() {
-        char key = '>';
+        char key = '>'; // Some dummy key;
         boolean firstKey = true;
         while (true) {
             if (key != '>') {
